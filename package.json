@@ -10,8 +10,13 @@
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.13",
     "@astrojs/mdx": "^4.3.14",
+    "@astrojs/react": "^5.0.0",
     "@keystatic/astro": "^5.0.6",
     "@keystatic/core": "^0.5.48",
-    "astro": "^5.18.1"
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "astro": "^5.18.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   }
 }
