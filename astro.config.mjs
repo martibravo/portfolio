@@ -7,6 +7,7 @@ import react from '@astrojs/react';
 
 export default defineConfig({
   site: 'https://universitat.studio',
+  output: 'server',
   adapter: cloudflare(),
   integrations: [mdx(), keystatic(), react()],
 });
