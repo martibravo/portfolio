@@ -1,4 +1,5 @@
 import { config, collection, fields } from '@keystatic/core';
+import { block, wrapper } from '@keystatic/core/content-components';
 
 const workCollection = (label: string, dirName: string) =>
   collection({
@@ -17,7 +18,60 @@ const workCollection = (label: string, dirName: string) =>
         publicPath: `/images/${dirName}/`,
       }),
       featured: fields.checkbox({ label: 'Featured', defaultValue: false }),
-      content: fields.mdx({ label: 'Content' }),
+      content: fields.mdx({
+        label: 'Content',
+        components: {
+          Figure: block({
+            label: 'Figure',
+            schema: {
+              src: fields.image({
+                label: 'Image',
+                directory: `public/images/${dirName}`,
+                publicPath: `/images/${dirName}/`,
+              }),
+              alt: fields.text({ label: 'Alt text' }),
+              caption: fields.text({ label: 'Caption' }),
+            },
+          }),
+          TwoCol: wrapper({
+            label: 'Two Columns',
+            schema: {},
+          }),
+          ThreeCol: wrapper({
+            label: 'Three Columns',
+            schema: {},
+          }),
+          ImageGrid: block({
+            label: 'Image Grid',
+            schema: {
+              cols: fields.select({
+                label: 'Columns',
+                options: [
+                  { label: '2', value: '2' },
+                  { label: '3', value: '3' },
+                  { label: '4', value: '4' },
+                ],
+                defaultValue: '3',
+              }),
+              images: fields.array(
+                fields.object({
+                  src: fields.image({
+                    label: 'Image',
+                    directory: `public/images/${dirName}`,
+                    publicPath: `/images/${dirName}/`,
+                  }),
+                  alt: fields.text({ label: 'Alt text' }),
+                  caption: fields.text({ label: 'Caption' }),
+                }),
+                {
+                  label: 'Images',
+                  itemLabel: (props) => props.fields.alt.value || 'Image',
+                }
+              ),
+            },
+          }),
+        },
+      }),
     },
   });
 
