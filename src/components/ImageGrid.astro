@@ -1,0 +1,30 @@
+---
+// Flexible image grid — breaks out of the narrow content column.
+// Usage in MDX:
+//   <ImageGrid images={[
+//     { src: '/images/foo.jpg', alt: 'Description' },
+//     { src: '/images/bar.jpg', alt: 'Description', caption: 'optional' },
+//   ]} cols={3} />
+
+interface ImageItem {
+  src:      string;
+  alt:      string;
+  caption?: string;
+}
+
+interface Props {
+  images: ImageItem[];
+  cols?:  2 | 3 | 4;
+}
+
+const { images, cols = 3 } = Astro.props;
+---
+
+<div class="image-grid" data-cols={String(cols)}>
+  {images.map(img => (
+    <figure class="figure" style="margin:0">
+      <img src={img.src} alt={img.alt} loading="lazy" />
+      {img.caption && <figcaption class="figure-caption">{img.caption}</figcaption>}
+    </figure>
+  ))}
+</div>

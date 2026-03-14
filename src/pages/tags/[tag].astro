@@ -1,0 +1,48 @@
+---
+import Base from '../../layouts/Base.astro';
+import WorkCard from '../../components/WorkCard.astro';
+import { getCollection } from 'astro:content';
+import { CATEGORIES } from '../../config';
+import type { CategoryId } from '../../config';
+
+export async function getStaticPaths() {
+  // Collect every entry across all categories
+  const all = (
+    await Promise.all(
+      CATEGORIES.map(async cat => {
+        const entries = await getCollection(cat.id);
+        return entries.map(e => ({ entry: e, categoryId: cat.id as CategoryId }));
+      })
+    )
+  ).flat();
+
+  // Find all unique tags
+  const tagMap = new Map<string, typeof all>();
+  for (const item of all) {
+    for (const tag of item.entry.data.tags) {
+      if (!tagMap.has(tag)) tagMap.set(tag, []);
+      tagMap.get(tag)!.push(item);
+    }
+  }
+
+  return [...tagMap.entries()].map(([tag, items]) => ({
+    params: { tag },
+    props:  { tag, items },
+  }));
+}
+
+const { tag, items } = Astro.props;
+items.sort((a, b) => b.entry.data.date.getTime() - a.entry.data.date.getTime());
+---
+
+<Base title={`[${tag}]`}>
+  <div class="page-heading">
+    <h1>[{tag}]</h1>
+  </div>
+
+  <ul class="work-list">
+    {items.map(({ entry, categoryId }) => (
+      <WorkCard entry={entry} categoryId={categoryId} showCategory={true} />
+    ))}
+  </ul>
+</Base>

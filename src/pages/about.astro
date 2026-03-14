@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../config';
+---
+
+<Base title="About">
+  <div class="page-heading">
+    <h1>About</h1>
+  </div>
+
+  <div class="about-prose prose">
+    <p>
+      Universitat Studio is the creative space of Martí Bravo, based in Barcelona.
+    </p>
+    <p>
+      Work spans graphic design, photography, art, and written content.
+      The studio takes on identity, print, editorial, and digital projects —
+      as well as independent work exhibited and published separately.
+    </p>
+    <p>
+      Currently available for freelance and collaborative projects.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      <a href="mailto:hello@universitat.studio">hello@universitat.studio</a>
+    </p>
+
+    <h2>Elsewhere</h2>
+    <p>
+      <a href={SITE.socials.instagram} target="_blank" rel="noopener">Instagram</a>
+      &ensp;·&ensp;
+      <a href={SITE.socials.twitter}   target="_blank" rel="noopener">Twitter</a>
+      &ensp;·&ensp;
+      <a href={SITE.socials.github}    target="_blank" rel="noopener">GitHub</a>
+      &ensp;·&ensp;
+      <a href={SITE.socials.unsplash}  target="_blank" rel="noopener">Unsplash</a>
+      &ensp;·&ensp;
+      <a href="https://martibravo.substack.com" target="_blank" rel="noopener">Substack</a>
+    </p>
+  </div>
+</Base>

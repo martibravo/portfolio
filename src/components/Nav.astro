@@ -1,0 +1,21 @@
+---
+import { CATEGORIES } from '../config';
+
+const { pathname } = Astro.url;
+---
+
+<nav class="site-nav">
+  {CATEGORIES.map((cat, i) => (
+    <>
+      {i > 0 && <span class="sep">·</span>}
+      <a
+        href={`/${cat.id}/`}
+        class:list={[{ active: pathname === `/${cat.id}/` || pathname.startsWith(`/${cat.id}/`) }]}
+      >
+        {cat.label}
+      </a>
+    </>
+  ))}
+  <span class="sep">·</span>
+  <a href="/about/" class:list={[{ active: pathname === '/about/' }]}>About</a>
+</nav>

@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import WorkCard from '../../components/WorkCard.astro';
+import { getCollection } from 'astro:content';
+import { CATEGORIES } from '../../config';
+import type { CategoryId } from '../../config';
+
+export async function getStaticPaths() {
+  return CATEGORIES.map(cat => ({
+    params: { category: cat.id },
+    props:  { category: cat },
+  }));
+}
+
+const { category } = Astro.props;
+const entries = await getCollection(category.id);
+entries.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<Base title={category.label}>
+  <div class="page-heading">
+    <h1>{category.label}</h1>
+  </div>
+
+  {entries.length === 0 ? (
+    <p style="font-family:var(--sans);font-size:13px;color:var(--muted);">
+      Nothing here yet.
+    </p>
+  ) : (
+    <ul class="work-list">
+      {entries.map(entry => (
+        <WorkCard entry={entry} categoryId={category.id as CategoryId} />
+      ))}
+    </ul>
+  )}
+</Base>

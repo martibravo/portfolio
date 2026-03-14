@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import WorkCard from '../components/WorkCard.astro';
+import { getCollection } from 'astro:content';
+import { CATEGORIES, SITE } from '../config';
+import type { CategoryId } from '../config';
+
+// Collect all work across every category
+const allEntries = (
+  await Promise.all(
+    CATEGORIES.map(async cat => {
+      const entries = await getCollection(cat.id);
+      return entries.map(e => ({ entry: e, categoryId: cat.id as CategoryId }));
+    })
+  )
+).flat();
+
+// Sort newest first
+allEntries.sort((a, b) => b.entry.data.date.getTime() - a.entry.data.date.getTime());
+---
+
+<Base>
+  <p style="font-family:var(--sans);font-size:13px;color:var(--muted);margin-bottom:2.5rem;line-height:1.5;">
+    {SITE.description}
+  </p>
+
+  <ul class="work-list">
+    {allEntries.map(({ entry, categoryId }) => (
+      <WorkCard entry={entry} categoryId={categoryId} showCategory={true} />
+    ))}
+  </ul>
+</Base>

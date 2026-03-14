@@ -1,0 +1,34 @@
+---
+import TagList from './TagList.astro';
+import { CATEGORIES } from '../config';
+import type { CollectionEntry } from 'astro:content';
+import type { CategoryId } from '../config';
+
+interface Props {
+  entry: CollectionEntry<'graphic-design'> | CollectionEntry<'photography'> | CollectionEntry<'art'> | CollectionEntry<'content'>;
+  categoryId: CategoryId;
+  showCategory?: boolean;
+}
+
+const { entry, categoryId, showCategory = false } = Astro.props;
+const cat = CATEGORIES.find(c => c.id === categoryId)!;
+const href = `/${categoryId}/${entry.slug}/`;
+
+const dateStr = entry.data.date.toLocaleDateString('en-US', {
+  year:  'numeric',
+  month: 'short',
+});
+---
+
+<li class="work-item">
+  <div class="work-item-main">
+    <a href={href} class="work-item-title">{entry.data.title}</a>
+    <div class="work-item-meta">
+      {showCategory && (
+        <a href={`/${categoryId}/`} class="cat-label">{cat.label}</a>
+      )}
+      {entry.data.tags.length > 0 && <TagList tags={entry.data.tags} />}
+    </div>
+  </div>
+  <time class="work-item-date" datetime={entry.data.date.toISOString()}>{dateStr}</time>
+</li>
