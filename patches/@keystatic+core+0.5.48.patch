@@ -1,0 +1,12 @@
+diff --git a/node_modules/@keystatic/core/dist/keystatic-core-api-generic.js b/node_modules/@keystatic/core/dist/keystatic-core-api-generic.js
+index aabdb1a..77b4d56 100644
+--- a/node_modules/@keystatic/core/dist/keystatic-core-api-generic.js
++++ b/node_modules/@keystatic/core/dist/keystatic-core-api-generic.js
+@@ -336,6 +336,7 @@ async function githubLogin(req, config) {
+   const url = new URL('https://github.com/login/oauth/authorize');
+   url.searchParams.set('client_id', config.clientId);
+   url.searchParams.set('redirect_uri', `${reqUrl.origin}/api/keystatic/github/oauth/callback`);
++  url.searchParams.set('scope', 'repo');
+   if (from === '/') {
+     return redirect(url.toString());
+   }
