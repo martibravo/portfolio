@@ -18,6 +18,22 @@ const workCollection = (label: string, dirName: string) =>
         publicPath: `/images/${dirName}/`,
       }),
       featured: fields.checkbox({ label: 'Featured', defaultValue: false }),
+      pageStyle: fields.select({
+        label: 'Layout',
+        options: [
+          { label: 'Standard', value: 'standard' },
+          { label: 'Case study', value: 'case-study' },
+        ],
+        defaultValue: 'standard',
+      }),
+      client: fields.text({ label: 'Client' }),
+      context: fields.text({ label: 'Context' }),
+      role: fields.text({ label: 'Role' }),
+      duration: fields.text({ label: 'Duration' }),
+      deliverables: fields.array(fields.text({ label: 'Deliverable' }), {
+        label: 'Deliverables',
+      }),
+      disclaimer: fields.text({ label: 'Disclaimer', multiline: true }),
       content: fields.mdx({
         label: 'Content',
         components: {

@@ -1,0 +1,23 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  priority?: boolean;
+  compact?: boolean;
+}
+
+const { src, alt, caption, priority = false, compact = false } = Astro.props;
+---
+
+<figure class:list={['case-visual', { compact }]}>
+  <img
+    src={src}
+    alt={alt}
+    loading={priority ? 'eager' : 'lazy'}
+    fetchpriority={priority ? 'high' : 'auto'}
+    width="1920"
+    height="1080"
+  />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

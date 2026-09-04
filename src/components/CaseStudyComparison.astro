@@ -1,0 +1,25 @@
+---
+interface Props {
+  leftValue: string;
+  leftLabel: string;
+  rightValue: string;
+  rightLabel: string;
+  note: string;
+  source?: string;
+}
+
+const { leftValue, leftLabel, rightValue, rightLabel, note, source } = Astro.props;
+---
+
+<div class="case-comparison" aria-label={`${leftLabel}: ${leftValue}. ${rightLabel}: ${rightValue}.` }>
+  <div class="case-comparison-item">
+    <p class="case-comparison-value muted-split">{leftValue}</p>
+    <p>{leftLabel}</p>
+  </div>
+  <div class="case-comparison-item">
+    <p class="case-comparison-value accent-split">{rightValue}</p>
+    <p>{rightLabel}</p>
+  </div>
+  <p class="case-comparison-note">{note}</p>
+  {source && <p class="case-source">{source}</p>}
+</div>

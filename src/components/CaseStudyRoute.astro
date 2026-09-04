@@ -1,0 +1,20 @@
+---
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="case-route">
+  <svg viewBox="0 0 900 360" role="img" aria-label="A flexible route connecting different moments in a daily journey">
+    <path d="M0 92 H105 C165 92 155 190 225 190 H354 C410 190 394 42 470 42 H555 L630 118 H745 C810 118 790 250 858 250 H900" />
+    {[105, 225, 354, 470, 630, 745, 858].map((x, index) => {
+      const y = [92, 190, 190, 42, 118, 118, 250][index];
+      return <circle cx={x} cy={y} r="11" />;
+    })}
+  </svg>
+  <ul>
+    {items.map(item => <li>{item}</li>)}
+  </ul>
+</div>

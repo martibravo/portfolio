@@ -13,6 +13,7 @@ interface Props {
 const { entry, categoryId, showCategory = false } = Astro.props;
 const cat = CATEGORIES.find(c => c.id === categoryId)!;
 const href = `/${categoryId}/${entry.slug}/`;
+const isCaseStudy = entry.data.pageStyle === 'case-study';
 
 const dateStr = entry.data.date.toLocaleDateString('en-US', {
   year:  'numeric',
@@ -20,8 +21,9 @@ const dateStr = entry.data.date.toLocaleDateString('en-US', {
 });
 ---
 
-<li class="work-item">
+<li class:list={['work-item', { 'is-case-study': isCaseStudy, featured: entry.data.featured }]}>
   <div class="work-item-main">
+    {isCaseStudy && <span class="work-item-kind">Case study</span>}
     <a href={href} class="work-item-title">{entry.data.title}</a>
     <div class="work-item-meta">
       {showCategory && (
@@ -31,4 +33,9 @@ const dateStr = entry.data.date.toLocaleDateString('en-US', {
     </div>
   </div>
   <time class="work-item-date" datetime={entry.data.date.toISOString()}>{dateStr}</time>
+  {isCaseStudy && entry.data.cover && (
+    <a href={href} class="work-item-preview" aria-label={`View ${entry.data.title}`}>
+      <img src={entry.data.cover} alt="" loading="eager" width="1920" height="1080" />
+    </a>
+  )}
 </li>

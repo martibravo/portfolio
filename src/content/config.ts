@@ -7,6 +7,13 @@ const workSchema = z.object({
   tags:        z.array(z.string()).default([]),
   cover:       z.string().optional(),
   featured:    z.boolean().default(false),
+  pageStyle:   z.enum(['standard', 'case-study']).default('standard'),
+  client:      z.string().optional(),
+  context:     z.string().optional(),
+  role:        z.string().optional(),
+  duration:    z.string().optional(),
+  deliverables: z.array(z.string()).default([]),
+  disclaimer:  z.string().optional(),
 });
 
 export const collections = {
