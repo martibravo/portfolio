@@ -1,0 +1,24 @@
+---
+interface Stat {
+  value: string;
+  label: string;
+}
+
+interface Props {
+  items: Stat[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="case-stats" aria-label="Key gender figures">
+  <svg viewBox="0 0 1000 100" aria-hidden="true">
+    <path d="M0 52 C170 6 220 94 365 52 S625 10 730 52 S890 90 1000 52" />
+  </svg>
+  {items.map(item => (
+    <div class="case-stat">
+      <strong>{item.value}</strong>
+      <span>{item.label}</span>
+    </div>
+  ))}
+</div>

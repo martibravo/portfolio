@@ -6,9 +6,8 @@ import TwoCol from '../../components/TwoCol.astro';
 import ThreeCol from '../../components/ThreeCol.astro';
 import ImageGrid from '../../components/ImageGrid.astro';
 import CaseStudyVisual from '../../components/CaseStudyVisual.astro';
-import CaseStudyMetric from '../../components/CaseStudyMetric.astro';
-import CaseStudyComparison from '../../components/CaseStudyComparison.astro';
 import CaseStudyRoute from '../../components/CaseStudyRoute.astro';
+import CaseStudyStats from '../../components/CaseStudyStats.astro';
 import { getCollection } from 'astro:content';
 import { CATEGORIES } from '../../config';
 import type { CategoryId } from '../../config';
@@ -34,31 +33,70 @@ const isCaseStudy = entry.data.pageStyle === 'case-study';
 const dateStr = entry.data.date.toLocaleDateString('en-US', {
   year: 'numeric', month: 'long', day: 'numeric',
 });
+
+const socialImage = entry.data.socialImage ?? entry.data.cover;
+const creativeWork = isCaseStudy ? {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: entry.data.title,
+  description: entry.data.description,
+  url: new URL(Astro.url.pathname, Astro.site).href,
+  image: socialImage ? new URL(socialImage, Astro.site).href : undefined,
+  author: {
+    '@type': 'Person',
+    name: 'Martí Bravo',
+    url: 'https://github.com/martibravo',
+  },
+  dateCreated: entry.data.date.toISOString().slice(0, 10),
+  inLanguage: ['en', 'ca'],
+  about: {
+    '@type': 'Thing',
+    name: 'Bicing',
+    description: "Barcelona's public bicycle-sharing system",
+  },
+} : undefined;
 ---
 
-<Base title={entry.data.title} description={entry.data.description} image={entry.data.cover}>
-  <a href={`/${category.id}/`} class="back">{category.label}</a>
+<Base
+  title={entry.data.title}
+  description={entry.data.description}
+  image={socialImage}
+  jsonLd={creativeWork}
+>
+  {isCaseStudy ? (
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href={`/${category.id}/`}>{category.label}</a>
+      <span aria-hidden="true">→</span>
+      <span aria-current="page">{entry.data.title}</span>
+    </nav>
+  ) : (
+    <a href={`/${category.id}/`} class="back">{category.label}</a>
+  )}
 
   <article class:list={{ 'case-study': isCaseStudy }}>
     <header class="article-header">
-      {isCaseStudy && <p class="case-study-kicker">Case study · {entry.data.context}</p>}
       <h1 class="article-title">{entry.data.title}</h1>
+      {isCaseStudy && (
+        <p class="case-study-context">Campaign proposal for the BAU art direction course.</p>
+      )}
       {isCaseStudy && entry.data.description && (
         <p class="case-study-summary">{entry.data.description}</p>
       )}
-      <div class="article-meta">
-        <time datetime={entry.data.date.toISOString()}>{dateStr}</time>
-        {entry.data.tags.length > 0 && (
-          <TagList tags={entry.data.tags} />
-        )}
-      </div>
+      {!isCaseStudy && (
+        <div class="article-meta">
+          <time datetime={entry.data.date.toISOString()}>{dateStr}</time>
+          {entry.data.tags.length > 0 && (
+            <TagList tags={entry.data.tags} />
+          )}
+        </div>
+      )}
       {isCaseStudy && (
         <dl class="case-study-meta">
           {entry.data.client && <div><dt>Subject</dt><dd>{entry.data.client}</dd></div>}
           {entry.data.role && <div><dt>Role</dt><dd>{entry.data.role}</dd></div>}
-          {entry.data.duration && <div><dt>When</dt><dd>{entry.data.duration}</dd></div>}
+          {entry.data.context && <div><dt>Course</dt><dd>{entry.data.context}</dd></div>}
           {entry.data.deliverables.length > 0 && (
-            <div><dt>Deliverables</dt><dd>{entry.data.deliverables.join(' · ')}</dd></div>
+            <div><dt>Output</dt><dd>{entry.data.deliverables.join(', ')}</dd></div>
           )}
         </dl>
       )}
@@ -71,13 +109,9 @@ const dateStr = entry.data.date.toLocaleDateString('en-US', {
         ThreeCol,
         ImageGrid,
         CaseStudyVisual,
-        CaseStudyMetric,
-        CaseStudyComparison,
         CaseStudyRoute,
+        CaseStudyStats,
       }} />
     </div>
-    {isCaseStudy && entry.data.disclaimer && (
-      <p class="case-study-disclaimer">{entry.data.disclaimer}</p>
-    )}
   </article>
 </Base>

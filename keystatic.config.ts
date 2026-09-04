@@ -17,6 +17,11 @@ const workCollection = (label: string, dirName: string) =>
         directory: `public/images/${dirName}`,
         publicPath: `/images/${dirName}/`,
       }),
+      socialImage: fields.image({
+        label: 'Social preview image',
+        directory: `public/images/${dirName}`,
+        publicPath: `/images/${dirName}/`,
+      }),
       featured: fields.checkbox({ label: 'Featured', defaultValue: false }),
       pageStyle: fields.select({
         label: 'Layout',

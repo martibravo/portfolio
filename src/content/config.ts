@@ -6,6 +6,7 @@ const workSchema = z.object({
   description: z.string().optional(),
   tags:        z.array(z.string()).default([]),
   cover:       z.string().optional(),
+  socialImage: z.string().optional(),
   featured:    z.boolean().default(false),
   pageStyle:   z.enum(['standard', 'case-study']).default('standard'),
   client:      z.string().optional(),

@@ -5,19 +5,59 @@ interface Props {
   caption?: string;
   priority?: boolean;
   compact?: boolean;
+  zoom?: boolean;
 }
 
-const { src, alt, caption, priority = false, compact = false } = Astro.props;
+const { src, alt, caption, priority = false, compact = false, zoom = false } = Astro.props;
+const base = src.replace(/\.(png|jpe?g|webp)$/i, '');
+const zoomId = `zoom-${base.split('/').pop()?.replace(/[^a-z0-9-]/gi, '-')}`;
 ---
 
-<figure class:list={['case-visual', { compact }]}>
-  <img
-    src={src}
-    alt={alt}
-    loading={priority ? 'eager' : 'lazy'}
-    fetchpriority={priority ? 'high' : 'auto'}
-    width="1920"
-    height="1080"
-  />
+<figure class:list={['case-visual', { compact, zoom }]}>
+  {zoom ? (
+    <>
+      <button
+        class="case-zoom-trigger"
+        popovertarget={zoomId}
+        aria-label={`Open large view: ${caption ?? alt}`}
+      >
+        <picture>
+          <source srcset={`${base}.avif`} type="image/avif" />
+          <source srcset={`${base}.webp`} type="image/webp" />
+          <img
+            src={src}
+            alt={alt}
+            loading={priority ? 'eager' : 'lazy'}
+            fetchpriority={priority ? 'high' : 'auto'}
+            width="1920"
+            height="1080"
+          />
+        </picture>
+        <span aria-hidden="true">View larger</span>
+      </button>
+      <div class="case-lightbox" id={zoomId} popover>
+        <button
+          class="case-lightbox-close"
+          popovertarget={zoomId}
+          popovertargetaction="hide"
+          aria-label="Close large view"
+        >×</button>
+        <img src={src} alt={alt} width="1920" height="1080" />
+      </div>
+    </>
+  ) : (
+    <picture>
+      <source srcset={`${base}.avif`} type="image/avif" />
+      <source srcset={`${base}.webp`} type="image/webp" />
+      <img
+        src={src}
+        alt={alt}
+        loading={priority ? 'eager' : 'lazy'}
+        fetchpriority={priority ? 'high' : 'auto'}
+        width="1920"
+        height="1080"
+      />
+    </picture>
+  )}
   {caption && <figcaption>{caption}</figcaption>}
 </figure>
