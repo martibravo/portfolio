@@ -4,7 +4,7 @@ titleLines: ["Bicing.", "Fes teva la ciutat."]
 date: 2026-07-15
 description: "Bicing is close to gender parity, but Barcelona's bike lanes are not. This campaign connects the journeys women already make with the cycling network."
 tags: [campaign, art-direction, strategy, public-space]
-cover: "/images/graphic-design/bicing/hero.webp"
+cover: "/images/graphic-design/bicing/hero-source.webp"
 socialImage: "/images/graphic-design/bicing/summary.webp"
 featured: true
 pageStyle: case-study
@@ -14,37 +14,11 @@ role: "Research, strategy, art direction, design and copywriting."
 deliverables: ["57-slide campaign proposal"]
 ---
 
-<CaseStudyVisual
-  src="/images/graphic-design/bicing/hero.webp"
-  alt="Cover slide with a woman riding a bicycle at night and the title Bicing: Fes teva la ciutat"
-  priority
-/>
-
-<section class="case-claim">
-  <h2 lang="ca">Fes teva la ciutat.</h2>
-  <p>{"Make the city yours."}</p>
-</section>
+<CaseStudyHero />
 
 <section class="case-showcase">
-  <h2 class="visually-hidden">Selected campaign applications</h2>
-  <div class="case-gallery three">
-    <CaseStudyVisual
-      src="/images/graphic-design/bicing/application-poster.webp"
-      alt="Poster showing a cyclist in a park with a red route line marked Francesc Macià 18:45 and CEM Joan Miró 18:55"
-      caption="Route poster. Francesc Macià 18:45 → CEM Joan Miró 18:55"
-    />
-    <CaseStudyVisual
-      src="/images/graphic-design/bicing/bike-front.png"
-      alt="Two Bicing bicycles shown from the front, one red electric bike and one white mechanical bike"
-      caption="Bike front. Electric and mechanical"
-      zoom
-    />
-    <CaseStudyVisual
-      src="/images/graphic-design/bicing/photography.webp"
-      alt="Woman in everyday clothes riding a bicycle along a city street"
-      caption="Photography direction. Everyday clothes, real movement. The ride isn't the point; what it enables is."
-    />
-  </div>
+  <h2 class="visually-hidden">Campaign application</h2>
+  <CaseStudyPoster />
 </section>
 
 <section class="case-section">
@@ -86,7 +60,7 @@ deliverables: ["57-slide campaign proposal"]
     <p>{"Her day includes home, work, the pool, her mother's place and dinner. At half past six, her plans change."}</p>
     <p>{"The L5 can't follow her day. Bicing can."}</p>
   </div>
-  <CaseStudyRoute items={['Home', 'Work', 'Gym', 'Relationships', 'Family', 'Health', 'Fun']} />
+  <CaseStudyMetroRoute items={['Home', 'Work', 'Gym', 'Relationships', 'Family', 'Health', 'Fun']} />
   <p class="case-route-caption">{"Her day does not fit on one line."}</p>
 
   <div class="case-objectives">
@@ -112,29 +86,7 @@ deliverables: ["57-slide campaign proposal"]
     <p>{"The line carries the route. Everything else stays asphalt black, white or infrastructure grey."}</p>
     <p>{"Helvetica Neue already speaks through Barcelona's signage. Bold carries claims. Regular handles station names and times."}</p>
   </div>
-  <div class="case-gallery three compact-grid">
-    <CaseStudyVisual
-      src="/images/graphic-design/bicing/principle.png"
-      alt="Black modular grid crossed by a thick red route line"
-      caption="The module, the grid and the personal route"
-    />
-    <CaseStudyVisual
-      src="/images/graphic-design/bicing/palette.png"
-      alt="Colour swatches for Bicing red, asphalt black, white and infrastructure grey"
-      caption="Red is reserved for the route and for Bicing"
-    />
-    <CaseStudyVisual
-      src="/images/graphic-design/bicing/typography.png"
-      alt="Helvetica Neue type specimens beside Barcelona transport signs"
-      caption="Helvetica Neue. The type already in the street"
-    />
-  </div>
-  <CaseStudyVisual
-    src="/images/graphic-design/bicing/summary.webp"
-    alt="Campaign summary board showing the claim, a modular grid, red routes and reference photographs"
-    caption="Campaign system at a glance"
-    zoom
-  />
+  <CaseStudySystem />
 </section>
 
 <section class="case-section">
@@ -144,18 +96,7 @@ deliverables: ["57-slide campaign proposal"]
     <p>{"No posing or eye contact. The bicycle stays a tool and never becomes the subject."}</p>
     <p>{"The reference frames below are placeholders. The proposed shoot would take place in Barcelona."}</p>
   </div>
-  <div class="case-gallery two">
-    <CaseStudyVisual
-      src="/images/graphic-design/bicing/photography.webp"
-      alt="Woman in everyday clothes riding a bicycle along a city street"
-      caption="Reference image. Placeholder for the proposed Barcelona shoot"
-    />
-    <CaseStudyVisual
-      src="/images/graphic-design/bicing/light.webp"
-      alt="Two women riding bicycles through a park in low evening light"
-      caption="Reference image. Natural light and real contrast"
-    />
-  </div>
+  <CaseStudyPhotoPair />
   <dl class="case-copy-lines">
     <div><dt lang="ca">Mitja hora.</dt><dd>Half an hour.</dd></div>
     <div><dt lang="ca">El camí de tornada.</dt><dd>The way back.</dd></div>
@@ -164,12 +105,6 @@ deliverables: ["57-slide campaign proposal"]
     <div><dt lang="ca">Encara hi ets a temps.</dt><dd>There's still time.</dd></div>
     <strong lang="ca">Bicing. Fes teva la ciutat.</strong>
   </dl>
-  <CaseStudyVisual
-    src="/images/graphic-design/bicing/application-poster.webp"
-    alt="Poster showing a cyclist in a park with a red route line marked Francesc Macià 18:45 and CEM Joan Miró 18:55"
-    caption="Francesc Macià 18:45 → CEM Joan Miró 18:55. The campaign starts from a simple observation: a twenty-minute walk can become a five-minute ride"
-    zoom
-  />
 </section>
 
 <section class="case-section case-unresolved">

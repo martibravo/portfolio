@@ -1,0 +1,50 @@
+<div class="case-photo-pair">
+  <figure>
+    <img
+      src="/images/graphic-design/bicing/photography-source.webp"
+      alt="Woman in everyday clothes cycling through a busy city junction"
+      width="1080"
+      height="1440"
+      loading="lazy"
+    />
+    <figcaption>Reference image. Everyday clothes and movement that feels observed, not staged.</figcaption>
+  </figure>
+  <figure>
+    <img
+      src="/images/graphic-design/bicing/light-source.webp"
+      alt="Cyclist travelling down a Barcelona street at night under traffic lights"
+      width="1080"
+      height="1350"
+      loading="lazy"
+    />
+    <figcaption>Reference image. Available light, city contrast and the route after dark.</figcaption>
+  </figure>
+</div>
+
+<style>
+  .case-photo-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
+    margin-top: clamp(3rem, 7vw, 6rem);
+  }
+  figure { min-width: 0; margin: 0; }
+  img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border: 1px solid var(--case-line);
+    background: var(--case-surface);
+    box-shadow: var(--case-image-shadow);
+  }
+  figcaption {
+    padding-top: 0.65rem;
+    color: var(--case-gray);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  @media (max-width: 600px) {
+    .case-photo-pair { grid-template-columns: 1fr; }
+  }
+</style>

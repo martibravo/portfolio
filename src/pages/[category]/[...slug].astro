@@ -7,7 +7,12 @@ import ThreeCol from '../../components/ThreeCol.astro';
 import ImageGrid from '../../components/ImageGrid.astro';
 import CaseStudyVisual from '../../components/CaseStudyVisual.astro';
 import CaseStudyRoute from '../../components/CaseStudyRoute.astro';
+import CaseStudyMetroRoute from '../../components/CaseStudyMetroRoute.astro';
 import CaseStudyStats from '../../components/CaseStudyStats.astro';
+import CaseStudyHero from '../../components/CaseStudyHero.astro';
+import CaseStudyPoster from '../../components/CaseStudyPoster.astro';
+import CaseStudySystem from '../../components/CaseStudySystem.astro';
+import CaseStudyPhotoPair from '../../components/CaseStudyPhotoPair.astro';
 import { getCollection } from 'astro:content';
 import { CATEGORIES } from '../../config';
 import type { CategoryId } from '../../config';
@@ -114,7 +119,12 @@ const creativeWork = isCaseStudy ? {
         ImageGrid,
         CaseStudyVisual,
         CaseStudyRoute,
+        CaseStudyMetroRoute,
         CaseStudyStats,
+        CaseStudyHero,
+        CaseStudyPoster,
+        CaseStudySystem,
+        CaseStudyPhotoPair,
       }} />
     </div>
   </article>

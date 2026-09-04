@@ -1,0 +1,118 @@
+<figure class="case-poster">
+  <div class="case-poster-art">
+    <img class="case-poster-base" src="/images/graphic-design/bicing/poster-base.webp" alt="" width="1381" height="1731" loading="lazy" />
+    <svg class="case-poster-route" viewBox="0 0 1381 1731" aria-hidden="true">
+      <path d="M-40 245 H330 Q370 245 398 273 L510 385 Q538 413 578 413 H770 Q810 413 838 441 L967 570 Q995 598 1035 598 H1421" />
+    </svg>
+    <img class="case-poster-subject" src="/images/graphic-design/bicing/poster-subject.webp" alt="Woman riding a shared bicycle through a park" width="1381" height="1731" loading="lazy" />
+    <div class="case-poster-station case-poster-station-start">
+      <strong>Francesc Macià</strong><span>18:45</span>
+    </div>
+    <div class="case-poster-station case-poster-station-end">
+      <strong>CEM Joan Miró</strong><span>18:55</span>
+    </div>
+    <div class="case-poster-copy">
+      <span lang="ca">Quatre braçades<br />abans de sopar?</span>
+      <strong lang="ca">La Maria fa<br />seva mitja hora</strong>
+    </div>
+    <div class="case-poster-lockup">
+      <strong lang="ca">Fes teva<br />la ciutat.</strong><span>Bicing</span>
+    </div>
+  </div>
+  <figcaption>
+    <span lang="ca">Quatre braçades abans de sopar? La Maria fa seva mitja hora.</span>
+    <em>Four laps before dinner? Maria makes half an hour her own.</em>
+  </figcaption>
+</figure>
+
+<style>
+  .case-poster {
+    width: min(100%, 760px);
+    margin: clamp(3rem, 7vw, 6rem) auto 0;
+  }
+  .case-poster-art {
+    position: relative;
+    aspect-ratio: 1381 / 1731;
+    overflow: hidden;
+    border: 1px solid var(--case-line);
+    background: #758c41;
+    box-shadow: var(--case-image-shadow);
+    isolation: isolate;
+  }
+  .case-poster-base,
+  .case-poster-subject {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .case-poster-base { z-index: 0; }
+  .case-poster-subject { z-index: 2; }
+  .case-poster-route {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+  }
+  .case-poster-route path {
+    fill: none;
+    stroke: var(--case-red);
+    stroke-width: 58;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .case-poster-station,
+  .case-poster-copy,
+  .case-poster-lockup {
+    position: absolute;
+    z-index: 3;
+    color: white;
+    font-family: var(--campaign);
+    line-height: 1;
+    text-shadow: 0 1px 12px rgb(0 0 0 / 28%);
+  }
+  .case-poster-station {
+    top: 10.5%;
+    display: flex;
+    flex-direction: column;
+    font-size: clamp(0.75rem, 2.2vw, 1.35rem);
+  }
+  .case-poster-station-start { left: 8%; }
+  .case-poster-station-end { right: 7%; text-align: right; }
+  .case-poster-station strong,
+  .case-poster-station span { font: inherit; font-weight: 700; }
+  .case-poster-copy { left: 31%; bottom: 17%; }
+  .case-poster-copy span {
+    display: block;
+    margin-bottom: 0.7em;
+    font-size: clamp(1rem, 3.2vw, 2rem);
+    line-height: 0.96;
+  }
+  .case-poster-copy strong {
+    display: block;
+    font-size: clamp(1.5rem, 5.2vw, 3.4rem);
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+  }
+  .case-poster-lockup {
+    right: 6%;
+    bottom: 4.5%;
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+  }
+  .case-poster-lockup strong { font-size: clamp(1rem, 3.3vw, 2rem); line-height: 0.9; }
+  .case-poster-lockup span { font-size: clamp(1rem, 3vw, 1.8rem); font-style: italic; font-weight: 700; }
+  figcaption {
+    display: grid;
+    gap: 0.2rem;
+    padding-top: 0.7rem;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  figcaption span { font-family: var(--campaign); color: var(--case-ink); }
+  figcaption em { color: var(--case-gray); }
+</style>

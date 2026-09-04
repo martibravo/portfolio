@@ -1,0 +1,89 @@
+<figure class="case-native-hero">
+  <div class="case-native-hero-media">
+    <img
+      src="/images/graphic-design/bicing/hero-source.webp"
+      alt="Woman cycling through a city street in everyday clothes"
+      width="1200"
+      height="1499"
+      loading="eager"
+      fetchpriority="high"
+    />
+  </div>
+  <figcaption>
+    <span>Campaign proposal</span>
+    <strong lang="ca">Bicing.<br />Fes teva la ciutat.</strong>
+    <em>Make the city yours.</em>
+  </figcaption>
+</figure>
+
+<style>
+  .case-native-hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(220px, 0.68fr) minmax(0, 1.55fr);
+    min-height: min(72vw, 760px);
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--case-line);
+    background: var(--case-paper);
+    box-shadow: var(--case-image-shadow);
+  }
+  .case-native-hero-media {
+    grid-column: 2;
+    min-height: 100%;
+    overflow: hidden;
+  }
+  .case-native-hero img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 48%;
+  }
+  figcaption {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(1.3rem, 4vw, 3.5rem);
+    color: var(--case-ink);
+  }
+  figcaption span {
+    color: var(--case-gray);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  figcaption strong {
+    margin-top: auto;
+    font-family: var(--campaign);
+    font-size: clamp(2.2rem, 5.7vw, 5.7rem);
+    font-weight: 700;
+    line-height: 0.85;
+    letter-spacing: -0.065em;
+  }
+  figcaption em {
+    margin-top: clamp(1rem, 3vw, 2rem);
+    color: var(--case-gray);
+    font-size: 12px;
+  }
+  @media (max-width: 680px) {
+    .case-native-hero {
+      grid-template-columns: 1fr;
+      min-height: 0;
+    }
+    .case-native-hero-media {
+      grid-column: 1;
+      grid-row: 1;
+      aspect-ratio: 4 / 4.5;
+    }
+    figcaption {
+      position: relative;
+      grid-column: 1;
+      grid-row: 2;
+      min-height: 310px;
+      border-top: 1px solid var(--case-line);
+    }
+  }
+</style>
