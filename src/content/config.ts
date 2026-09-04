@@ -2,6 +2,7 @@ import { defineCollection, z } from 'astro:content';
 
 const workSchema = z.object({
   title:       z.string(),
+  titleLines:  z.array(z.string()).optional(),
   date:        z.coerce.date(),
   description: z.string().optional(),
   tags:        z.array(z.string()).default([]),

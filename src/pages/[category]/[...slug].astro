@@ -75,9 +75,13 @@ const creativeWork = isCaseStudy ? {
 
   <article class:list={{ 'case-study': isCaseStudy }}>
     <header class="article-header">
-      <h1 class="article-title">{entry.data.title}</h1>
+      <h1 class="article-title">
+        {entry.data.titleLines
+          ? entry.data.titleLines.map((line) => <span class="article-title-line">{line}</span>)
+          : entry.data.title}
+      </h1>
       {isCaseStudy && (
-        <p class="case-study-context">Campaign proposal for the BAU art direction course.</p>
+        <p class="case-study-context">Brand and campaign exploration for the Art Direction course at BAU, College of Arts and Design of Barcelona.</p>
       )}
       {isCaseStudy && entry.data.description && (
         <p class="case-study-summary">{entry.data.description}</p>

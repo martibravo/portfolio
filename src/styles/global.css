@@ -433,6 +433,10 @@ a.tag:hover {
   text-wrap: balance;
 }
 
+.article-title-line {
+  display: block;
+}
+
 .case-study-context {
   max-width: 68ch;
   margin: 1.25rem 0 0;
