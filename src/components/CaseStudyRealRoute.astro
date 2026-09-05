@@ -27,6 +27,7 @@ const stations = [
 ---
 
 <div class="case-real-route">
+  <div class="route-grid" aria-hidden="true"></div>
   <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} role="img" aria-label="One flexible route linking the stops of a single day">
     <path d={ROUTE_PATH} pathLength="1" />
     {stations.map((s) => <circle cx={s.x} cy={s.y} r="33.8" />)}
@@ -51,7 +52,23 @@ const stations = [
     position: relative;
     width: 100%;
   }
+  /* Eixample blocks sitting under the route. Masked rather than tinted so the
+     block colour follows the theme and the streets stay open. */
+  .route-grid {
+    position: absolute;
+    inset: 0;
+    background: var(--case-ink);
+    -webkit-mask-image: url("/images/graphic-design/bicing/svg/eixample-tile.svg");
+    mask-image: url("/images/graphic-design/bicing/svg/eixample-tile.svg");
+    -webkit-mask-repeat: repeat;
+    mask-repeat: repeat;
+    -webkit-mask-size: clamp(78px, 9vw, 128px);
+    mask-size: clamp(78px, 9vw, 128px);
+    opacity: 0.09;
+    pointer-events: none;
+  }
   svg {
+    position: relative;
     display: block;
     width: 100%;
     height: auto;

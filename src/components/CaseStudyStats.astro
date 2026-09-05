@@ -9,16 +9,202 @@ interface Props {
 }
 
 const { items } = Astro.props;
+
+/* Drawn to the same conventions as the campaign's own metro map: a constant
+   line weight of roughly 0.3% of the canvas width, 45 degree turns, and
+   corners rounded off rather than mitred. Grey runs stand for the existing
+   network the red one crosses. */
+const VIEW_W = 1200;
+const VIEW_H = 380;
+const NODE_Y = 240;
+const NODES = [200, 600, 1000];
+
+/* The red run climbs in from the lower left, then holds a straight line
+   through all three stops. The grey ones cross it in the gaps between
+   columns so they never cut through a figure. */
+const ROUTE = 'M-40 380L72 268Q100 240 140 240H1240';
+const NETWORK = [
+  'M400 -40V180Q400 220 428 248L640 460',
+  'M700 -40L815 95Q843 123 843 163V460',
+];
+const NETWORK_STOPS = [
+  { x: 400, y: 70 },
+  { x: 843, y: 330 },
+];
 ---
 
-<div class="case-stats" aria-label="Key gender figures">
-  <svg viewBox="0 0 1200 300" aria-hidden="true">
-    <path d="M0 180 H260 L320 120 H720 L780 180 H1200" />
+<div class="case-stats" data-stats>
+  <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} aria-hidden="true">
+    <g class="network">
+      {NETWORK.map((d) => <path d={d} pathLength="1" />)}
+      {NETWORK_STOPS.map((s) => <circle cx={s.x} cy={s.y} r="10" />)}
+    </g>
+    <path class="route" d={ROUTE} pathLength="1" />
+    <g class="stops">
+      {NODES.map((x) => <circle cx={x} cy={NODE_Y} r="17" />)}
+    </g>
   </svg>
-  {items.map(item => (
-    <div class="case-stat">
-      <strong>{item.value}</strong>
-      <span>{item.label}</span>
-    </div>
-  ))}
+  <ul>
+    {items.slice(0, NODES.length).map((item, i) => (
+      <li style={`--x:${(NODES[i] / VIEW_W) * 100}%;--y:${(NODE_Y / VIEW_H) * 100}%`}>
+        <strong>{item.value}</strong>
+        <span>{item.label}</span>
+      </li>
+    ))}
+  </ul>
 </div>
+
+<style>
+  .case-stats {
+    position: relative;
+    margin-top: clamp(3rem, 7vw, 6rem);
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: hidden; /* lines run off the frame rather than stopping short */
+  }
+  path {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .route {
+    stroke: var(--case-red);
+    stroke-width: 12;
+  }
+  .network path {
+    stroke: var(--case-gray);
+    stroke-width: 10;
+    opacity: 0.38;
+  }
+  /* Opaque fill, and the stroke pre-blended to match the line's 38% grey.
+     Fading these with opacity would let the line show through the roundel. */
+  .network circle {
+    fill: var(--case-paper);
+    stroke: var(--case-gray);
+    stroke: color-mix(in srgb, var(--case-gray) 45%, var(--case-paper));
+    stroke-width: 5;
+  }
+  .stops circle {
+    fill: var(--case-paper);
+    stroke: var(--case-ink);
+    stroke-width: 6;
+  }
+
+  ul {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    display: grid;
+    grid-template-rows: 1fr 3.4rem 1fr;
+    align-items: center;
+    justify-items: center;
+    width: 31%;
+    height: clamp(13rem, 21vw, 16rem);
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  li strong {
+    grid-row: 1;
+    align-self: end;
+    font-size: clamp(1.9rem, 3.6vw, 3.1rem);
+    font-weight: 600;
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+  }
+  li span {
+    grid-row: 3;
+    align-self: start;
+    max-width: 24ch;
+    color: var(--case-gray);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  /* Drawn state is the default, so this still reads with no JS. */
+  .case-stats.is-armed .route,
+  .case-stats.is-armed .network path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .case-stats.is-armed :is(.stops, .network) circle {
+    opacity: 0;
+  }
+  .case-stats.is-drawn .route,
+  .case-stats.is-drawn .network path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.33, 0, 0.15, 1);
+  }
+  .case-stats.is-drawn .network path {
+    transition-duration: 1.9s;
+  }
+  .case-stats.is-drawn .network circle {
+    opacity: 1;
+    transition: opacity 0.5s ease 1.1s;
+  }
+  .case-stats.is-drawn .stops circle {
+    opacity: 1;
+    transition: opacity 0.45s ease;
+  }
+  .case-stats.is-drawn .stops circle:nth-child(1) { transition-delay: 0.5s; }
+  .case-stats.is-drawn .stops circle:nth-child(2) { transition-delay: 0.85s; }
+  .case-stats.is-drawn .stops circle:nth-child(3) { transition-delay: 1.2s; }
+
+  @media (max-width: 700px) {
+    svg { display: none; }
+    ul {
+      position: static;
+      display: grid;
+      gap: clamp(1.75rem, 6vw, 2.5rem);
+    }
+    li {
+      position: static;
+      display: block;
+      width: auto;
+      height: auto;
+      transform: none;
+      text-align: left;
+      padding-left: 1rem;
+      border-left: 3px solid var(--case-red);
+    }
+    li span { margin-top: 0.6rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .case-stats.is-armed .route,
+    .case-stats.is-armed .network path { stroke-dashoffset: 0; }
+    .case-stats.is-armed :is(.stops, .network) circle { opacity: revert-layer; }
+    .case-stats.is-drawn :is(.route, .network path, .stops circle, .network circle) {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const decks = document.querySelectorAll<HTMLElement>('[data-stats]');
+  decks.forEach((el) => {
+    if (!('IntersectionObserver' in window)) return;
+    el.classList.add('is-armed');
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          el.classList.add('is-drawn');
+          io.disconnect();
+        });
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(el);
+  });
+</script>
