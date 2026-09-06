@@ -35,6 +35,7 @@ const stations = [
   <ul>
     {items.slice(0, stations.length).map((item, index) => {
       const s = stations[index];
+      if (!item) return null;   /* unlabelled stops still draw, like a real line */
       return (
         <li
           class:list={[s.side, `align-${s.align}`]}

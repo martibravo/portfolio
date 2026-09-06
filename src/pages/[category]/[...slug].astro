@@ -101,6 +101,7 @@ const creativeWork = isCaseStudy ? {
           {entry.data.client && <div><dt>Subject</dt><dd>{entry.data.client}</dd></div>}
           {entry.data.role && <div><dt>Role</dt><dd>{entry.data.role}</dd></div>}
           {entry.data.context && <div><dt>Course</dt><dd>{entry.data.context}</dd></div>}
+          {entry.data.duration && <div><dt>Timeframe</dt><dd>{entry.data.duration}</dd></div>}
           {entry.data.deliverables.length > 0 && (
             <div><dt>Output</dt><dd>{entry.data.deliverables.join(', ')}</dd></div>
           )}
