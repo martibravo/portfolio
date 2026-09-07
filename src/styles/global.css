@@ -16,8 +16,8 @@
   --hover-bg:   #f2f2f2;
 
   --serif:  Georgia, 'Times New Roman', serif;
-  --sans:   Poppins, Arial, sans-serif;
-  --campaign: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial, sans-serif;
+  --sans:   var(--campaign);
+  --campaign: 'Helvetica Neue', 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Arimo', Arial, sans-serif;
   --mono:   'Courier New', Courier, monospace;
 }
 

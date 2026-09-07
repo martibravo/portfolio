@@ -1,0 +1,120 @@
+---
+interface Props {
+  sections: { id: string; label: string }[];
+  label?: string;
+}
+const { sections, label = 'On this page' } = Astro.props;
+---
+<section-navigation>
+  <nav aria-label={label}>
+    <button type="button" aria-expanded="false" hidden>
+      <span>Sections</span><span class="toggle-icon" aria-hidden="true">+</span>
+    </button>
+    <span class="active-dot" aria-hidden="true"></span>
+    <ul>
+      {sections.map(({ id, label }, index) => (
+        <li><a href={`#${id}`} aria-current={index === 0 ? 'location' : undefined}>{label}</a></li>
+      ))}
+    </ul>
+  </nav>
+</section-navigation>
+
+<style>
+  section-navigation { position:fixed; left:1.25rem; top:50%; transform:translateY(-50%); width:160px; z-index:30; font-family:var(--campaign,Arial,sans-serif); font-size:.875rem; }
+  nav { position:relative; color:var(--fg); }
+  .active-dot { position:absolute; left:0; top:0; width:6px; height:6px; border-radius:50%; background:currentColor; transform:translateY(var(--dot-y,16px)); pointer-events:none; }
+  ul { list-style:none; margin:0; padding:0; display:grid; gap:.3rem; }
+  a { display:block; padding:.55rem .75rem; text-decoration:none; color:var(--muted);  line-height:1.35; }
+  a[aria-current="location"] { color:var(--fg); font-weight:700;  }
+  a:hover { color:var(--fg); opacity:1; }
+  a:focus-visible,button:focus-visible { outline:2px solid currentColor; outline-offset:3px; }
+  button { display:none; }
+  @media (min-width:1200px) {
+    :global(body:has(section-navigation) .site) { width:calc(100% - 240px); max-width:1200px; margin-left:max(216px,calc((100vw - 1200px)/2)); margin-right:24px; }
+  }
+  @media (max-width:1199px) {
+    section-navigation { left:1rem; top:auto; bottom:calc(1rem + env(safe-area-inset-bottom)); transform:none; width:auto; max-width:calc(100vw - 2rem); }
+    nav { border:1px solid var(--border); border-radius:12px; background:var(--bg); box-shadow:0 4px 24px #0002; overflow:hidden; }
+    button:not([hidden]) { display:flex; align-items:center; justify-content:space-between; gap:2rem; width:100%; min-height:48px; padding:.75rem 1rem; border:0; background:transparent; color:inherit; font:inherit; cursor:pointer; }
+    .toggle-icon { font-size:1.3rem; line-height:1; }
+    .active-dot { display:none; }
+    ul { padding:.5rem; max-height:60vh; max-height:60dvh; overflow:auto; }
+    :host { display:block; }
+    section-navigation[data-ready] ul { display:none; }
+    section-navigation[data-open] ul { display:grid; }
+    section-navigation[data-open] .toggle-icon { transform:rotate(45deg); }
+    a { border:0; min-height:44px; padding:.75rem; }
+    a[aria-current="location"] { border:0; padding-left:.75rem; }
+  }
+  @media (prefers-reduced-motion:no-preference) {
+    .active-dot { transition:transform 280ms cubic-bezier(.22,1,.36,1); }
+    :global(html:has(section-navigation)) { scroll-behavior:smooth; }
+  }
+</style>
+
+<script>
+  class SectionNavigation extends HTMLElement {
+    private dispose?: () => void;
+    connectedCallback() {
+      this.dispose?.();
+      const button = this.querySelector('button')!;
+      const list = this.querySelector('ul')!;
+      const links = Array.from(this.querySelectorAll<HTMLAnchorElement>('a'));
+      const entries = links.map(link => ({ link, target: document.getElementById(decodeURIComponent(link.hash.slice(1))) })).filter(entry => entry.target);
+      if (!entries.length) return;
+      list.id ||= `section-list-${crypto.randomUUID()}`;
+      button.setAttribute('aria-controls', list.id);
+      button.hidden = false;
+      this.dataset.ready = '';
+      const close = () => { delete this.dataset.open; button.setAttribute('aria-expanded', 'false'); };
+      const toggle = () => {
+        const open = !this.hasAttribute('data-open');
+        this.toggleAttribute('data-open', open);
+        button.setAttribute('aria-expanded', String(open));
+      };
+      const click = (event: Event) => {
+        if ((event.target as Element).closest('a')) {
+          if (window.matchMedia('(max-width:1199px)').matches) button.focus();
+          close();
+        }
+      };
+      const outside = (event: Event) => { if (!this.contains(event.target as Node)) close(); };
+      const key = (event: KeyboardEvent) => {
+        if (event.key === 'Escape' && this.hasAttribute('data-open')) { close(); button.focus(); }
+      };
+      let frame = 0;
+      const update = () => {
+        frame = 0;
+        const threshold = window.innerHeight * .3;
+        let active = entries[0];
+        for (const entry of entries) if (entry.target!.getBoundingClientRect().top <= threshold) active = entry;
+        if (window.scrollY > 0 && Math.ceil(window.scrollY + window.innerHeight) >= document.documentElement.scrollHeight - 2) active = entries[entries.length - 1];
+        const navTop = this.querySelector('nav')!.getBoundingClientRect().top;
+        const activeBox = active.link.getBoundingClientRect();
+        this.style.setProperty('--dot-y', `${activeBox.top - navTop + activeBox.height / 2 - 3}px`);
+        for (const entry of entries) {
+          if (entry === active) entry.link.setAttribute('aria-current','location');
+          else entry.link.removeAttribute('aria-current');
+        }
+      };
+      const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+      button.addEventListener('click', toggle);
+      list.addEventListener('click', click);
+      document.addEventListener('click', outside);
+      document.addEventListener('keydown', key);
+      window.addEventListener('scroll', schedule, { passive:true });
+      window.addEventListener('resize', schedule);
+      const observer = new ResizeObserver(schedule);
+      observer.observe(document.body);
+      update();
+      this.dispose = () => {
+        cancelAnimationFrame(frame); observer.disconnect();
+        button.removeEventListener('click', toggle); list.removeEventListener('click', click);
+        document.removeEventListener('click', outside); document.removeEventListener('keydown', key);
+        window.removeEventListener('scroll', schedule); window.removeEventListener('resize', schedule);
+      };
+    }
+    disconnectedCallback() { this.dispose?.(); }
+  }
+  if (!customElements.get('section-navigation')) customElements.define('section-navigation', SectionNavigation);
+</script>

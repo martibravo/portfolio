@@ -9,7 +9,7 @@ const workSchema = z.object({
   cover:       z.string().optional(),
   socialImage: z.string().optional(),
   featured:    z.boolean().default(false),
-  pageStyle:   z.enum(['standard', 'case-study']).default('standard'),
+  pageStyle:   z.enum(['standard', 'case-study', 'editorial-case-study']).default('standard'),
   client:      z.string().optional(),
   context:     z.string().optional(),
   role:        z.string().optional(),

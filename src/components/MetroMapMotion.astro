@@ -1,0 +1,56 @@
+---
+import map from '../../public/images/graphic-design/bicing/svg/metro-map.svg?raw';
+import guides from './metro-route-guides.json';
+// Guides join the source export's centerline endpoints in route order.
+// A slightly wider mask covers the original rounded joins without altering them.
+const prefix = `metro-${crypto.randomUUID()}`;
+// Source order: light blue, orange, dark blue, yellow, red.
+// Long parallel routes begin halfway drawn; yellow starts 850ms later.
+const delays = [0, 0, 0, 850, 0];
+const initialOffsets = [0.5, 0.5, 0.65, 1, 0.75];
+const durations = [1.8, 1.8, 1.733333, 2.7, 2.0];
+let routeIndex = 0;
+const maskedMap = map.replace(/<path\b[^>]*\/>/g, artwork => {
+  const index = routeIndex++;
+  return `<g mask="url(#${prefix}-${index})">${artwork}</g>`;
+}).replace('</svg>', `<defs>${guides.map((d, index) =>
+  `<mask id="${prefix}-${index}" maskUnits="userSpaceOnUse" x="0" y="0" width="6370" height="4522"><path class="route-guide${index === 3 ? ' route-yellow' : ''}" d="${d}" pathLength="1" fill="none" stroke="white" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" style="--delay:${delays[index]}ms;--initial-offset:${initialOffsets[index]};--duration:${durations[index]}s" /></mask>`
+).join('')}</defs></svg>`);
+---
+<div class="metro-map-motion" aria-hidden="true" set:html={maskedMap}></div>
+<style>
+  .metro-map-motion { position:absolute; left:50%; top:50%; width:300%; transform:translate(-74.3%,-46.4%); }
+  .metro-map-motion :global(svg) { display:block; width:100%; height:auto; }
+  @media (prefers-reduced-motion:no-preference) {
+    .metro-map-motion[data-armed] :global(.route-guide) { stroke-dasharray:1; stroke-dashoffset:var(--initial-offset,1); }
+    .metro-map-motion[data-drawn] :global(.route-guide) { stroke-dashoffset:0; transition:stroke-dashoffset var(--duration,3.6s) linear var(--delay,0ms); }
+    /* First half: 1.8s as before. Remaining half: 0.9s (twice the speed). */
+    .metro-map-motion[data-drawn] :global(.route-yellow) {
+      transition:none;
+      animation:yellow-finish var(--duration) linear var(--delay) both;
+    }
+    @keyframes yellow-finish {
+      0% { stroke-dashoffset:1; }
+      66.666667% { stroke-dashoffset:.5; }
+      100% { stroke-dashoffset:0; }
+    }
+  }
+</style>
+<script>
+  function animateMaps() {
+    document.querySelectorAll<HTMLElement>('.metro-map-motion:not([data-initialized])').forEach(map => {
+      map.dataset.initialized = '';
+      if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      map.dataset.armed = '';
+      const observer = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          map.dataset.drawn = '';
+          observer.disconnect();
+        }
+      }, { threshold:.25 });
+      observer.observe(map.parentElement!);
+    });
+  }
+  animateMaps();
+  document.addEventListener('astro:page-load', animateMaps);
+</script>

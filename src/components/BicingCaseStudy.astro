@@ -1,0 +1,240 @@
+---
+import SectionNav from './SectionNav.astro';
+import CaseStudyRealRoute from './CaseStudyRealRoute.astro';
+import MetroMapMotion from './MetroMapMotion.astro';
+import CaseStudySystemDiagram from './CaseStudySystemDiagram.astro';
+import CaseStudyPhotoPair from './CaseStudyPhotoPair.astro';
+const assets = '/images/graphic-design/bicing';
+const transportSource = 'https://noticies.tmb.cat/sala-de-premsa/dones-de-fins-35-anys-residents-barcelona-perfil-de-persones-usuaries-de-bus-metro';
+const cyclingSource = 'https://bacc.cat/wp-content/uploads/2026/02/2025_Informe-Radiografia-Ciclista-de-Barcelona_CAT.pdf';
+const womenCyclingSource = 'https://www.institutmetropoli.cat/wp-content/uploads/2024/03/Enquesta_Bici_Dona_AMB.pdf';
+---
+
+  <SectionNav sections={[
+    { id: 'top', label: 'Overview' },
+    { id: 'idea', label: 'The idea' },
+    { id: 'campaign', label: 'The campaign' },
+    { id: 'system', label: 'The system' },
+    { id: 'research', label: 'Research & reflection' },
+    { id: 'credits', label: 'Credits' },
+  ]} />
+  <div class="bicing-case-study" id="top">
+<nav class="page-back" aria-label="Portfolio"><a href="/graphic-design/">← Graphic design</a></nav>
+
+    <article>
+      <header class="intro">
+        <h1 lang="ca">Fes teva<br />la ciutat.</h1>
+        <p class="translation">Make the city yours.</p>
+        <p class="lead">A student campaign concept exploring how Bicing could become part of more women’s everyday journeys in Barcelona.</p>
+        <p class="summary">Candid photography, short Catalan copy, and a graphic system drawn from the city’s streets turn everyday journeys into personal routes.</p>
+        <dl class="metadata">
+          <div><dt>Role</dt><dd>Research, concept, art direction and copywriting</dd></div>
+          <div><dt>Context</dt><dd>BAU · Art direction<br />Summer 2026 · Two weeks</dd></div>
+          <div><dt>Output</dt><dd>Campaign strategy and visual system<br />57-slide proposal</dd></div>
+        </dl>
+        <p class="note">Independent academic project; not commissioned by or endorsed by Bicing.</p>
+      </header>
+
+      <figure class="hero">
+        <img src={`${assets}/key-visual.jpg`} width="1600" height="900" alt="Campaign key visual with a woman cycling in everyday clothes" fetchpriority="high" />
+        <figcaption>Campaign direction. Photography used as reference material.</figcaption>
+      </figure>
+
+      <section id="idea" class="section split">
+        <div><h2>Another way through<br />an ordinary day.</h2></div>
+        <div class="copy">
+          <p>The brief was open: choose a brand and develop a campaign in two weeks. I chose Bicing, Barcelona’s public bike-sharing service, and explored how it could become a more familiar option for women already travelling around the city.</p>
+          <p>The proposed audience is a regular bus or metro user who can already ride a bike and makes short journeys within the service area. The opportunity is to add Bicing to the transport choices she already makes.</p>
+          <p>My creative hypothesis: presenting cycling as part of everyday life could make it feel more approachable to people who do not identify as cyclists. A shared bike removes the need to own, store or maintain one.</p>
+        </div>
+      </section>
+
+      <figure class="metro-context">
+        <div class="case-metro">
+          <MetroMapMotion />
+          <div class="case-metro-cards">
+            <div class="case-metro-card"><b>63%</b><span>of metro users were women<br /><small>TMB study · 2022</small></span></div>
+            <div class="case-metro-card"><b>74%</b><span>of TMB bus users were women<br /><small>TMB study · 2022</small></span></div>
+          </div>
+        </div>
+        <figcaption>Women made up a majority of users in <a href={transportSource}>TMB’s 2022 customer-perception study</a>, published in May 2023. These figures describe the user profile, not the share of all trips in Barcelona.</figcaption>
+      </figure>
+
+      <aside class="proposition" aria-label="Creative proposition">
+        <p>You already have<br />somewhere to be.<br /><span>Make the journey yours.</span></p>
+      </aside>
+
+      <section id="campaign" class="section">
+        <div class="split">
+          <div><h2>Small moments.<br />Personal routes.</h2></div>
+          <div class="copy"><p>A swim before dinner. The journey home. A last-minute change of plan. Each piece starts with a recognisable moment and connects it to a journey through the city.</p><p>The route line links the origin and destination. Short copy supplies the human detail; <span lang="ca">Fes teva la ciutat</span> closes the idea.</p></div>
+        </div>
+        <div class="application">
+          <figure class="poster">
+            <div class="poster-art">
+              <img src={`${assets}/poster-base.webp`} alt="" width="1381" height="1731" loading="lazy" />
+              <svg viewBox="0 0 1381 1731" aria-hidden="true"><path d="M-40 245 H330 Q370 245 398 273 L510 385 Q538 413 578 413 H770 Q810 413 838 441 L967 570 Q995 598 1035 598 H1421" /></svg>
+              <img class="subject" src={`${assets}/poster-subject.webp`} alt="Woman cycling through a park, used as reference photography for the campaign poster" width="1381" height="1731" loading="lazy" />
+              <div class="station start">Francesc Macià<br />18:45</div>
+              <div class="station finish">CEM Joan Miró<br />18:55</div>
+              <div class="poster-copy" lang="ca"><span>Quatre braçades<br />abans de sopar?</span><strong>La Maria fa<br />seva mitja hora</strong></div>
+              <div class="lockup"><strong lang="ca">Fes teva<br />la ciutat.</strong><span>Bicing</span></div>
+            </div>
+            <figcaption>Poster concept from the proposal, reconstructed for the web. Journey times are illustrative.</figcaption>
+          </figure>
+          <div class="application-caption">
+            <h3 lang="ca">Quatre braçades<br />abans de sopar?</h3>
+            <p>A few swimming strokes before dinner? Maria makes half an hour her own.</p>
+            <p>The swimming reference gives the journey a purpose beyond the ride itself. This longer version introduces the character and the moment.</p>
+            <p class="note">Concept artwork with reference photography. A shorter outdoor version and further applications are planned.</p>
+          </div>
+        </div>
+        <div class="bike-extension split">
+          <div><h3>The line reaches the bike.</h3><p>The proposal also explores the route motif on the front panels of the electric and mechanical bikes.</p></div>
+          <figure><img src={`${assets}/svg/app-icons.svg`} alt="Proposed electric and mechanical bike panels, carrying the Bicing mark and route motif" loading="lazy" /><figcaption>Exploratory bike-panel application.</figcaption></figure>
+        </div>
+      </section>
+
+      <section id="system" class="section">
+        <div class="split">
+          <div><h2>Drawn from<br />Barcelona.</h2></div>
+          <div class="copy"><p>The visual system brings together the Bicing module, the chamfered geometry of an Eixample block, docking infrastructure and a personal route line.</p><p>The grid gives the composition a common structure. The line changes with the journey: a schematic connection between places, rather than a navigation map.</p></div>
+        </div>
+        <figure class="daily-route">
+          <CaseStudyRealRoute items={['', '', 'Work', 'Home', 'Pool', '', 'Dinner', '']} />
+          <figcaption>A day connects different places. The loop turns that idea into a personal route, laid over the city grid. Schematic illustration.</figcaption>
+        </figure>
+        <CaseStudySystemDiagram />
+        <div class="design-notes">
+          <div><h3>Route</h3><p>Red makes the personal journey visible against the surrounding network. Angled turns echo the city grid.</p></div>
+          <div><h3>Type</h3><p>Helvetica Neue gives the campaign a familiar transport tone. Bold carries the headline; quieter labels carry places and times.</p></div>
+          <div><h3>Colour</h3><p>Red anchors the brand and route. Black, white and grey provide the background and supporting information.</p></div>
+        </div>
+        <ul class="palette" aria-label="Campaign colour palette"><li style="--swatch:#DF2935"><span>Bicing red</span><span>#DF2935</span></li><li style="--swatch:#1C1C1C"><span>Asphalt</span><span>#1C1C1C</span></li><li class="white" style="--swatch:#FFFFFF"><span>White</span><span>#FFFFFF</span></li><li style="--swatch:#747474"><span>Infrastructure grey</span><span>#747474</span></li></ul>
+
+        <div class="subsection split"><h3>People dressed for their day.</h3><div class="copy"><p>The photography direction focuses on everyday clothes, observed movement and available light. The destination shapes the person’s appearance; the bicycle is simply how she gets there.</p><p>A proposed Barcelona shoot would cover different times of day, including journeys after dark.</p></div></div>
+        <CaseStudyPhotoPair />
+        <p class="note photo-note">Photography references, not commissioned campaign images.</p>
+
+        <div class="subsection split"><h3>A voice close to everyday life.</h3><div class="copy"><p>The Catalan lines describe time, places and small decisions. Each leaves room for the image and route to complete the story.</p></div></div>
+        <dl class="copy-lines"><div><dt lang="ca">El camí de tornada.</dt><dd>The way home.</dd></div><div><dt lang="ca">Avui, pel parc.</dt><dd>Today, through the park.</dd></div><div><dt lang="ca">Has canviat de plans.</dt><dd>You’ve changed your plans.</dd></div></dl>
+      </section>
+
+      <section id="research" class="section split">
+        <div><h2>What informed<br />the direction.</h2></div>
+        <div class="copy">
+          <p>The research places two observations alongside each other. TMB’s 2022 customer study reports a majority of women among metro and bus users. BACC’s 2025 counts find a much smaller share among people observed using selected bike lanes.</p>
+          <p>BACC reports a female share of 30.7% in 2025, down from 35.6% in 2021: a fall of 4.9 percentage points. This series includes bicycles and scooters. It counts passages at selected locations and times, with gender estimated by observation; it is not a count of every cyclist in Barcelona. A lower share does not necessarily mean fewer women riding.</p>
+          <p>These datasets use different methods and populations, so they provide context rather than a direct comparison or an explanation of transport choices. The Institut Metròpoli study of women’s cycling experiences also documents safety concerns and harassment. A communication campaign has a limited role here. The identity-based proposition remains a hypothesis to explore with the intended audience.</p>
+          <details><summary>Sources and scope</summary><div><ul>
+            <li><a href={transportSource}>TMB, 2022 customer-perception study</a> — published 4 May 2023. Women account for 63% of metro users and 74% of TMB bus users in the reported profile.</li>
+            <li><a href={`${cyclingSource}#page=20`}>BACC, Radiografia Ciclista de Barcelona 2025</a> — published February 2026; pp. 10–11 and 20–21. Observations at six locations in morning and evening periods during September–October 2025. The bicycle-only series is separate: 30.73% in 2025 versus 35.31% in 2021.</li>
+            <li><a href={womenCyclingSource}>Institut Metròpoli, women’s everyday cycling in metropolitan Barcelona</a> — 2023 survey, published 2024; pp. 57–58 discuss reported harassment.</li>
+          </ul><p>The project used desk research and did not include audience interviews or testing. The idea that cycling identity can be a barrier is a creative hypothesis, not a finding established by these statistics.</p></div></details>
+          <h3>What I would develop next</h3>
+          <p>The project establishes a proposition and an initial visual language. The next stage is to refine the poster hierarchy, extend the campaign to other formats, and test whether the route motif reads clearly as Bicing alongside the city’s other transport brands.</p>
+          <p>Audience conversations would test the central hypothesis before developing it into a campaign claim.</p>
+        </div>
+      </section>
+
+      <footer class="credits" id="credits">
+        <div><p>Martí Bravo · BAU, art direction · Summer 2026</p><p class="note">Independent student proposal. Not commissioned by, produced for or endorsed by Bicing or B:SM. Photography is reference material.</p></div>
+        <a class="download" href="/downloads/bicing-case-study.pdf" download>Full course presentation ↓<span>PDF · 58 pages · Catalan and Spanish · Sources corrected September 2026</span></a>
+      </footer>
+<nav class="page-back closing" aria-label="Page navigation"><a href="/graphic-design/">← Graphic design</a><a href="#top">Back to top ↑</a></nav>
+    </article>
+  </div>
+
+
+<style>
+  :global(body:has(.bicing-case-study) .site) { max-width: 1200px; }
+  .bicing-case-study { --case-red:#DF2935; --case-ink:var(--fg); --case-paper:var(--bg); --case-line:var(--border); --case-surface:var(--hover-bg); --case-gray:var(--muted); --case-image-shadow:none; font-family:var(--campaign); font-size:1rem; line-height:1.6; }
+  .bicing-case-study :global(img) { display:block; max-width:100%; height:auto; }
+  .page-back { display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap; padding:1rem 0; border-bottom:1px solid var(--border); font-size:.875rem; }
+  .page-back a { text-underline-offset:5px; }
+  .page-back span { color:var(--muted); }
+  .intro { max-width:880px; padding:clamp(2.5rem,6vw,5rem) 0 2rem; }
+  h1,h2,h3 { font-family:var(--campaign); font-weight:600; letter-spacing:-.045em; margin:0; }
+  h1 { font-size:clamp(3.5rem,9vw,7.5rem); line-height:.94; }
+  .translation { font-size:clamp(1.25rem,3vw,2rem); margin:1rem 0 2rem; color:var(--muted); letter-spacing:-.025em; }
+  .lead { font-size:clamp(1.25rem,2.5vw,1.65rem); line-height:1.4; max-width:42ch; }
+  .summary { max-width:65ch; }
+  .metadata { display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:1.5rem; border-top:1px solid var(--border); padding-top:1.5rem; margin:2rem 0 1rem; font-size:.875rem; }
+  .metadata dt { color:var(--muted); margin-bottom:.35rem; }
+  .note, figcaption { color:var(--muted); font-size:.8125rem; line-height:1.5; }
+  figcaption { padding-top:.7rem; }
+  .hero img { width:100%; }
+  .section { padding:clamp(3rem,7vw,6rem) 0; scroll-margin-top:2rem; }
+  .section + .section { border-top:1px solid var(--border); }
+  .split { display:grid; grid-template-columns: .9fr 1.1fr; gap:clamp(2rem,6vw,6rem); }
+  .split > *, .application > * { min-width:0; }
+  h2 { font-size:clamp(2rem,4vw,3.25rem); line-height:1.06; }
+  h3 { font-size:1.5rem; line-height:1.2; margin-bottom:1rem; }
+  .copy { max-width:62ch; }
+  .copy h3 { margin-top:2.5rem; }
+  .case-metro-card small { display:inline-block; margin-top:.6rem; font-size:.75rem; font-weight:400; }
+  .metro-context { margin:0 0 clamp(3rem,7vw,6rem); }
+  .metro-context .case-metro { margin-top:0; }
+  .metro-context .case-metro > img { max-width:none; }
+  .daily-route { margin:clamp(3rem,6vw,5rem) 0; padding:2rem 1rem; }
+  .daily-route figcaption { margin-top:2rem; }
+  .daily-route :global(.case-real-route li) { font-size:clamp(.75rem,1.1vw,.875rem); }
+  @media (max-width:500px) {
+    .metro-context .case-metro { min-height:360px; }
+    .metro-context .case-metro-cards { gap:1rem; padding:1rem; }
+    .metro-context .case-metro-card { width:calc(50% - .5rem); padding:1rem; }
+  }
+  .proposition { background:#DF2935; color:#fff; padding:clamp(2rem,5vw,4rem); }
+  .proposition > p:last-child { font-size:clamp(2rem,4.8vw,4rem); font-weight:600; line-height:1.08; letter-spacing:-.035em; }
+  .proposition span { color:#fff; }
+  #credits, #top { scroll-margin-top:2rem; }
+  .application { display:grid; grid-template-columns:1.15fr .85fr; gap:clamp(2rem,5vw,5rem); align-items:center; margin-top:3rem; }
+  .poster-art { position:relative; aspect-ratio:1381/1731; overflow:hidden; background:#758c41; container-type:inline-size; isolation:isolate; color:#fff; }
+  .poster-art > img, .poster-art > svg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .poster-art svg { z-index:1; fill:none; stroke:#DF2935; stroke-width:58; stroke-linecap:round; stroke-linejoin:round; }
+  .poster-art .subject { z-index:2; }
+  .station, .poster-copy, .lockup { position:absolute; z-index:3; line-height:1; text-shadow:0 1px 12px #0007; }
+  .station { top:10.5%; font-size:3.1cqw; font-weight:700; }
+  .start { left:8%; } .finish { right:7%; text-align:right; }
+  .poster-copy { left:31%; bottom:17%; }
+  .poster-copy span { display:block; font-size:4.6cqw; margin-bottom:.7em; }
+  .poster-copy strong { display:block; font-size:7.5cqw; letter-spacing:-.04em; line-height:.92; }
+  .lockup { right:6%; bottom:4.5%; display:flex; align-items:flex-end; gap:3cqw; font-size:4.4cqw; }
+  .lockup span { font-weight:700; font-style:italic; }
+  .application-caption h3 { font-size:clamp(1.75rem,3vw,2.5rem); }
+  .bike-extension { align-items:center; padding-top:4rem; }
+  .bike-extension figure { background:#f1f1f1; padding:1.5rem; color:#111; }
+  .bike-extension figcaption { color:#555; }
+  .design-notes { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:2rem; margin:2rem 0; }
+  .design-notes h3 { font-size:1.125rem; letter-spacing:0; }
+  .palette { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); padding:0; list-style:none; }
+  .palette li { background:var(--swatch); color:white; min-height:135px; padding:1rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem; font-size:.8125rem; }
+  .palette .white { color:#111; border:1px solid #ccc; }
+  .subsection { margin-top:4rem; }
+  .bicing-case-study :global(.case-photo-pair) { margin-top:2rem; }
+  .bicing-case-study :global(.case-photo-pair figcaption) { font-size:.8125rem; }
+  .photo-note { margin-top:1rem; }
+  .copy-lines { margin-top:2rem; }
+  .copy-lines > div { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; border-top:1px solid var(--border); padding:1.5rem 0; }
+  .copy-lines dt { font-size:clamp(1.5rem,3vw,2.5rem); line-height:1.2; font-weight:600; letter-spacing:-.04em; }
+  .copy-lines dd { color:var(--muted); }
+  details { border-block:1px solid var(--border); margin-top:2rem; padding:1rem 0; }
+  summary { cursor:pointer; font-weight:600; }
+  details > div { padding-top:1rem; font-size:.875rem; }
+  details ul { padding-left:1.2rem; margin-bottom:1rem; }
+  .credits { display:grid; grid-template-columns:1.3fr 1fr; gap:2rem; padding:2rem 0; border-top:1px solid var(--border); }
+  .download { align-self:start; padding:1rem 0; font-weight:600; text-underline-offset:5px; }
+  .download span { display:block; font-size:.8125rem; font-weight:400; margin-top:.4rem; }
+  .closing { border-top:1px solid var(--border); border-bottom:0; margin-top:1rem; }
+  a:focus-visible, summary:focus-visible { outline:2px solid var(--fg); outline-offset:5px; }
+  @media (max-width:700px) {
+    .split, .application, .credits { grid-template-columns:1fr; }
+    .metadata { grid-template-columns:1fr; gap:1rem; }
+    .metadata > div { display:grid; grid-template-columns:5rem 1fr; gap:1rem; }
+    .design-notes { grid-template-columns:1fr; gap:1rem; }
+    .palette { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .copy-lines > div { flex-direction:column; gap:.5rem; }
+    .bicing-case-study :global(.case-system-diagram figcaption) { position:static; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); height:auto; gap:1rem; padding:1rem; }
+    .bicing-case-study :global(.case-system-diagram figcaption span) { position:static; transform:none; width:auto; font-size:.875rem; }
+  }
+</style>

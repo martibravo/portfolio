@@ -28,6 +28,7 @@ const workCollection = (label: string, dirName: string) =>
         options: [
           { label: 'Standard', value: 'standard' },
           { label: 'Case study', value: 'case-study' },
+          { label: 'Editorial case study', value: 'editorial-case-study' },
         ],
         defaultValue: 'standard',
       }),

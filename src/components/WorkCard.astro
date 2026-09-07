@@ -13,7 +13,7 @@ interface Props {
 const { entry, categoryId, showCategory = false } = Astro.props;
 const cat = CATEGORIES.find(c => c.id === categoryId)!;
 const href = `/${categoryId}/${entry.slug}/`;
-const isCaseStudy = entry.data.pageStyle === 'case-study';
+const isCaseStudy = entry.data.pageStyle === 'case-study' || entry.data.pageStyle === 'editorial-case-study';
 
 const dateStr = entry.data.date.toLocaleDateString('en-US', {
   year:  'numeric',
