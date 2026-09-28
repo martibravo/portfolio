@@ -1,0 +1,78 @@
+---
+/* Block 10: opening years as printed, first edition (June 2022) → December 2024
+   → June 2025. Each row is a small track from 2024 to 2030. */
+import { SLIP } from '../../data/metro/editions';
+
+const Y0 = 2024, Y1 = 2030;
+const px = (y: number) => ((y - Y0) / (Y1 - Y0)) * 100;
+const rows = SLIP.map((r) => ({ ...r, slip: r.years[2] - r.years[0] })).sort((a, b) => b.slip - a.slip || a.years[0] - b.years[0]);
+const slipped = rows.filter((r) => r.slip > 0).length;
+const avg = (rows.reduce((s, r) => s + r.slip, 0) / rows.length).toFixed(1);
+---
+
+<figure class="slip" data-reveal>
+  <div class="slip-head">
+    <p class="big"><b>{slipped}</b> of {rows.length} stations now open<br />later than the first map said.</p>
+    <p class="aside">Average slip: <b>+{avg} years</b> across three years of editions. Motors is the only date that held.</p>
+  </div>
+  <div class="board" role="table" aria-label="Estimated opening year per station, June 2022, December 2024 and June 2025 editions">
+    <div class="row head" role="row">
+      <span role="columnheader">Station</span>
+      <span role="columnheader" class="scale">{Array.from({ length: Y1 - Y0 + 1 }, (_, i) => <i style={`--x:${px(Y0 + i)}%`}>{Y0 + i}</i>)}</span>
+      <span role="columnheader">Slip</span>
+    </div>
+    {rows.map((r, i) => (
+      <div class="row" role="row" style={`--a:${px(r.years[0])}%;--m:${px(r.years[1])}%;--b:${px(r.years[2])}%;--i:${i}`}>
+        <span role="cell" class="name">{r.name}</span>
+        <span role="cell" class="track" aria-label={`${r.years[0]} in June 2022, ${r.years[1]} in December 2024, ${r.years[2]} in June 2025`}>
+          <i class="rail"></i>
+          <i class="arrow" class:list={{ back: r.years[2] < r.years[1] }}></i>
+          <i class="dot first" title={`June 2022: ${r.years[0]}`}></i>
+          <i class="dot mid" title={`December 2024: ${r.years[1]}`}></i>
+          <i class="dot last" title={`June 2025: ${r.years[2]}`}><b>{r.years[2]}</b></i>
+        </span>
+        <span role="cell" class="badge" class:list={{ zero: r.slip === 0 }}>{r.slip > 0 ? `+${r.slip}` : '±0'}</span>
+      </div>
+    ))}
+  </div>
+  <p class="key"><span class="k first"></span>June 2022 <span class="k mid"></span>December 2024 <span class="k last"></span>June 2025</p>
+</figure>
+
+<style>
+  .slip { margin:2rem 0 0; }
+  .slip-head { display:grid; grid-template-columns:1.2fr 1fr; gap:1.5rem; align-items:end; margin-bottom:1.25rem; }
+  .big { margin:0; font-size:clamp(1.5rem,3.2vw,2.4rem); line-height:1.08; letter-spacing:-.035em; font-weight:600; }
+  .big b { color:#e32739; }
+  .aside { margin:0; color:var(--muted); font-size:.9375rem; }
+  .aside b { color:var(--fg); }
+  .board { box-shadow:0 0 0 1px var(--border); background:#111; color:#f1f1f1; border-radius:18px; padding:.75rem 1rem 1rem; font-family:var(--campaign); }
+  .row { display:grid; grid-template-columns:minmax(7.5rem,10rem) 1fr 3.2rem; align-items:center; gap:1rem; padding:.42rem 0; border-top:1px solid #ffffff14; }
+  .row.head { border-top:0; color:#888; font-size:.6875rem; text-transform:uppercase; letter-spacing:.06em; padding-bottom:.6rem; }
+  .name { font-size:.875rem; font-weight:600; }
+  .scale { position:relative; height:1em; }
+  .scale i { position:absolute; left:var(--x); transform:translateX(-50%); font-style:normal; letter-spacing:0; }
+  .track { position:relative; height:22px; margin:0 10px; }
+  .rail { position:absolute; left:0; right:0; top:50%; height:2px; background:#ffffff1f; }
+  .arrow { position:absolute; top:calc(50% - 2px); height:4px; left:var(--a); width:calc(var(--b) - var(--a)); background:linear-gradient(90deg,#ffe07d,#ff6600); border-radius:2px; transform-origin:left; }
+  .arrow.back { background:linear-gradient(90deg,#ffe07d,#ff6600 70%,#ffb27a); }
+  .dot { position:absolute; top:50%; width:12px; height:12px; border-radius:50%; transform:translate(-50%,-50%); }
+  .first { left:var(--a); background:#ffe07d; }
+  .mid { left:var(--m); background:none; border:2px solid #fff; }
+  .last { left:var(--b); background:#ff6600; width:14px; height:14px; }
+  .last b { position:absolute; left:50%; bottom:130%; transform:translateX(-50%); font-size:.6875rem; background:#000; padding:0 .25rem; border-radius:2px; }
+  .badge { justify-self:end; font-weight:700; font-variant-numeric:tabular-nums; background:#e32739; color:#fff; border-radius:4px; padding:.05rem .4rem; font-size:.8125rem; }
+  .badge.zero { background:#333; }
+  .key { display:flex; gap:.4rem .6rem; flex-wrap:wrap; align-items:center; font-size:.75rem; color:var(--muted); margin:.75rem 0 0; }
+  .k { display:inline-block; width:10px; height:10px; border-radius:50%; margin-left:.3rem; }
+  .k.first { background:#ffe07d; } .k.mid { border:2px solid var(--fg); } .k.last { background:#ff6600; }
+
+  [data-armed] .arrow { transform:scaleX(0); transition:transform .9s cubic-bezier(.6,0,.2,1) calc(.2s + var(--i) * 70ms); }
+  [data-armed] .last, [data-armed] .mid { opacity:0; transition:opacity .3s calc(.9s + var(--i) * 70ms); }
+  [data-inview] .arrow { transform:none; }
+  [data-inview] .last, [data-inview] .mid { opacity:1; }
+  @media (max-width:640px) {
+    .slip-head { grid-template-columns:1fr; }
+    .row { grid-template-columns:6.5rem 1fr 2.6rem; gap:.5rem; }
+    .scale i:nth-child(even) { visibility:hidden; }
+  }
+</style>

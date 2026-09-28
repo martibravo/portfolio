@@ -1,0 +1,92 @@
+---
+/* Block 15: "Metro del Vallès, Zona de la Riera de Caldes", redrawn as SVG
+   from the proposal artwork. Lines draw in, then the line badges pop. */
+const C = { R9: '#ffc20e', C1: '#3e70c1', S2: '#7cbf3a', C2: '#d62fb0', R3: '#c8202f' };
+const lines = [
+  { id: 'R3', d: 'M1612 -20 V490 Q1612 505 1601 516 L1135 982 Q1122 995 1122 1013 V1200' },
+  { id: 'R9', d: 'M216 1200 V548 Q216 512 248 496 L888 164' },
+  { id: 'C1', d: 'M246 1004 V560 Q246 530 272 516 L902 190' },
+  { id: 'S2', d: 'M272 1200 V742' },
+  { id: 'C2', d: 'M926 186 V842 Q926 862 940 876 L1090 1026 Q1104 1040 1104 1060 V1082' },
+];
+const ticks = [
+  { d: 'M446 380 l10 20', c: C.R9 }, { d: 'M458 392 l10 20', c: C.C1 },
+  { d: 'M668 262 l10 20', c: C.R9 }, { d: 'M680 274 l10 20', c: C.C1 },
+  { d: 'M926 490 h26', c: C.C2 }, { d: 'M926 730 h26', c: C.C2 },
+  { d: 'M246 748 h26', c: C.C1 }, { d: 'M1612 478 h26', c: C.R3 },
+];
+const labels = [
+  { x: 108, y: 360, t: 'Castellar del Vallès' }, { x: 465, y: 252, t: 'Sentmenat' },
+  { x: 958, y: 198, t: 'Caldes', big: true }, { x: 958, y: 244, t: 'de Montbui', big: true },
+  { x: 974, y: 504, t: 'Palau-solità' }, { x: 974, y: 548, t: 'i Plegamans' },
+  { x: 984, y: 738, t: 'Can Perera' }, { x: 984, y: 782, t: 'Industrial' },
+  { x: 296, y: 754, t: 'Sabadell' }, { x: 296, y: 798, t: 'Parc del Nord' },
+  { x: 326, y: 1002, t: 'Sabadell' }, { x: 326, y: 1046, t: 'Plaça Major' },
+  { x: 1180, y: 1094, t: 'Mollet - Sta. Rosa' },
+  { x: 1656, y: 492, t: 'Granollers' }, { x: 1656, y: 536, t: 'Canovelles' },
+];
+const pills = [
+  { x: 958, y: 116, id: 'C1', r: true }, { x: 1058, y: 116, id: 'C2', r: true }, { x: 1166, y: 116, id: 'R9' },
+  { x: 324, y: 926, id: 'C1', r: true }, { x: 1180, y: 1156, id: 'C2', r: true }, { x: 1272, y: 1156, id: 'R3' },
+];
+const legend = [
+  { id: 'C1', text: 'Sabadell Plaça Major – Caldes de Montbui' },
+  { id: 'C2', text: 'Caldes de Montbui – Mollet Sta. Rosa' },
+  { id: 'S2', text: 'Barcelona Pl. Catalunya – Sabadell Parc del Nord' },
+  { id: 'R9', text: 'Barcelona Pl. Catalunya – Caldes de Montbui' },
+  { id: 'R3', text: 'L’Hospitalet de Llobregat – Puigcerdà, via Vic (Rodalies)' },
+];
+---
+
+<figure class="valles" data-reveal>
+  <div class="art">
+    <svg viewBox="0 0 2000 1186" role="img" aria-label="Metro del Vallès proposal around the Riera de Caldes: C1 from Sabadell Plaça Major to Caldes de Montbui via Castellar del Vallès and Sentmenat, C2 from Caldes de Montbui to Mollet - Santa Rosa via Palau-solità i Plegamans and Can Perera Industrial, with R9 and S2 to Barcelona and the R3 Rodalies line.">
+      <g class="hdr"><text x="60" y="80" class="fgc">FGC</text><text x="300" y="62" class="k">METRO DEL VALLÈS</text><text x="300" y="104" class="t">Zona de la Riera de Caldes</text></g>
+      {lines.map((l, i) => <path class="ln" d={l.d} pathLength="1" style={`stroke:${C[l.id as keyof typeof C]};--i:${i}`} />)}
+      {ticks.map((t) => <path class="tick" d={t.d} style={`stroke:${t.c}`} />)}
+      <rect class="cap" x="196" y="986" width="100" height="36" rx="18" />
+      <rect class="cap" x="1064" y="1062" width="100" height="36" rx="18" />
+      <circle class="ring" cx="908" cy="176" r="30" />
+      {labels.map((l) => <text x={l.x} y={l.y} class:list={['lbl', { big: l.big }]}>{l.t}</text>)}
+      {pills.map((p, i) => (
+        <g class="pill" style={`--i:${i}`}>
+          <rect x={p.x} y={p.y - 34} width={p.r ? 84 : 48} height="44" rx={p.r ? 22 : 0} style={`fill:${C[p.id as keyof typeof C]}`} />
+          <text x={p.x + (p.r ? 42 : 24)} y={p.y} text-anchor="middle" class:list={{ dark: p.id === 'R9' }}>{p.id}</text>
+        </g>
+      ))}
+    </svg>
+  </div>
+  <ul class="legend">
+    {legend.map((l) => <li><span class:list={['b', { round: l.id.startsWith('C') || l.id === 'S2' }]} style={`background:${C[l.id as keyof typeof C]};color:${l.id === 'R9' ? '#111' : '#fff'}`}>{l.id}</span>{l.text}</li>)}
+  </ul>
+  <p class="note">Redrawn from the proposal artwork. <a class="orig" href="/images/graphic-design/metro/metro-del-valles.webp" target="_blank" rel="noopener">Original</a> ↗</p>
+</figure>
+
+<style>
+  .valles { margin:2rem 0 0; display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); gap:1.5rem; align-items:end; }
+  .art { background:#fff; border-radius:24px; overflow:hidden; box-shadow:0 0 0 1px var(--border); }
+  svg { display:block; width:100%; height:auto; font-family:var(--campaign); }
+  .hdr .fgc { font-size:64px; font-weight:800; fill:#1f2d2d; }
+  .hdr .k { font-size:28px; fill:#1f2d2d; letter-spacing:.02em; }
+  .hdr .t { font-size:40px; font-weight:700; fill:#1f2d2d; }
+  .ln { fill:none; stroke-width:22; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:0; }
+  .tick { stroke-width:10; }
+  .cap, .ring { fill:#fff; stroke:#111; stroke-width:9; }
+  .lbl { font-size:40px; font-weight:700; fill:#111; }
+  .big { font-size:44px; }
+  .pill text { font-size:30px; font-weight:700; fill:#fff; }
+  .pill text.dark { fill:#111; }
+  .pill { transform-box:fill-box; transform-origin:center; }
+  [data-armed] .ln { stroke-dashoffset:1; transition:stroke-dashoffset 1.6s cubic-bezier(.5,0,.2,1) calc(var(--i) * .2s); }
+  [data-armed] .pill { transform:scale(0); transition:transform .45s cubic-bezier(.3,1.7,.5,1) calc(1.4s + var(--i) * .1s); }
+  [data-armed] .lbl, [data-armed] .tick, [data-armed] .cap, [data-armed] .ring { opacity:0; transition:opacity .5s 1.2s; }
+  [data-inview] .ln { stroke-dashoffset:0; }
+  [data-inview] .pill { transform:none; }
+  [data-inview] .lbl, [data-inview] .tick, [data-inview] .cap, [data-inview] .ring { opacity:1; }
+  .note { grid-column:1/-1; margin:0; }
+  .legend { list-style:none; padding:0; margin:0; display:grid; gap:.5rem; font-size:.875rem; }
+  .legend li { display:flex; gap:.6rem; align-items:center; }
+  .b { flex:none; display:inline-grid; place-items:center; min-width:2.6rem; height:1.5rem; font-weight:700; font-size:.8125rem; }
+  .b.round { border-radius:999px; }
+  @media (max-width:760px) { .valles { grid-template-columns:1fr; } }
+</style>

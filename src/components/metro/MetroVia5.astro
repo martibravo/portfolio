@@ -1,0 +1,100 @@
+---
+/* Block 6: "Metro 2032". L9 and L10 take L5's central section between
+   Collblanc and La Sagrera, joined to the L9/L10 ends that already run.
+   Three steps: today, L5's core, the combined route. */
+import network from '../../data/metro/network.json';
+import { COLOR } from './lines';
+
+const VB = '70 70 1790 930';
+const { lines, m2032 } = network;
+const byId = Object.fromEntries(lines.map((l) => [l.id, l]));
+const others = lines.filter((l) => !['L5', 'L9', 'L10'].includes(l.id));
+const steps = [
+  { n: 1, label: 'Today', text: 'L9 and L10 run at both ends. The middle, under Zona Universitària, Sarrià and Lesseps, is still being dug.' },
+  { n: 2, label: 'L5’s core', text: 'L5 already crosses the city from Collblanc to La Sagrera, through Sants, Hospital Clínic, Diagonal and Sagrada Família.' },
+  { n: 3, label: 'Joined up', text: 'Metro 2032 routes L9 and L10 through that section, from Collblanc to La Sagrera, joined to the ends that already work.' },
+];
+---
+
+<figure class="whatif via" data-via data-step="1">
+  <div class="card-top">
+    <span class="tag">What if…? · B</span>
+    <h3>Metro 2032: L9 and L10 through L5’s middle.</h3>
+    <ol class="steps">
+      {steps.map((s) => (
+        <li><button type="button" data-go={s.n} aria-pressed={s.n === 1 ? 'true' : 'false'}><b>{s.n}</b>{s.label}</button></li>
+      ))}
+    </ol>
+    <div class="step-text" aria-live="polite">
+      {steps.map((s) => <p data-text={s.n}>{s.text}</p>)}
+    </div>
+  </div>
+  <div class="stage" data-reveal>
+    <svg viewBox={VB} role="img" aria-label="Network diagram showing L9 and L10 routed through L5’s central section between Collblanc and La Sagrera.">
+      <g class="faded">
+        {others.map((l) => l.pieces.map((p) => <path d={p.d} style={`stroke:${l.color}`} />))}
+        {byId.L5.pieces.map((p) => <path d={p.d} style={`stroke:${COLOR.L5}`} />)}
+      </g>
+      <g class="ends">
+        {byId.L9.pieces.filter((p) => !p.new).map((p) => <path d={p.d} style={`stroke:${COLOR.L9}`} />)}
+        {byId.L10.pieces.filter((p) => !p.new).map((p) => <path d={p.d} style={`stroke:${COLOR.L10}`} />)}
+      </g>
+      <g class="dig">
+        {byId.L9.pieces.filter((p) => p.new).map((p) => <path d={p.d} />)}
+      </g>
+      <path class="core-glow" d={m2032.mid} />
+      <path class="core" d={m2032.mid} pathLength="1" />
+      <path class="route r9" d={m2032.m9} pathLength="1" style={`stroke:${COLOR.L9}`} />
+      <path class="route r10" d={m2032.m10} pathLength="1" style={`stroke:${COLOR.L10}`} />
+    </svg>
+  </div>
+  <p class="note">Collblanc and La Sagrera are the two junctions. The remaining L9 branch to Zona Universitària stays in place. <a class="orig" href="/images/graphic-design/metro/l9-l10-via-l5.webp" target="_blank" rel="noopener">Original artwork</a> ↗</p>
+</figure>
+
+<style>
+  svg { display:block; width:100%; height:auto; overflow:visible; }
+  .faded path { fill:none; stroke-width:7; stroke-linecap:round; stroke-linejoin:round; opacity:.13; }
+  .ends path { fill:none; stroke-width:10; stroke-linecap:round; stroke-linejoin:round; }
+  .dig path { fill:none; stroke:var(--muted); stroke-width:9; stroke-dasharray:4 14; stroke-linecap:round; animation:march 1.2s linear infinite; transition:opacity .6s; }
+  @keyframes march { to { stroke-dashoffset:-18; } }
+  .core-glow { fill:none; stroke:#317bc8; stroke-width:34; stroke-linecap:round; stroke-linejoin:round; opacity:0; transition:opacity .6s; }
+  .core { fill:none; stroke:#317bc8; stroke-width:12; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset 1.2s cubic-bezier(.6,0,.2,1), opacity .6s; }
+  .route { fill:none; stroke-width:8; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset 1.6s cubic-bezier(.6,0,.2,1); }
+  .r10 { transition-delay:.15s; }
+  .via[data-step="2"] .core, .via[data-step="3"] .core { stroke-dashoffset:0; }
+  .via[data-step="2"] .core-glow { opacity:.18; }
+  .via[data-step="3"] .core { opacity:.25; }
+  .via[data-step="3"] .route { stroke-dashoffset:0; }
+  .via[data-step="3"] .dig path { opacity:.15; }
+  .steps { list-style:none; display:flex; flex-wrap:wrap; gap:.4rem; padding:0; margin:1rem 0 .75rem; }
+  .steps button { display:inline-flex; align-items:center; gap:.45rem; border:1px solid var(--border); background:var(--bg); color:var(--fg); border-radius:999px; padding:.3rem .85rem .3rem .3rem; font:inherit; font-size:.8125rem; cursor:pointer; }
+  .steps b { display:inline-grid; place-items:center; width:1.6em; height:1.6em; border-radius:50%; background:var(--hover-bg); font-size:.75rem; transition:background .3s, color .3s; }
+  .steps button[aria-pressed="true"] { border-color:var(--fg); }
+  .steps button[aria-pressed="true"] b { background:#ff6600; color:#fff; }
+  .step-text p { display:none; margin:0; font-size:.9375rem; min-height:3em; }
+  .via[data-step="1"] [data-text="1"], .via[data-step="2"] [data-text="2"], .via[data-step="3"] [data-text="3"] { display:block; animation:fade .4s; }
+  @keyframes fade { from { opacity:0; transform:translateY(4px); } }
+  @media (prefers-reduced-motion:reduce) { .dig path { animation:none; } .core, .route { transition:none; } }
+</style>
+
+<script>
+  import { onReveal } from './reveal';
+  function initVia() {
+    document.querySelectorAll<HTMLElement>('[data-via]:not([data-initialized])').forEach((fig) => {
+      fig.dataset.initialized = '';
+      const buttons = fig.querySelectorAll<HTMLButtonElement>('[data-go]');
+      let timer: number | undefined;
+      const go = (n: number) => {
+        fig.dataset.step = String(n);
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.go) === n)));
+      };
+      buttons.forEach((b) => b.addEventListener('click', () => { clearTimeout(timer); go(Number(b.dataset.go)); }));
+      const stage = fig.querySelector('[data-reveal]')!;
+      onReveal(stage, () => {
+        timer = window.setTimeout(() => { go(2); timer = window.setTimeout(() => go(3), 2600); }, 1400);
+      });
+    });
+  }
+  initVia();
+  document.addEventListener('astro:page-load', initVia);
+</script>

@@ -1,0 +1,91 @@
+---
+/* Block 13: the A3 poster assembled layer by layer on scroll, with a
+   Figma-style layers panel to switch each layer off again. */
+import A3Map from './A3Map.astro';
+const layers = [
+  { id: 'names', label: 'Names', swatch: 'Aa' },
+  { id: 'stations', label: 'Stations', swatch: '○' },
+  { id: 'lines', label: 'Lines', swatch: '╱' },
+  { id: 'geo', label: 'Geography', swatch: '≈' },
+];
+---
+
+<figure class="a3wrap" data-a3 data-reveal>
+  <div class="frame">
+    <A3Map label="Metro de Barcelona A3 poster: the full future network drawn over the coastline, the Llobregat and Besòs rivers, Montjuïc and Collserola." />
+  </div>
+  <aside class="panel" aria-label="Map layers">
+    <p class="panel-title"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>Layers</p>
+    <ul>
+      {layers.map((l, i) => (
+        <li style={`--i:${3 - i}`}>
+          <button type="button" data-toggle={l.id} aria-pressed="true">
+            <span class="sw" aria-hidden="true">{l.swatch}</span>{l.label}<span class="eye" aria-hidden="true"></span>
+          </button>
+        </li>
+      ))}
+    </ul>
+    <p class="panel-note">A3 · 420 × 297 mm<br /><a class="orig" href="/images/graphic-design/metro/a3-full.webp" target="_blank" rel="noopener">Original</a> · <a class="orig" href="/images/graphic-design/metro/a3-no-names.webp" target="_blank" rel="noopener">no names</a> ↗</p>
+  </aside>
+</figure>
+
+<style>
+  .a3wrap { position:relative; margin:2.5rem 0 0; display:grid; grid-template-columns:1fr 200px; gap:1rem; align-items:start; }
+  .frame { border-radius:14px; overflow:hidden; box-shadow:0 1px 0 #0000000d, 0 18px 50px -18px #0005; transform:rotate(-.4deg); transition:transform .4s; }
+  .frame:hover { transform:rotate(0); }
+  .panel { position:sticky; top:1.5rem; background:#2c2c2c; color:#eee; border-radius:12px; padding:.6rem; font-size:.8125rem; box-shadow:0 12px 30px #0003; }
+  .panel-title { display:flex; align-items:center; gap:.5rem; margin:0 0 .5rem; padding:.2rem .3rem .5rem; border-bottom:1px solid #ffffff1a; font-weight:700; }
+  .dots { display:flex; gap:4px; } .dots i { width:8px; height:8px; border-radius:50%; background:#ff5f57; } .dots i:nth-child(2) { background:#febc2e; } .dots i:nth-child(3) { background:#28c840; }
+  ul { list-style:none; margin:0; padding:0; display:grid; gap:2px; }
+  button { display:flex; align-items:center; gap:.55rem; width:100%; border:0; background:none; color:inherit; font:inherit; padding:.45rem .5rem; border-radius:6px; cursor:pointer; text-align:left; }
+  button:hover { background:#ffffff14; }
+  button[aria-pressed="false"] { color:#888; }
+  .sw { width:1.1rem; text-align:center; opacity:.8; }
+  .eye { margin-left:auto; width:16px; height:10px; border:1.5px solid currentColor; border-radius:50% / 60%; position:relative; }
+  .eye::after { content:''; position:absolute; inset:2px 5px; border-radius:50%; background:currentColor; }
+  button[aria-pressed="false"] .eye::before { content:''; position:absolute; left:-3px; right:-3px; top:50%; height:1.5px; background:currentColor; transform:rotate(-30deg); }
+  .panel-note a { color:inherit; }
+  .panel-note { margin:.5rem 0 0; padding:.5rem .3rem 0; border-top:1px solid #ffffff1a; color:#999; font-size:.75rem; }
+  .a3wrap :global(.layer) { transition:opacity .6s; }
+  .a3wrap[data-off-geo] :global([data-layer="geo"]),
+  .a3wrap[data-off-lines] :global([data-layer="lines"]),
+  .a3wrap[data-off-stations] :global([data-layer="stations"]),
+  .a3wrap[data-off-names] :global([data-layer="names"]) { opacity:0; }
+  /* assembly on first view: geography, then lines drawing, then stations, then names */
+  .a3wrap[data-armed]:not([data-inview]) :global(.layer) { opacity:0; }
+  .a3wrap[data-armed] :global([data-layer="geo"]) { transition-delay:0s; }
+  .a3wrap[data-armed] :global([data-layer="lines"]) { transition-delay:.4s; }
+  .a3wrap[data-armed] :global([data-layer="stations"]) { transition-delay:2.2s; }
+  .a3wrap[data-armed] :global([data-layer="names"]) { transition-delay:2.8s; }
+  .a3wrap[data-armed] :global(.ln) { stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset 1.8s cubic-bezier(.5,0,.2,1) calc(.4s + var(--i) * 60ms); }
+  .a3wrap[data-inview] :global(.ln) { stroke-dashoffset:0; }
+  .a3wrap[data-touched] :global(.layer) { transition-delay:0s !important; }
+  li { transition:opacity .4s, transform .4s; }
+  .a3wrap[data-armed]:not([data-inview]) li { opacity:0; transform:translateX(10px); }
+  .a3wrap[data-armed] li { transition-delay:calc(var(--i) * .7s); }
+  @media (max-width:760px) {
+    .a3wrap { grid-template-columns:1fr; }
+    .panel { position:static; }
+    ul { grid-template-columns:repeat(2,1fr); }
+  }
+  @media (prefers-reduced-motion:reduce) { .a3wrap :global(.ln), .a3wrap :global(.layer), li { transition:none !important; } }
+</style>
+
+<script>
+  function initA3() {
+    document.querySelectorAll<HTMLElement>('[data-a3]:not([data-initialized])').forEach((fig) => {
+      fig.dataset.initialized = '';
+      fig.querySelectorAll<HTMLButtonElement>('[data-toggle]').forEach((b) => {
+        b.addEventListener('click', () => {
+          fig.dataset.touched = '';
+          const on = b.getAttribute('aria-pressed') !== 'true';
+          b.setAttribute('aria-pressed', String(on));
+          const key = `off${b.dataset.toggle![0].toUpperCase()}${b.dataset.toggle!.slice(1)}`;
+          if (on) delete fig.dataset[key]; else fig.dataset[key] = '';
+        });
+      });
+    });
+  }
+  initA3();
+  document.addEventListener('astro:page-load', initA3);
+</script>

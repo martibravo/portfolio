@@ -1,0 +1,83 @@
+---
+/* Block 5: "What if L2 and L5 swapped ends?" Both lines are split at
+   Sagrada Família; the swap repaints each north-eastern half outward from
+   the junction in the other line's colour. */
+import network from '../../data/metro/network.json';
+import { COLOR } from './lines';
+
+const VB = '70 70 1790 930';
+const { swap, lines } = network;
+const [sfx, sfy] = swap.sf;
+---
+
+<figure class="whatif swap" data-swap data-state="before">
+  <div class="card-top">
+    <span class="tag">What if…? · A</span>
+    <h3>L2 and L5 swap ends.</h3>
+    <p>The two lines already meet at Sagrada Família. This study trades their north-eastern halves there: L5 runs on to Badalona, and L2 climbs to Vall d’Hebron.</p>
+    <button type="button" class="go" aria-pressed="false"><span class="icon" aria-hidden="true">⇄</span><span class="label">Swap the ends</span></button>
+  </div>
+  <div class="stage">
+    <svg viewBox={VB} role="img" aria-label="Network diagram with L2 and L5 highlighted. Swapping sends L5 to Badalona Pompeu Fabra and L2 to Vall d’Hebron.">
+      <g class="faded">
+        {lines.filter((l) => l.id !== 'L2' && l.id !== 'L5').map((l) => l.pieces.map((p) => <path d={p.d} style={`stroke:${l.color}`} />))}
+      </g>
+      <path class="half" d={swap.l5b} style={`stroke:${COLOR.L5}`} />
+      <path class="half" d={swap.l2b} style={`stroke:${COLOR.L2}`} />
+      <g class="flip">
+        <path class="half" d={swap.l5a} style={`stroke:${COLOR.L5}`} />
+        <path class="half paint" d={swap.l5a} pathLength="1" style={`stroke:${COLOR.L2}`} />
+        <path class="half" d={swap.l2a} style={`stroke:${COLOR.L2}`} />
+        <path class="half paint" d={swap.l2a} pathLength="1" style={`stroke:${COLOR.L5}`} />
+      </g>
+      <circle class="spark" cx={sfx} cy={sfy} r="22" />
+      <circle class="junction" cx={sfx} cy={sfy} r="13" />
+    </svg>
+  </div>
+  <dl class="routes">
+    <div style={`--c:${COLOR.L5}`}><dt>L5</dt><dd>Cornellà Centre → <span class="a">Vall d’Hebron</span><span class="b">Badalona Pompeu Fabra</span></dd></div>
+    <div style={`--c:${COLOR.L2}`}><dt>L2</dt><dd>Aeroport T1 → <span class="a">Badalona Pompeu Fabra</span><span class="b">Vall d’Hebron</span></dd></div>
+  </dl>
+  <p class="note">Originals: <a class="orig" href="/images/graphic-design/metro/l2-l5-before.webp" target="_blank" rel="noopener">before</a> · <a class="orig" href="/images/graphic-design/metro/l2-l5-swapped.webp" target="_blank" rel="noopener">swapped</a> ↗</p>
+</figure>
+
+<style>
+  svg { display:block; width:100%; height:auto; overflow:visible; }
+  .faded path { fill:none; stroke-width:7; stroke-linecap:round; stroke-linejoin:round; opacity:.13; }
+  .half { fill:none; stroke-width:12; stroke-linecap:round; stroke-linejoin:round; }
+  .paint { stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset 1.3s cubic-bezier(.6,0,.2,1); }
+  .swap[data-state="after"] .paint { stroke-dashoffset:0; }
+  .junction { fill:var(--bg); stroke:var(--fg); stroke-width:6; }
+  .spark { fill:none; stroke:var(--fg); stroke-width:4; opacity:0; transform-box:fill-box; transform-origin:center; }
+  .swap[data-flash] .spark { animation:spark .7s ease-out; }
+  @keyframes spark { 0% { opacity:.8; transform:scale(.5); } 100% { opacity:0; transform:scale(3); } }
+  .routes { display:grid; gap:.5rem; margin:1rem 0 0; font-size:.875rem; }
+  .routes > div { display:flex; gap:.6rem; align-items:center; }
+  .routes dt { background:var(--c); color:#fff; font-weight:700; font-size:.75rem; padding:.1rem .4rem; border-radius:4px; }
+  .routes dd { margin:0; }
+  .routes .b { display:none; }
+  .swap[data-state="after"] .routes .a { display:none; }
+  .swap[data-state="after"] .routes .b { display:inline; animation:pop .5s cubic-bezier(.3,1.6,.5,1); }
+  @keyframes pop { from { opacity:0; transform:translateY(6px); } }
+  .routes span { display:inline-block; font-weight:600; }
+  @media (prefers-reduced-motion:reduce) { .paint { transition:none; } .swap[data-flash] .spark { animation:none; } }
+</style>
+
+<script>
+  function initSwap() {
+    document.querySelectorAll<HTMLElement>('[data-swap]:not([data-initialized])').forEach((fig) => {
+      fig.dataset.initialized = '';
+      const btn = fig.querySelector<HTMLButtonElement>('.go')!;
+      const label = btn.querySelector('.label')!;
+      btn.addEventListener('click', () => {
+        const after = fig.dataset.state !== 'after';
+        fig.dataset.state = after ? 'after' : 'before';
+        btn.setAttribute('aria-pressed', String(after));
+        label.textContent = after ? 'Swap them back' : 'Swap the ends';
+        delete fig.dataset.flash; void fig.offsetWidth; fig.dataset.flash = '';
+      });
+    });
+  }
+  initSwap();
+  document.addEventListener('astro:page-load', initSwap);
+</script>

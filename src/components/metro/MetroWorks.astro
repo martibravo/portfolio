@@ -1,0 +1,369 @@
+---
+/* Block 8: the L9/L10 works map, redrawn, with a slider across its seven
+   dated editions. The central section is one path; tunnel states, the boring
+   machine and every station card update from the transcribed data. */
+import network from '../../data/metro/network.json';
+import geo from '../../data/metro/editions-geo.json';
+import { EDITIONS } from '../../data/metro/editions';
+import { COLOR } from './lines';
+
+const T = { x: 20.5, y: -131 };   // 2030 artwork → works-map frame
+const VB = { x: 600, y: 118, w: 900, h: 402 };
+
+// Walk the central polyline to place stations, ticks and the machine.
+const P = [...geo.central.matchAll(/(-?\d+\.?\d*) (-?\d+\.?\d*)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+const seg = P.slice(1).map((p, i) => Math.hypot(p[0] - P[i][0], p[1] - P[i][1]));
+const total = seg.reduce((a, b) => a + b, 0);
+function at(t: number) {
+  let d = t * total;
+  for (let i = 0; i < seg.length; i++) {
+    if (d <= seg[i] || i === seg.length - 1) {
+      const k = seg[i] ? Math.min(d / seg[i], 1) : 0;
+      const [a, b] = [P[i], P[i + 1]];
+      const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+      return { x: a[0] + (b[0] - a[0]) * k, y: a[1] + (b[1] - a[1]) * k, ang: (ang * 180) / Math.PI };
+    }
+    d -= seg[i];
+  }
+  return { x: 0, y: 0, ang: 0 };
+}
+
+const S = geo.stations as Record<string, { t: number; x: number; y: number }>;
+const RINGS = new Set(['Zona Universitària', 'Mandri', 'Lesseps', 'Guinardó']);
+const CAPS: Record<string, number> = { 'Sarrià': 90, 'La Sagrera': 45, 'Sagrera | TAV': 90 };
+const LESSEPS = S['Lesseps'].t;
+const SLAB_FROM = S['Guinardó'].t;
+const markers = Object.entries(S).map(([name, s]) => {
+  const p = name === 'Sagrera | TAV' ? { x: s.x, y: s.y, ang: 0 } : at(s.t);
+  return { name, ...p, kind: RINGS.has(name) ? 'ring' : name in CAPS ? 'cap' : 'tick' };
+});
+// label placement: above for the top run, below-left elsewhere
+const labelPos: Record<string, [number, number, 'start' | 'end' | 'middle']> = {
+  'Zona Universitària': [-8, -18, 'end'], 'Campus Nord': [0, -16, 'middle'], 'Manuel Girona': [0, 30, 'middle'],
+  'Prat de la Riba': [0, -16, 'middle'], 'Sarrià': [0, -34, 'middle'], 'Mandri': [16, -6, 'start'],
+  'El Putxet': [-14, 6, 'end'], 'Lesseps': [-16, 24, 'end'], 'Muntanya': [0, -16, 'middle'], 'Sanllehy': [0, -16, 'middle'],
+  'Guinardó': [16, -8, 'start'], 'Pl. Maragall': [-14, 8, 'end'], 'La Sagrera': [-18, 16, 'end'], 'Sagrera | TAV': [0, -26, 'middle'],
+};
+const tbmPos = EDITIONS.map((e) => at(e.tbm));
+const payload = {
+  editions: EDITIONS.map((e, i) => ({ ...e, pos: tbmPos[i] })),
+  lesseps: LESSEPS,
+};
+const cards = ['Campus Nord', 'Manuel Girona', 'Prat de la Riba', 'Sarrià', 'Mandri', 'El Putxet', 'Lesseps', 'Muntanya', 'Sanllehy', 'Guinardó', 'Pl. Maragall', 'La Sagrera', 'Sagrera | TAV'];
+const first = EDITIONS[0];
+const bored = (t: number) => `${t} ${LESSEPS - t} ${1 - LESSEPS} 1`;
+---
+
+<figure class="works" data-works data-ed="0">
+  <script type="application/json" data-payload set:html={JSON.stringify(payload)} />
+  <header class="works-head">
+    <div class="bullets" aria-hidden="true">
+      <span style={`--c:${COLOR.L9}`}>L9</span><span style={`--c:${COLOR.L10}`}>L10</span>
+      <span class="late" style={`--c:${COLOR.L4};--ink:#111`}>L4</span><span class="late" style={`--c:${COLOR.L2}`}>L2</span>
+    </div>
+    <p class="map-title" lang="ca">Estat de les obres<br />del metro de Barcelona<br /><em>a <span data-date>{first.date}</span></em></p>
+  </header>
+
+  <div class="works-map">
+    <svg viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`} role="img" aria-labelledby="works-desc">
+      <desc id="works-desc">Redrawn map of the L9/L10 central section between Zona Universitària and La Sagrera. Use the edition slider below to see how far the tunnel had been bored and how each station progressed.</desc>
+      <g class="bg" transform={`translate(${T.x} ${T.y})`}>
+        {network.lines.filter((l) => l.id !== 'L9' && l.id !== 'L10').map((l) => l.pieces.map((p) => <path d={p.d} style={`stroke:${l.color}`} />))}
+      </g>
+      <g class="service">
+        {geo.l9.filter((p) => !p.new).map((p) => <path d={p.d} style={`stroke:${COLOR.L9}`} />)}
+        {geo.l10.filter((p) => !p.new).map((p) => <path d={p.d} style={`stroke:${COLOR.L10}`} />)}
+      </g>
+      <path class="band none" d={geo.central} />
+      <path class="band bored" d={geo.central} pathLength="1" style={`stroke-dasharray:${bored(first.tbm)}`} />
+      <path class="band slab" d={geo.central} pathLength="1" style={`stroke-dasharray:0 ${SLAB_FROM} ${1 - SLAB_FROM} 1`} />
+      {markers.map((m) => {
+        const [dx, dy, anchor] = labelPos[m.name] ?? [0, -16, 'middle'];
+        return (
+          <g class="st" data-station={m.name}>
+            {m.kind === 'ring' && <circle cx={m.x} cy={m.y} r="10" />}
+            {m.kind === 'cap' && <rect x={m.x - 9} y={m.y - 20} width="18" height="40" rx="9" transform={`rotate(${CAPS[m.name] - 90} ${m.x} ${m.y})`} />}
+            {m.kind === 'tick' && <path d={`M${m.x} ${m.y} l0 -14`} transform={`rotate(${m.ang} ${m.x} ${m.y})`} />}
+            <text x={m.x + dx} y={m.y + dy} text-anchor={anchor} data-label={m.name}>{m.name === 'Mandri' ? first.names.mandri : m.name === 'Muntanya' ? first.names.muntanya : m.name}</text>
+          </g>
+        );
+      })}
+      <g class="tbm" style={`transform:translate(${tbmPos[0].x}px,${tbmPos[0].y}px) rotate(${tbmPos[0].ang}deg)`}>
+        <g class="tbm-body">
+          <rect x="-34" y="-10" width="30" height="20" rx="6" />
+          <g class="wheel"><circle r="12" /><path d="M-9 0H9M0 -9V9M-6.4 -6.4L6.4 6.4M-6.4 6.4L6.4 -6.4" /></g>
+        </g>
+      </g>
+    </svg>
+    <span class="speed" data-speed>200 m/month</span>
+  </div>
+
+  <div class="scrub">
+    <button type="button" class="play" data-play aria-label="Play through the editions"><span aria-hidden="true">▶</span></button>
+    <div class="range">
+      <input type="range" min="0" max={EDITIONS.length - 1} step="1" value="0" aria-label="Map edition" aria-valuetext={first.short} />
+      <ol aria-hidden="true">{EDITIONS.map((e, i) => <li style={`--p:${(i / (EDITIONS.length - 1)) * 100}%`}><button type="button" tabindex="-1" data-jump={i}>{e.short}</button></li>)}</ol>
+    </div>
+  </div>
+
+  <div class="panels">
+    <section class="news">
+      <div class="news-head"><h4 data-news-title>{first.newsTitle}</h4>
+        <button type="button" class="lang" data-lang aria-pressed="false" title="Show the map’s original Catalan">CA</button></div>
+      <ul data-news>{first.news.map((n) => <li>{n.en}</li>)}</ul>
+    </section>
+    <section class="forecast">
+      <h4><span>Previsió</span> Forecasts on this edition</h4>
+      <ul data-forecast>{first.forecast.map((f) => <li>{f.en}</li>)}</ul>
+      <button type="button" class="original" data-original>See this edition’s original map ↗</button>
+    </section>
+  </div>
+
+  <ul class="cards" aria-label="Station progress in this edition">
+    {cards.map((name) => {
+      const s = first.stations[name];
+      return (
+        <li class="card" data-card={name}>
+          <div class="card-top"><span class="name" data-name>{name === 'Mandri' ? first.names.mandri : name === 'Muntanya' ? first.names.muntanya : name}</span><span class="year" data-year>{s ? s[2] : ''}</span></div>
+          <div class="meter civil"><span class="bar"><i style={`--v:${s?.[0] ?? 0}%`}></i></span><span class="val" data-civil>{s?.[0] == null ? '—' : `${s[0]}%`}</span></div>
+          <div class="meter arch"><span class="bar"><i style={`--v:${s?.[1] ?? 0}%`}></i></span><span class="val" data-arch>{s?.[1] == null ? '—' : `${s[1]}%`}</span></div>
+          <span class="gone">off the map</span>
+        </li>
+      );
+    })}
+  </ul>
+  <p class="legend"><span class="k civil"></span>civil works (— not started) <span class="k arch"></span>architecture <span class="k year"></span>estimated opening (PDI 2021–2030) <span class="k bored"></span>bored tunnel <span class="k none"></span>not yet bored <span class="k slab"></span>slab finished</p>
+
+  <dialog data-dialog>
+    <form method="dialog"><button aria-label="Close">×</button></form>
+    <img alt="" width="1920" height="1080" data-img />
+  </dialog>
+</figure>
+
+<style>
+  .works { margin:2.5rem 0 0; background:var(--hover-bg); border-radius:24px; padding:clamp(1rem,3vw,2rem); }
+  .works-head { display:flex; align-items:flex-start; gap:1rem 1.5rem; flex-wrap:wrap; }
+  .bullets { display:flex; gap:6px; }
+  .bullets span { display:grid; place-items:center; width:clamp(44px,6vw,64px); aspect-ratio:1; background:var(--c); color:var(--ink,#fff); font-weight:700; font-size:clamp(1.1rem,2.4vw,1.8rem); letter-spacing:-.05em; border-radius:2px; transition:transform .5s cubic-bezier(.3,1.6,.5,1), opacity .3s; }
+  .bullets .late { transform:scale(0); opacity:0; width:0; margin-left:-6px; }
+  .works[data-ed="5"] .bullets .late, .works[data-ed="6"] .bullets .late { transform:none; opacity:1; width:clamp(44px,6vw,64px); margin-left:0; }
+  .map-title { margin:0; font-weight:700; font-size:clamp(1.1rem,2.2vw,1.6rem); line-height:1.08; letter-spacing:-.03em; }
+  .map-title em { font-weight:400; }
+  [data-date] { display:inline-block; }
+  .works[data-flip] [data-date] { animation:flipIn .45s cubic-bezier(.3,1.4,.5,1); }
+  @keyframes flipIn { from { transform:rotateX(90deg); opacity:0; } }
+
+  .works-map { position:relative; margin:1rem -1rem 0; background:var(--bg); border-radius:18px; padding:.5rem; }
+  svg { display:block; width:100%; height:auto; }
+  .bg path { fill:none; stroke-width:7; stroke-linecap:round; stroke-linejoin:round; opacity:.14; }
+  .service path { fill:none; stroke-width:9; stroke-linecap:round; stroke-linejoin:round; }
+  .band { fill:none; stroke-linecap:butt; stroke-linejoin:round; }
+  .none { stroke:#c6c6c6; stroke-width:16; }
+  .bored { stroke:#ffe07d; stroke-width:16; transition:stroke-dasharray 1.2s cubic-bezier(.6,0,.2,1); }
+  .slab { stroke:#f59e00; stroke-width:4; }
+  .st circle, .st rect { fill:var(--bg); stroke:var(--fg); stroke-width:4.5; }
+  .st path { stroke:var(--fg); stroke-width:4; }
+  .st text { font-family:var(--campaign); font-size:13px; font-weight:700; fill:var(--fg); paint-order:stroke; stroke:var(--bg); stroke-width:4px; stroke-linejoin:round; transition:opacity .3s; }
+  .st.hl circle, .st.hl rect { stroke:#ff6600; }
+  .st.hl text { fill:#ff6600; }
+  .st.hidden { opacity:.0; }
+  .st { transition:opacity .4s; }
+  .tbm { transition:transform 1.2s cubic-bezier(.6,0,.2,1); }
+  .tbm rect { fill:#ff6600; stroke:var(--fg); stroke-width:2.5; }
+  .wheel circle { fill:#ffd24a; stroke:var(--fg); stroke-width:2.5; }
+  .wheel path { stroke:var(--fg); stroke-width:2; }
+  .wheel { animation:spin 1.4s linear infinite; animation-play-state:paused; }
+  .works[data-dig] .wheel { animation-play-state:running; }
+  .works[data-ed="5"] .tbm-body, .works[data-ed="6"] .tbm-body { animation:snooze 2.6s ease-in-out infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  @keyframes snooze { 50% { transform:translateY(-3px) rotate(-4deg); } }
+  .speed { position:absolute; left:1rem; bottom:.75rem; font-size:.75rem; color:var(--muted); background:var(--hover-bg); padding:.15rem .55rem; border-radius:999px; }
+  @media (max-width:640px) { .st text { display:none; } }
+
+  .scrub { display:flex; align-items:center; gap:1rem; margin:1.25rem 0 .5rem; }
+  .play { flex:none; width:48px; height:48px; border-radius:50%; border:0; background:#ff6600; color:#fff; font-size:1rem; cursor:pointer; transition:transform .2s; }
+  .play:hover { transform:scale(1.08); }
+  .works[data-playing] .play span::before { content:'❚❚'; font-size:.8rem; letter-spacing:-2px; }
+  .works[data-playing] .play span { font-size:0; }
+  .range { position:relative; flex:1; padding-bottom:1.75rem; }
+  input[type=range] { width:100%; accent-color:#ff6600; margin:0; cursor:pointer; }
+  .range ol { list-style:none; padding:0; margin:0; position:absolute; left:8px; right:8px; top:1.6rem; height:1.5rem; }
+  .range li { position:absolute; left:var(--p); transform:translateX(-50%); }
+  .range li button { border:0; background:none; font:inherit; font-size:.75rem; color:var(--muted); white-space:nowrap; cursor:pointer; padding:0; }
+  .range li button.on { color:var(--fg); font-weight:700; }
+  @media (max-width:640px) { .range li:nth-child(even) { display:none; } }
+
+  .panels { display:grid; grid-template-columns:1.3fr 1fr; gap:1rem; margin-top:.5rem; }
+  .panels section { background:var(--bg); border-radius:16px; padding:1rem 1.1rem; }
+  .news { border:2px solid var(--fg); }
+  .news-head { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:.5rem; }
+  h4 { margin:0; font-family:var(--campaign); font-size:1rem; font-weight:700; letter-spacing:-.01em; }
+  .news h4 { background:var(--fg); color:var(--bg); padding:.2rem .55rem; border-radius:4px; }
+  .lang { border:1px solid var(--border); background:none; color:var(--fg); border-radius:999px; font:inherit; font-size:.75rem; font-weight:700; padding:.2rem .6rem; cursor:pointer; }
+  .lang[aria-pressed="true"] { background:var(--fg); color:var(--bg); }
+  ul[data-news], ul[data-forecast] { margin:0; padding-left:1.1rem; font-size:.875rem; line-height:1.45; display:grid; gap:.3rem; }
+  ul[data-news] :global(li.obs) { color:var(--muted); font-style:italic; }
+  .works[data-flip] ul[data-news] :global(li) { animation:rise .4s both; }
+  @keyframes rise { from { opacity:0; transform:translateY(6px); } }
+  .forecast h4 span { display:block; color:#e32739; font-size:.6875rem; text-transform:uppercase; letter-spacing:.06em; }
+  .original { margin-top:.9rem; border:0; background:none; padding:0; font:inherit; font-size:.8125rem; text-decoration:underline; text-underline-offset:4px; color:var(--fg); cursor:pointer; }
+
+  .cards { list-style:none; padding:0; margin:1rem 0 0; display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:.5rem; }
+  .card { position:relative; background:var(--bg); border-radius:12px; padding:.6rem .7rem .7rem; font-size:.75rem; transition:transform .2s, box-shadow .2s, opacity .3s; cursor:default; }
+  .card:hover { transform:translateY(-2px); box-shadow:0 6px 18px #0001; }
+  .card-top { display:flex; justify-content:space-between; align-items:center; gap:.4rem; margin-bottom:.45rem; }
+  .name { font-weight:700; font-size:.8125rem; line-height:1.15; }
+  .year { flex:none; box-shadow:inset 0 0 0 1px #ffffff2e; background:#111; color:#fff; font-weight:700; padding:.05rem .35rem; border-radius:2px; font-variant-numeric:tabular-nums; display:inline-block; }
+  .year.changed { animation:flip .6s cubic-bezier(.3,1.4,.5,1); background:#e32739; }
+  @keyframes flip { 0% { transform:rotateX(0); } 50% { transform:rotateX(90deg); } 100% { transform:rotateX(0); } }
+  .meter { display:grid; grid-template-columns:1fr 2.4rem; align-items:center; gap:.4rem; margin-top:4px; }
+  .bar { position:relative; height:10px; border-radius:3px; background:var(--hover-bg); overflow:hidden; }
+  .bar i { position:absolute; inset:0 auto 0 0; width:var(--v); transition:width 1s cubic-bezier(.6,0,.2,1); }
+  .civil i { background:var(--fg); }
+  .arch i { background:#e32739; }
+  .val { font-size:.6875rem; font-weight:700; text-align:right; font-variant-numeric:tabular-nums; }
+  .arch .val { color:#e32739; }
+  .card .gone { display:none; position:absolute; inset:0; place-items:center; border-radius:12px; background:color-mix(in srgb, var(--bg) 70%, transparent); font-weight:700; color:var(--muted); }
+  .card.off .gone { display:grid; }
+  .card.off .name { text-decoration:line-through; }
+  .card.hl { outline:2px solid #ff6600; }
+
+  .legend { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem .5rem; margin:1rem 0 0; font-size:.75rem; color:var(--muted); }
+  .k { display:inline-block; width:16px; height:10px; border-radius:2px; margin-left:.4rem; }
+  .k.civil { background:var(--fg); } .k.arch { background:#e32739; } .k.year { background:#111; }
+  .k.bored { background:#ffe07d; } .k.none { background:#c6c6c6; } .k.slab { background:linear-gradient(#ffe07d 35%,#f59e00 35% 65%,#ffe07d 65%); }
+
+  dialog { border:0; padding:0; border-radius:14px; max-width:min(1200px,94vw); background:#fff; box-shadow:0 20px 60px #0005; }
+  dialog::backdrop { background:#000a; }
+  dialog img { display:block; width:100%; height:auto; }
+  dialog form { position:absolute; top:.5rem; right:.5rem; }
+  dialog form button { width:40px; height:40px; border-radius:50%; border:0; background:#111; color:#fff; font-size:1.4rem; cursor:pointer; }
+  @media (max-width:760px) { .panels { grid-template-columns:1fr; } .works-map { margin:1rem 0 0; } }
+  @media (prefers-reduced-motion:reduce) { .tbm, .bored, .bar i { transition:none; } .wheel, .tbm-body { animation:none !important; } }
+</style>
+
+<script>
+  type Ed = {
+    date: string; short: string; image: string; tbm: number; speed?: string; newsTitle: string;
+    news: { ca?: string; en: string }[]; forecast: { ca: string; en: string }[];
+    names: { mandri: string; muntanya: string | null };
+    stations: Record<string, [number | null, number | null, string]>;
+    pos: { x: number; y: number; ang: number };
+  };
+
+  function initWorks() {
+    document.querySelectorAll<HTMLElement>('[data-works]:not([data-initialized])').forEach((fig) => {
+      fig.dataset.initialized = '';
+      const { editions, lesseps } = JSON.parse(fig.querySelector('[data-payload]')!.textContent!) as { editions: Ed[]; lesseps: number };
+      const $ = <T extends Element = HTMLElement>(s: string) => fig.querySelector<T>(s)!;
+      const range = $<HTMLInputElement>('input[type=range]');
+      const jumps = fig.querySelectorAll<HTMLButtonElement>('[data-jump]');
+      const bored = $<SVGPathElement>('.bored');
+      const tbm = $<SVGGElement>('.tbm');
+      let lang: 'en' | 'ca' = 'en';
+      let current = 0;
+      let timer: number | undefined;
+
+      const renderNews = (e: Ed) => {
+        $('[data-news-title]').textContent = e.newsTitle;
+        $('[data-news]').innerHTML = '';
+        e.news.forEach((n, i) => {
+          const li = document.createElement('li');
+          li.textContent = lang === 'ca' && n.ca ? n.ca : n.en;
+          if (!n.ca) li.className = 'obs';
+          li.style.animationDelay = `${i * 60}ms`;
+          if (lang === 'ca' && n.ca) li.lang = 'ca';
+          $('[data-news]').append(li);
+        });
+        $('[data-forecast]').innerHTML = '';
+        e.forecast.forEach((f) => {
+          const li = document.createElement('li');
+          li.textContent = lang === 'ca' ? f.ca : f.en;
+          if (lang === 'ca') li.lang = 'ca';
+          $('[data-forecast]').append(li);
+        });
+      };
+
+      const show = (i: number) => {
+        const prev = editions[current];
+        const e = editions[i];
+        current = i;
+        fig.dataset.ed = String(i);
+        range.value = String(i);
+        range.setAttribute('aria-valuetext', e.short);
+        jumps.forEach((b, j) => b.classList.toggle('on', j === i));
+        $('[data-date]').textContent = e.date;
+        delete fig.dataset.flip; void fig.offsetWidth; fig.dataset.flip = '';
+        $('[data-speed]').textContent = e.speed ? `Boring speed: ${e.speed}` : '';
+        bored.style.strokeDasharray = `${e.tbm} ${lesseps - e.tbm} ${1 - lesseps} 1`;
+        tbm.style.transform = `translate(${e.pos.x}px,${e.pos.y}px) rotate(${e.pos.ang}deg)`;
+        if (e.tbm !== prev.tbm) { fig.dataset.dig = ''; setTimeout(() => delete fig.dataset.dig, 1300); }
+        // station labels on the map
+        fig.querySelectorAll<SVGTextElement>('[data-label]').forEach((t) => {
+          const n = t.dataset.label!;
+          if (n === 'Mandri') t.textContent = e.names.mandri;
+          if (n === 'Muntanya') {
+            t.textContent = e.names.muntanya ?? 'Muntanya';
+            t.parentElement!.classList.toggle('hidden', !e.names.muntanya);
+          }
+        });
+        // cards
+        fig.querySelectorAll<HTMLElement>('[data-card]').forEach((card) => {
+          const n = card.dataset.card!;
+          const s = e.stations[n];
+          const was = prev.stations[n];
+          card.classList.toggle('off', !s);
+          const name = n === 'Mandri' ? e.names.mandri : n === 'Muntanya' ? (e.names.muntanya ?? 'Muntanya') : n;
+          card.querySelector('[data-name]')!.textContent = name;
+          if (!s) return;
+          const year = card.querySelector<HTMLElement>('[data-year]')!;
+          year.textContent = s[2];
+          year.classList.remove('changed');
+          if (was && was[2] !== s[2]) { void year.offsetWidth; year.classList.add('changed'); }
+          card.querySelector<HTMLElement>('.civil i')!.style.setProperty('--v', `${s[0] ?? 0}%`);
+          card.querySelector<HTMLElement>('.arch i')!.style.setProperty('--v', `${s[1] ?? 0}%`);
+          card.querySelector('[data-civil]')!.textContent = s[0] == null ? '—' : `${s[0]}%`;
+          card.querySelector('[data-arch]')!.textContent = s[1] == null ? '—' : `${s[1]}%`;
+        });
+        renderNews(e);
+      };
+
+      range.addEventListener('input', () => { stop(); show(Number(range.value)); });
+      jumps.forEach((b) => b.addEventListener('click', () => { stop(); show(Number(b.dataset.jump)); }));
+      const stop = () => { clearInterval(timer); timer = undefined; delete fig.dataset.playing; };
+      $('[data-play]').addEventListener('click', () => {
+        if (timer) { stop(); return; }
+        fig.dataset.playing = '';
+        if (current === editions.length - 1) show(0);
+        timer = window.setInterval(() => {
+          if (current >= editions.length - 1) { stop(); return; }
+          show(current + 1);
+        }, 2000);
+      });
+      $('[data-lang]').addEventListener('click', (ev) => {
+        lang = lang === 'en' ? 'ca' : 'en';
+        (ev.currentTarget as HTMLElement).setAttribute('aria-pressed', String(lang === 'ca'));
+        (ev.currentTarget as HTMLElement).textContent = lang === 'ca' ? 'EN' : 'CA';
+        renderNews(editions[current]);
+      });
+      const dialog = $<HTMLDialogElement>('[data-dialog]');
+      $('[data-original]').addEventListener('click', () => {
+        const e = editions[current];
+        const img = $<HTMLImageElement>('[data-img]');
+        img.src = `/images/graphic-design/metro/${e.image}.webp`;
+        img.alt = `Original map: Estat de les obres, ${e.date}`;
+        dialog.showModal();
+      });
+      dialog.addEventListener('click', (ev) => { if (ev.target === dialog) dialog.close(); });
+      // hover a card ⇄ highlight its station
+      fig.querySelectorAll<HTMLElement>('[data-card]').forEach((card) => {
+        const st = fig.querySelector(`[data-station="${card.dataset.card}"]`);
+        card.addEventListener('mouseenter', () => { st?.classList.add('hl'); card.classList.add('hl'); });
+        card.addEventListener('mouseleave', () => { st?.classList.remove('hl'); card.classList.remove('hl'); });
+      });
+      jumps[0].classList.add('on');
+    });
+  }
+  initWorks();
+  document.addEventListener('astro:page-load', initWorks);
+</script>

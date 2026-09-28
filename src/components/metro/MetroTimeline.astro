@@ -1,0 +1,91 @@
+---
+/* Block 2: every map on one metro line. Dated maps sit on a 2020–2025 axis;
+   the undated ones branch off into their own section. Each station is a
+   button with a preview card and a link to its block. */
+interface Stop { x: number; row: number; title: string; date: string; img: string; href: string; approx?: boolean }
+const Y0 = 2020, Y1 = 2025.75, AXIS = 76;   // % of width used by the dated axis
+const ax = (y: number) => ((y - Y0) / (Y1 - Y0)) * AXIS + 2;
+const undated = (i: number) => 82 + i * 5;
+const ROWS = [
+  { name: 'Network diagram', color: '#e32739', y: 22 },
+  { name: 'L9/L10 works', color: '#ff6600', y: 50 },
+  { name: 'Future city', color: '#fbb911', y: 78 },
+];
+const stops: Stop[] = [
+  { x: ax(2020.4), row: 0, title: 'Metro 2020', date: '2020', img: 'network-2020', href: '#network' },
+  { x: undated(0), row: 0, title: 'Network in 2030', date: 'undated', img: 'network-2030', href: '#network' },
+  { x: undated(1), row: 0, title: 'What if: L2 ⇄ L5', date: 'undated', img: 'l2-l5-swapped', href: '#what-if' },
+  { x: undated(2), row: 0, title: 'Metro 2032: L9/L10 via L5', date: 'undated', img: 'l9-l10-via-l5', href: '#what-if' },
+  { x: undated(3), row: 0, title: 'Network in 2030, variant', date: 'undated', img: 'network-2033', href: '#network' },
+  { x: ax(2022.05), row: 1, title: 'Works map, first draft', date: 'before June 2022', img: 'works-draft-1', href: '#works', approx: true },
+  { x: ax(2022.25), row: 1, title: 'Draft with the whole network', date: 'before June 2022', img: 'works-draft-2', href: '#works', approx: true },
+  { x: ax(2022.47), row: 1, title: 'Works map', date: '21 June 2022', img: 'works-edition-1', href: '#works' },
+  { x: ax(2023.17), row: 1, title: 'Works map', date: 'March 2023', img: 'works-edition-2', href: '#works' },
+  { x: ax(2023.29), row: 1, title: 'Works map', date: 'April 2023', img: 'works-edition-3', href: '#works' },
+  { x: ax(2023.92), row: 1, title: 'Works map', date: 'December 2023', img: 'works-edition-4', href: '#works' },
+  { x: ax(2024.5), row: 1, title: 'Works map', date: 'July 2024', img: 'works-edition-5', href: '#works' },
+  { x: ax(2024.92), row: 1, title: 'Works map, now with L4 and L2', date: 'December 2024', img: 'works-edition-6', href: '#works' },
+  { x: ax(2025.42), row: 1, title: 'Works map', date: 'June 2025', img: 'works-edition-7', href: '#works' },
+  { x: undated(0), row: 2, title: 'Metro de Barcelona, A3', date: 'undated', img: 'a3-full', href: '#future' },
+  { x: undated(1), row: 2, title: 'A3: L4 as a loop', date: 'undated', img: 'a3-l4-loop', href: '#future' },
+  { x: undated(2), row: 2, title: 'Metro del Vallès', date: 'undated', img: 'metro-del-valles', href: '#valles' },
+];
+const years = Array.from({ length: 6 }, (_, i) => ({ y: Y0 + i, x: ax(Y0 + i) }));
+const rowStart = [ax(2020.4), ax(2022.05), undated(0)];
+---
+
+<figure class="timeline" data-reveal>
+  <div class="scroller">
+    <div class="track">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <rect class="undated-zone" x="79.5" y="4" width="20" height="92" rx="1.5" />
+        {ROWS.map((r, i) => (
+          <line class="row-line" x1={rowStart[i]} x2="99" y1={r.y} y2={r.y} style={`stroke:${r.color};--i:${i}`} />
+        ))}
+        {years.map((t) => <line class="year-tick" x1={t.x} x2={t.x} y1="92" y2="96" />)}
+      </svg>
+      {years.map((t) => <span class="year" style={`left:${t.x}%`}>{t.y}</span>)}
+      <span class="zone-label" style="left:89.5%">undated</span>
+      {ROWS.map((r) => <span class="row-label" style={`top:${r.y}%;--c:${r.color}`}>{r.name}</span>)}
+      {stops.map((s, i) => (
+        <a class:list={['stop', { approx: s.approx }]} href={s.href} style={`left:${s.x}%;top:${ROWS[s.row].y}%;--c:${ROWS[s.row].color};--i:${i}`}>
+          <span class="sr">{s.title}, {s.date}</span>
+          <span class="card" aria-hidden="true">
+            <img src={`/images/graphic-design/metro/${s.img}-480.webp`} alt="" width="480" height="270" loading="lazy" />
+            <b>{s.title}</b><small>{s.date}</small>
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+  <figcaption>Every map in the series, on three lines. Hover or tap a station to preview it; the undated maps branch off to the right.</figcaption>
+</figure>
+
+<style>
+  .timeline { margin:2rem 0 0; }
+  .scroller { overflow-x:auto; overflow-y:hidden; padding:9.5rem 0 2.5rem; margin:-8rem 0 0; scrollbar-width:thin; }
+  .track { position:relative; min-width:760px; height:200px; }
+  svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .undated-zone { fill:var(--hover-bg); }
+  .row-line { stroke-width:7; vector-effect:non-scaling-stroke; stroke-linecap:round; transform-box:fill-box; transform-origin:left center; }
+  .year-tick { stroke:var(--muted); stroke-width:1.5; vector-effect:non-scaling-stroke; }
+  .year, .zone-label { position:absolute; bottom:-1.6rem; transform:translateX(-50%); font-size:.8125rem; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .zone-label { font-style:italic; }
+  .row-label { position:absolute; left:0; transform:translateY(-190%); font-size:.75rem; font-weight:700; color:var(--c); white-space:nowrap; }
+  .stop { position:absolute; width:22px; height:22px; margin:-11px 0 0 -11px; border-radius:50%; background:var(--bg); border:4px solid var(--fg); z-index:1; transition:transform .25s cubic-bezier(.3,1.7,.5,1); }
+  .stop.approx { border-style:dashed; }
+  .stop:hover, .stop:focus-visible { transform:scale(1.35); z-index:5; outline:none; background:var(--c); }
+  .card { position:absolute; left:50%; bottom:calc(100% + 12px); width:200px; transform:translate(-50%,8px) scale(.9); transform-origin:bottom center; background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:6px; box-shadow:0 12px 30px #0002; opacity:0; pointer-events:none; transition:opacity .2s, transform .25s cubic-bezier(.3,1.5,.5,1); font-size:.75rem; line-height:1.3; color:var(--fg); }
+  .stop:hover .card, .stop:focus-visible .card { opacity:1; transform:translate(-50%,0) scale(.74); }
+  .card img { display:block; width:100%; height:auto; border-radius:7px; margin-bottom:5px; background:#fff; }
+  .card b { display:block; } .card small { color:var(--muted); }
+  .stop:nth-last-child(-n+8) .card { left:auto; right:-10px; transform:translate(0,8px) scale(.9); transform-origin:bottom right; }
+  .stop:nth-last-child(-n+8):hover .card, .stop:nth-last-child(-n+8):focus-visible .card { transform:translate(0,0) scale(.74); }
+  .sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  [data-armed] .row-line { transform:scaleX(0); transition:transform 1.6s cubic-bezier(.5,0,.2,1) calc(var(--i) * .25s); }
+  [data-inview] .row-line { transform:none; }
+  [data-armed] .stop { transform:scale(0); transition:transform .4s cubic-bezier(.3,1.7,.5,1) calc(.5s + var(--i) * 60ms); }
+  [data-inview] .stop { transform:none; }
+  [data-inview] .stop:hover, [data-inview] .stop:focus-visible { transform:scale(1.35); transition-delay:0s; }
+  figcaption { margin-top:.5rem; }
+</style>

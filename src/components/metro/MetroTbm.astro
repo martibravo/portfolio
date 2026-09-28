@@ -1,0 +1,133 @@
+---
+/* Block 9: when would the boring machine reach Mandri? Each edition's forecast
+   is an arrow from the day the map was published to the promised date; the
+   real machine digs along the bottom and arrives on 29 July 2024. */
+const M0 = 2022 * 12 + 5;            // June 2022
+const M1 = 2025 * 12 + 11;           // December 2025
+const X0 = 60, X1 = 960;
+const x = (y: number, m: number, d = 1) => X0 + ((y * 12 + (m - 1) + (d - 1) / 30 - M0) / (M1 - M0)) * (X1 - X0);
+
+const promises = [
+  { said: x(2022, 6, 21), label: 'Jun 2022 map', to: x(2023, 8), toLabel: 'summer 2023', y: 128 },
+  { said: x(2023, 3), label: 'Mar 2023', to: x(2023, 8), toLabel: '', y: 100 },
+  { said: x(2023, 4), label: 'Apr 2023', to: x(2023, 8), toLabel: '', y: 72 },
+  { said: x(2023, 12), label: 'Dec 2023', to: x(2024, 4, 23), toLabel: '23 Apr 2024', y: 128 },
+];
+const arrive = x(2024, 7, 29);
+const stopFrom = x(2024, 12);
+const years = [2023, 2024, 2025].map((y) => ({ y, x: x(y, 1) }));
+const endPromise = x(2024, 12);
+---
+
+<figure class="tbm-chart" data-reveal>
+  <div class="scroll">
+  <svg viewBox="0 0 1000 330" role="img" aria-labelledby="tbm-title tbm-desc">
+    <title id="tbm-title">When would the boring machine reach Mandri?</title>
+    <desc id="tbm-desc">Forecasts printed on the map: summer 2023 (in the June 2022, March 2023 and April 2023 editions), then 23 April 2024 (December 2023 edition). The machine arrived on 29 July 2024, then stopped for 14 months of maintenance from December 2024. The forecast that excavation would finish in December 2024 appeared in five editions and was dropped in December 2024.</desc>
+    <defs>
+      <marker id="tbm-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" /></marker>
+      <pattern id="tbm-hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="10" /></pattern>
+    </defs>
+
+    <!-- axis -->
+    <line class="axis" x1={X0} x2={X1} y1="290" y2="290" />
+    {years.map((t) => <g class="year"><line x1={t.x} x2={t.x} y1="284" y2="296" /><text x={t.x} y="318">{t.y}</text></g>)}
+
+    <!-- dropped promise: excavation finished in Dec 2024 -->
+    <g class="flag" style="--d:2.6s">
+      <line x1={endPromise} x2={endPromise} y1="20" y2="232" class="dash" />
+      <rect x={endPromise + 6} y="10" width="206" height="44" rx="8" />
+      <text x={endPromise + 16} y="29">“Excavation done: Dec 2024”</text>
+      <text x={endPromise + 16} y="45" class="small">printed 5 times, then dropped</text>
+      <line x1={endPromise + 12} x2={endPromise + 204} y1="25" y2="25" class="strike" />
+    </g>
+
+    <!-- promises -->
+    {promises.map((p, i) => (
+      <g class="promise" style={`--d:${0.3 + i * 0.35}s`}>
+        <path class="arc" d={`M${p.said} 286 C${p.said} ${p.y + 40} ${p.to - 40} ${p.y} ${p.to - 20} ${p.y}`} marker-end="url(#tbm-arrow)" pathLength="1" />
+        <circle class="said" cx={p.said} cy="290" r="6" />
+        <g class="ghost" transform={`translate(${p.to} ${p.y})`}>
+          <rect x="-16" y="-9" width="24" height="18" rx="5" /><circle cx="12" r="10" />
+        </g>
+        {p.toLabel && <text class="to" x={p.to + 26} y={p.y + 5}>{p.toLabel}</text>}
+        <text class="said-label" x={p.said + (i === 1 ? -4 : i === 2 ? 4 : 0)} y="272" text-anchor={i === 1 ? 'end' : i === 2 ? 'start' : 'middle'}>{p.label}</text>
+      </g>
+    ))}
+
+    <!-- the gap -->
+    <g class="gap" style="--d:2.2s">
+      <path d={`M${x(2023, 8)} 40 V32 H${arrive} V40`} />
+      <text x={(x(2023, 8) + arrive) / 2} y="24" text-anchor="middle">≈ a year late</text>
+    </g>
+
+    <!-- reality -->
+    <line class="reality-track" x1={X0} x2={arrive} y1="232" y2="232" />
+    <line class="reality" x1={X0} x2={arrive} y1="232" y2="232" pathLength="1" />
+    <rect class="stopped" x={stopFrom} y="224" width={X1 - stopFrom + 30} height="16" rx="3" fill="url(#tbm-hatch)" />
+    <line class="arrival" x1={arrive} x2={arrive} y1="42" y2="286" />
+    <g class="machine" style={`--dx:${arrive - X0}px`} transform={`translate(${X0} 232)`}>
+      <g class="bob">
+        <rect x="-38" y="-12" width="32" height="24" rx="7" />
+        <g class="wheel"><circle r="14" /><path d="M-10 0H10M0 -10V10M-7 -7L7 7M-7 7L7 -7" /></g>
+      </g>
+    </g>
+    <text class="arrive-label" x={arrive - 8} y="210" text-anchor="end">Arrives 29 Jul 2024</text>
+    <text class="zzz" x={stopFrom + 70} y="212">z<tspan dy="-8">z</tspan><tspan dy="-8">z</tspan></text>
+    <text class="stop-label" x={stopFrom + 12} y="262">maintenance, 14 months</text>
+  </svg>
+  </div>
+  <figcaption>Dates as printed on each edition’s forecast note. The ghost machines are where the map said it would be.</figcaption>
+</figure>
+
+<style>
+  .tbm-chart { margin:2rem 0 0; background:var(--hover-bg); border-radius:24px; padding:clamp(.75rem,3vw,1.75rem); }
+  .scroll { overflow-x:auto; padding-top:.5rem; margin-top:-.5rem; }
+  svg { display:block; width:100%; min-width:680px; height:auto; overflow:visible; font-family:var(--campaign); }
+  text { fill:var(--fg); font-size:13px; font-weight:700; }
+  .small { font-weight:400; font-size:12px; fill:var(--muted); }
+  .axis, .year line { stroke:var(--fg); stroke-width:2; }
+  .year text { font-size:14px; text-anchor:middle; fill:var(--muted); }
+  .arc { fill:none; stroke:var(--muted); stroke-width:2; stroke-dasharray:1; stroke-dashoffset:0; }
+  marker path { fill:var(--muted); }
+  .said { fill:var(--fg); }
+  .said-label { font-size:11px; font-weight:400; fill:var(--muted); }
+  .ghost rect, .ghost circle { fill:none; stroke:#ff6600; stroke-width:2.5; stroke-dasharray:4 3; }
+  .to { fill:#ff6600; }
+  .flag rect { fill:var(--bg); stroke:var(--fg); stroke-width:2; }
+  .flag .dash { stroke:var(--muted); stroke-width:1.5; stroke-dasharray:3 4; }
+  .flag .strike { stroke:#e32739; stroke-width:3; stroke-dasharray:1; stroke-dashoffset:0; }
+  .gap path { fill:none; stroke:#e32739; stroke-width:2; }
+  .gap text { fill:#e32739; }
+  .reality-track { stroke:var(--border); stroke-width:16; stroke-linecap:round; }
+  .reality { stroke:#ffe07d; stroke-width:16; stroke-dasharray:1; stroke-dashoffset:0; }
+  .stopped { opacity:.55; }
+  #tbm-hatch rect { fill:var(--muted); }
+  .arrival { stroke:#e32739; stroke-width:2; stroke-dasharray:6 5; }
+  .arrive-label { fill:#e32739; }
+  .machine .bob rect { fill:#ff6600; stroke:var(--fg); stroke-width:2.5; }
+  .wheel circle { fill:#ffd24a; stroke:var(--fg); stroke-width:2.5; }
+  .wheel path { stroke:var(--fg); stroke-width:2; }
+  .machine { transform:translate(calc(60px + var(--dx)), 232px); }
+  .zzz { font-size:18px; fill:var(--muted); }
+  .stop-label { font-size:12px; font-weight:400; fill:var(--muted); }
+
+  /* choreography, once in view */
+  [data-armed] .arc { stroke-dashoffset:1; transition:stroke-dashoffset .8s ease-out var(--d); }
+  [data-armed] .ghost, [data-armed] .to { opacity:0; transition:opacity .4s calc(var(--d) + .6s); }
+  [data-armed] .flag, [data-armed] .gap { opacity:0; transition:opacity .5s var(--d); }
+  [data-armed] .flag .strike { stroke-dashoffset:1; transition:stroke-dashoffset .5s calc(var(--d) + .6s); }
+  [data-armed] .reality { stroke-dashoffset:1; transition:stroke-dashoffset 3s cubic-bezier(.4,0,.3,1) .2s; }
+  [data-armed] .machine { transform:translate(60px, 232px); transition:transform 3s cubic-bezier(.4,0,.3,1) .2s; }
+  [data-armed] .arrival, [data-armed] .arrive-label, [data-armed] .stopped, [data-armed] .zzz, [data-armed] .stop-label { opacity:0; transition:opacity .5s 3.2s; }
+  [data-inview] .arc, [data-inview] .flag .strike, [data-inview] .reality { stroke-dashoffset:0; }
+  [data-inview] .ghost, [data-inview] .to, [data-inview] .flag, [data-inview] .gap,
+  [data-inview] .arrival, [data-inview] .arrive-label, [data-inview] .stopped, [data-inview] .zzz, [data-inview] .stop-label { opacity:1; }
+  [data-inview] .machine { transform:translate(calc(60px + var(--dx)), 232px); }
+  [data-inview] .wheel { animation:spin .7s linear 5 .2s; }
+  [data-inview] .zzz { animation:float 2.4s ease-in-out infinite 3.4s; }
+  .ghost { animation:none; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  @keyframes float { 50% { transform:translateY(-5px); } }
+  @media (prefers-reduced-motion:reduce) { .wheel, .zzz { animation:none !important; } }
+</style>

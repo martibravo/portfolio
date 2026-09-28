@@ -1,0 +1,91 @@
+---
+/* Block 11: one station label taken apart. Sarrià, as printed in June 2025. */
+const parts = [
+  { n: 1, title: 'Year box', text: 'Estimated opening, from the PDI 2021–2030 infrastructure plan.', at: [290, 44] },
+  { n: 2, title: 'Connections', text: 'The lines you’ll be able to change to here: FGC, L6 and L12.', at: [330, 84] },
+  { n: 3, title: 'Warning sign', text: 'The station is under construction or only projected.', at: [186, 104] },
+  { n: 4, title: 'Name', text: 'Official names change: Mandri was La Bonanova until April 2023.', at: [362, 122] },
+  { n: 5, title: 'Black figure', text: 'Share of the civil works completed.', at: [218, 160] },
+  { n: 6, title: 'Red figure', text: 'Share of the architecture, the station fit-out, completed.', at: [372, 160] },
+  { n: 7, title: 'Capsule', text: 'An interchange whose platforms sit apart.', at: [172, 206] },
+  { n: 8, title: 'Band colour', text: 'The tunnel’s state: pale yellow is bored, grey isn’t yet.', at: [420, 262] },
+];
+---
+
+<figure class="anatomy" data-anatomy data-reveal>
+  <svg viewBox="0 0 520 300" role="img" aria-label="The Sarrià station label from the June 2025 map, with its eight parts numbered.">
+    <line class="band grey" x1="232" x2="510" y1="236" y2="236" data-p="8" />
+    <line class="band" x1="10" x2="232" y1="236" y2="236" data-p="8" />
+    <g data-p="7"><rect class="cap" x="198" y="210" width="26" height="52" rx="13" /></g>
+    <g data-p="1"><rect x="208" y="30" width="64" height="28" /><text x="240" y="50" class="inv" text-anchor="middle">2030</text></g>
+    <g data-p="2">
+      <rect x="208" y="70" width="24" height="24" fill="#92d400" /><path d="M213 86c4-8 10-8 14-4" stroke="#fff" stroke-width="3" fill="none" />
+      <rect x="236" y="70" width="28" height="24" fill="#847dc6" /><text x="250" y="87" class="inv s" text-anchor="middle">L6</text>
+      <rect x="268" y="70" width="34" height="24" fill="#b6b3da" /><text x="285" y="87" class="inv s" text-anchor="middle">L12</text>
+    </g>
+    <g data-p="3"><path d="M221 104 L235 128 H207 Z" fill="#ffcc00" stroke="#111" stroke-width="1.5" /><text x="221" y="125" text-anchor="middle" class="warn">!</text></g>
+    <g data-p="4"><text x="244" y="126" class="name">Sarrià</text></g>
+    <g data-p="5"><text x="244" y="160" class="pct">55%</text></g>
+    <g data-p="6"><text x="300" y="160" class="pct red">2%</text></g>
+    {parts.map((p) => (
+      <g class="num" data-num={p.n} style={`--i:${p.n}`}>
+        <circle cx={p.at[0]} cy={p.at[1]} r="12" /><text x={p.at[0]} y={p.at[1] + 4.5} text-anchor="middle">{p.n}</text>
+      </g>
+    ))}
+  </svg>
+  <ol class="parts">
+    {parts.map((p) => <li data-part={p.n} tabindex="0"><b>{p.n}</b><span><strong>{p.title}.</strong> {p.text}</span></li>)}
+  </ol>
+</figure>
+
+<style>
+  .anatomy { display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:center; margin:2rem 0 0; }
+  svg { width:100%; height:auto; display:block; font-family:var(--campaign); background:var(--hover-bg); border-radius:24px; }
+  .band { stroke:#ffe07d; stroke-width:20; }
+  .band.grey { stroke:#c6c6c6; }
+  .cap { fill:var(--bg); stroke:var(--fg); stroke-width:5; }
+  [data-p="1"] rect { fill:#111; }
+  .inv { fill:#fff; font-weight:700; font-size:17px; }
+  .inv.s { font-size:12px; }
+  .warn { font-weight:900; font-size:15px; fill:#111; }
+  .name { font-weight:700; font-size:26px; fill:var(--fg); letter-spacing:-.02em; }
+  .pct { font-weight:700; font-size:20px; fill:var(--fg); }
+  .red { fill:#e32739; }
+  [data-p] { transition:opacity .25s, transform .25s; transform-box:fill-box; transform-origin:center; }
+  .num circle { fill:#ff6600; }
+  .num text { fill:#fff; font-weight:700; font-size:13px; }
+  .num { transform-box:fill-box; transform-origin:center; }
+  [data-armed] .num { transform:scale(0); transition:transform .45s cubic-bezier(.3,1.7,.5,1) calc(.2s + var(--i) * 90ms); }
+  [data-inview] .num { transform:none; }
+  .anatomy[data-focus] [data-p] { opacity:.2; }
+  .anatomy[data-focus] [data-p].on { opacity:1; transform:scale(1.08); }
+  .anatomy[data-focus] .num:not(.on) { opacity:.3; }
+  .parts { list-style:none; padding:0; margin:0; display:grid; gap:.35rem; counter-reset:none; }
+  .parts li { display:flex; gap:.7rem; align-items:flex-start; padding:.45rem .6rem; border-radius:10px; font-size:.875rem; line-height:1.4; cursor:default; transition:background .2s; }
+  .parts li:hover, .parts li:focus-visible, .parts li.on { background:var(--hover-bg); outline:none; }
+  .parts b { flex:none; display:grid; place-items:center; width:1.5rem; height:1.5rem; border-radius:50%; background:#ff6600; color:#fff; font-size:.75rem; }
+  @media (max-width:760px) { .anatomy { grid-template-columns:1fr; } }
+</style>
+
+<script>
+  function initAnatomy() {
+    document.querySelectorAll<HTMLElement>('[data-anatomy]:not([data-initialized])').forEach((fig) => {
+      fig.dataset.initialized = '';
+      const set = (n: string | null) => {
+        if (n) fig.dataset.focus = n; else delete fig.dataset.focus;
+        fig.querySelectorAll<HTMLElement | SVGElement>('[data-p],[data-num],[data-part]').forEach((el) => {
+          const v = el.getAttribute('data-p') ?? el.getAttribute('data-num') ?? el.getAttribute('data-part');
+          el.classList.toggle('on', v === n);
+        });
+      };
+      fig.querySelectorAll<HTMLElement>('[data-part]').forEach((li) => {
+        li.addEventListener('mouseenter', () => set(li.dataset.part!));
+        li.addEventListener('focus', () => set(li.dataset.part!));
+        li.addEventListener('mouseleave', () => set(null));
+        li.addEventListener('blur', () => set(null));
+      });
+    });
+  }
+  initAnatomy();
+  document.addEventListener('astro:page-load', initAnatomy);
+</script>
