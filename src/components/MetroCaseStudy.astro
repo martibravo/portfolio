@@ -54,8 +54,8 @@ const tunnel = [
 
   <article>
     <header class="intro" data-reveal>
-      <p class="kicker">Information design · 2020–2026</p>
-      <h1>Redrawing<br />the metro.</h1>
+      <p class="kicker">Side project · 2020–2026</p>
+      <h1>Metro,<br />in progress.</h1>
       <svg class="title-line" viewBox="0 0 900 40" aria-hidden="true">
         <path d="M4 20 H560 L580 8 H820" pathLength="1" />
         {[120, 260, 400, 660].map((x) => <path class="t" d={`M${x} ${x > 570 ? 8 : 20} V${x > 570 ? -4 : 8}`} />)}
@@ -64,14 +64,14 @@ const tunnel = [
       <ul class="bullet-row" aria-label="The twelve lines">
         {LINES.map((l, i) => <li style={`--c:${l.color};--ink:${l.ink};--i:${i}`}>{l.id}</li>)}
       </ul>
-      <p class="lead">Six years of maps of Barcelona’s metro: the network as it runs, as it’s promised, and as it could be.</p>
-      <p class="summary">A diagram of the whole network, redrawn as it grows. A works map for L9 and L10, updated edition by edition while the tunnel was being dug. Proposals for lines that don’t exist, and an A3 poster of the city with all of it on.</p>
+      <p class="lead">Status updates on Barcelona’s metro works, and a few lines of my own.</p>
+      <p class="summary">Since 2020 I’ve been making maps in the style of the official one: how far the L9/L10 tunnel has got, when each station is supposed to open, what the network will look like in 2030, and some what-if proposals.</p>
       <dl class="metadata">
-        <div><dt>Role</dt><dd>Research, diagram design and data tracking</dd></div>
+        <div><dt>What</dt><dd>Status maps and line proposals</dd></div>
         <div><dt>Context</dt><dd>Personal project<br />2020–2026</dd></div>
-        <div><dt>Output</dt><dd>Network diagrams, seven works editions,<br />proposals and an A3 poster</dd></div>
+        <div><dt>Output</dt><dd>Seven works updates, network maps,<br />proposals and an A3 poster</dd></div>
       </dl>
-      <p class="note">Independent project. Not commissioned by or affiliated with TMB, FGC or the Generalitat de Catalunya.</p>
+      <p class="note">Not affiliated with TMB, FGC or the Generalitat.</p>
     </header>
 
     <MetroTimeline />
@@ -81,8 +81,8 @@ const tunnel = [
       <div class="split">
         <div><p class="part">Part 1</p><h2>The network,<br />2020 → 2030.</h2></div>
         <div class="copy">
-          <p>It started as a diagram of the network as it ran in 2020, in the visual language of Barcelona’s own maps: line colours, white interchange rings, a legend grouping TMB and FGC lines.</p>
-          <p>The same artwork then became the 2030 map. Nothing moves; lines simply grow out of their old ends, and L9 and L10 finally get their middle.</p>
+          <p>A copy of the network map, kept up to date in 2020, then pushed forward to show everything planned for 2030.</p>
+          <p>The style is the official map’s, not mine.</p>
         </div>
       </div>
       <MetroNetworkGrow />
@@ -92,7 +92,7 @@ const tunnel = [
     <section id="what-if" class="section">
       <div class="split">
         <div><h2>What if…?</h2></div>
-        <div class="copy"><p>Once the diagram existed, it became a place to test ideas. Fade the rest of the network back, highlight two lines, and redraw.</p></div>
+        <div class="copy"><p>Sometimes I just want to see what a line would look like.</p></div>
       </div>
       <div class="whatifs">
         <MetroSwap />
@@ -103,10 +103,10 @@ const tunnel = [
     <!-- ── Part 2 ───────────────────────────── -->
     <section id="works" class="section">
       <div class="split">
-        <div><p class="part">Part 2</p><h2>L9/L10: the metro that’s always almost finished.</h2></div>
+        <div><p class="part">Part 2</p><h2>L9/L10: always almost finished.</h2></div>
         <div class="copy">
-          <p>L9 and L10 run at both ends of the city, but not through the middle. From June 2022, I kept one map of the works up to date: how far the boring machine had got, how much of each station was built, and when each one was expected to open.</p>
-          <p>Seven editions later, the design had barely changed. The dates had.</p>
+          <p>L9 and L10 run at both ends of the city but not through the middle. From June 2022 I made a status map every few months: where the boring machine was, how built each station was, and when it was meant to open.</p>
+          <p>Seven updates in, the dates kept moving.</p>
         </div>
       </div>
       <aside class="statement" aria-label="Lesseps station’s opening year across editions">
@@ -120,25 +120,25 @@ const tunnel = [
 
       <div class="subsection split">
         <h3>Forecast vs reality.</h3>
-        <div class="copy"><p>Every edition printed a forecast for the boring machine. Here they are on one timeline, against the day it actually arrived.</p></div>
+        <div class="copy"><p>Every update had a forecast for the boring machine. It didn’t keep many.</p></div>
       </div>
       <MetroTbm />
 
       <div class="subsection split">
         <h3>The dates slip.</h3>
-        <div class="copy"><p>The black year boxes are the map’s most-read element. Tracked across editions, they tell their own story.</p></div>
+        <div class="copy"><p>Same stations, later every time.</p></div>
       </div>
       <MetroSlip />
 
       <div class="subsection split">
         <h3>Anatomy of a station.</h3>
-        <div class="copy"><p>Every station carries its whole status in one compact label. Hover a part to find it.</p></div>
+        <div class="copy"><p>What’s in a station label. Hover a part.</p></div>
       </div>
       <MetroAnatomy />
 
       <div class="subsection split">
         <h3>The map changes too.</h3>
-        <div class="copy"><p>Small design changes followed the news: a panel removed when it went stale, a box added to say what had changed, two more lines once their works began.</p></div>
+        <div class="copy"><p>The map changed a bit too, mostly to keep up with the news.</p></div>
       </div>
       <ol class="changelog" data-reveal>
         {changelog.map((c, i) => (
@@ -157,14 +157,13 @@ const tunnel = [
       <div class="split">
         <div><p class="part">Part 3</p><h2>Barcelona,<br />further ahead.</h2></div>
         <div class="copy">
-          <p>The A3 poster puts every planned and proposed line on a map of the city itself: the coast, the port, the Llobregat and Besòs rivers, Montjuïc and Collserola. The schematic rules stay, but the lines now sit roughly where the city is.</p>
-          <p>It also has many more stations than the diagram, so the names drop to a smaller size and bold marks the line ends and main hubs.</p>
+          <p>An A3 poster with everything planned or proposed on it, drawn over the city: coast, rivers, Montjuïc and Collserola.</p>
         </div>
       </div>
       <MetroA3Layers />
       <div class="subsection split">
         <h3>L4 as a loop.</h3>
-        <div class="copy"><p>A second artboard fades everything but two lines to test one idea: close L4 into a ring, and let L11 take over its branch.</p></div>
+        <div class="copy"><p>One idea on its own: turn L4 into a ring and give its branch to L11.</p></div>
       </div>
       <MetroLoop />
     </section>
@@ -173,7 +172,7 @@ const tunnel = [
     <section id="valles" class="section">
       <div class="split">
         <div><p class="part">Part 4</p><h2>Beyond<br />Barcelona.</h2></div>
-        <div class="copy"><p>The same approach, applied outside the city: a proposal for rail along the Riera de Caldes, with two new FGC lines meeting at Caldes de Montbui. It borrows FGC’s conventions instead: pill-shaped line badges, thicker lines and bigger type.</p></div>
+        <div class="copy"><p>Same idea outside Barcelona: two new FGC lines along the Riera de Caldes, in FGC’s style.</p></div>
       </div>
       <MetroValles />
     </section>
@@ -181,8 +180,8 @@ const tunnel = [
     <!-- ── System ───────────────────────────── -->
     <section id="system" class="section">
       <div class="split">
-        <div><h2>The system.</h2></div>
-        <div class="copy"><p>Twelve line colours, a handful of symbols and four tunnel states cover every Barcelona map in the series. Hover a colour to turn it over.</p></div>
+        <div><h2>The kit.</h2></div>
+        <div class="copy"><p>Line colours, symbols and tunnel states used across the maps. Hover a colour to flip it.</p></div>
       </div>
       <ul class="palette" aria-label="Line colours">
         {LINES.map((l, i) => (
@@ -212,19 +211,12 @@ const tunnel = [
           {tunnel.map((t) => <li><i class={t.cls}></i><span>{t.name}</span></li>)}
         </ul>
       </div>
-      <div class="design-notes">
-        <div><h3>Type</h3><p>Helvetica Neue throughout, a familiar transport face. Bold for line ends and main interchanges, regular for everything else.</p></div>
-        <div><h3>Colour</h3><p>Official line colours, never used for anything else. Status gets its own colours: pale yellow and grey for the tunnel, red for architecture and for anything that changed.</p></div>
-        <div><h3>Geometry</h3><p>45° and 90° angles only, and the same artwork reused from map to map, so changes between editions are real changes.</p></div>
-      </div>
     </section>
 
     <section class="section split reflection">
-      <div><h2>Drawing a network<br />that isn’t there yet.</h2></div>
+      <div><h2>Still under<br />construction.</h2></div>
       <div class="copy">
-        <p>A metro map usually shows a promise already kept: every line on it runs. Most of these maps show promises instead. The 2030 diagram draws a network that doesn’t exist yet; the works map tracks the gap between that drawing and what’s under the street; the A3 goes further still.</p>
-        <p>Keeping one visual language across all of them is what makes the differences readable. The same colours, ticks and rings carry a line that runs today, a tunnel being dug and a line that’s only an idea. What changes is the state: a pale band for bored tunnel, grey for not yet, and a year box that keeps moving.</p>
-        <p>The works map is also a record. Each edition shows what was known at the time, so the series now shows how a forecast drifts.</p>
+        <p>Each map shows what was known at the time. Put together, they show how much the forecasts moved.</p>
       </div>
     </section>
 
@@ -236,8 +228,8 @@ const tunnel = [
       </div>
       <div class="credit-grid">
         <div>
-          <p>Martí Bravo · Personal project · 2020–2026</p>
-          <p class="note">Independent work. Not commissioned by, produced for or endorsed by TMB, FGC, Ferrocarrils de la Generalitat de Catalunya or the Generalitat de Catalunya. Progress figures, forecasts and opening years are as printed on each edition at the time; opening years follow the PDI 2021–2030 estimates named in the map legend. They are a historical record, not current information.</p>
+          <p>Martí Bravo · Side project · 2020–2026</p>
+          <p class="note">Not affiliated with TMB, FGC or the Generalitat. Figures and dates are as they were on each map at the time; opening years come from the PDI 2021–2030.</p>
         </div>
         <div class="downloads">
           <a href="/downloads/metro-network-maps.pdf" download>Network diagram ↓<span>PDF · 2 pages</span></a>
@@ -356,9 +348,6 @@ const tunnel = [
   .tunnel .bored { background:repeating-linear-gradient(90deg,#ffe07d 0 34px,#ffd24a 34px 40px); animation:bore 1.5s linear infinite; }
   .tunnel .none { background:repeating-linear-gradient(90deg,#c6c6c6 0 12px,transparent 12px 18px); }
   @keyframes bore { to { background-position:40px 0; } }
-  .design-notes { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:2rem; margin:2.5rem 0 0; }
-  .design-notes h3 { font-size:1.125rem; letter-spacing:0; margin-bottom:.4rem; }
-  .design-notes p { margin:0; font-size:.9375rem; }
 
   .credits { padding:2rem 0; border-top:1px solid var(--border); scroll-margin-top:2rem; }
   .end-line { margin:1rem 0 2.5rem; }
@@ -385,7 +374,6 @@ const tunnel = [
     .split, .credit-grid { grid-template-columns:1fr; gap:1.25rem; }
     .metadata { grid-template-columns:1fr; gap:1rem; }
     .metadata > div { display:grid; grid-template-columns:5rem 1fr; gap:1rem; }
-    .design-notes { grid-template-columns:1fr; gap:1.25rem; }
     .palette { grid-template-columns:repeat(3,minmax(0,1fr)); }
     .symbols { grid-template-columns:repeat(2,minmax(0,1fr)); }
     .statement { grid-template-columns:1fr; }
