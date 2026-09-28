@@ -6,23 +6,11 @@ import MetroRules from './metro/MetroRules.astro';
 import MetroSwap from './metro/MetroSwap.astro';
 import MetroVia5 from './metro/MetroVia5.astro';
 import MetroWorks from './metro/MetroWorks.astro';
-import MetroTbm from './metro/MetroTbm.astro';
-import MetroSlip from './metro/MetroSlip.astro';
-import MetroAnatomy from './metro/MetroAnatomy.astro';
 import MetroA3Layers from './metro/MetroA3Layers.astro';
 import MetroLoop from './metro/MetroLoop.astro';
 import MetroValles from './metro/MetroValles.astro';
 import { LINES } from './metro/lines';
 
-const changelog = [
-  { date: '21 Jun 2022', title: 'First edition', items: [['+', 'Boring machine box, with its speed'], ['+', 'Tunnel statistics panel'], ['+', 'Opening years from the PDI 2021–2030']] },
-  { date: 'Mar 2023', title: 'Progress only', items: [['~', 'Tunnel redrawn up to Sarrià'], ['~', 'Nothing else changes, not even the statistics']] },
-  { date: 'Apr 2023', title: 'New names', items: [['~', 'La Bonanova → Mandri'], ['~', 'Parc Güell → Muntanya'], ['–', 'Tunnel statistics panel']] },
-  { date: 'Dec 2023', title: 'The news box', items: [['+', '“Novetats” box: what changed since last time'], ['~', 'Boring speed 200 → 180 m a month'], ['~', 'New arrival date at Mandri']] },
-  { date: 'Jul 2024', title: 'Arrival', items: [['~', 'Bored tunnel reaches Mandri'], ['~', 'Arrival forecast replaced by the actual date']] },
-  { date: 'Dec 2024', title: 'Four lines', items: [['+', 'L4 and L2 join the title'], ['+', 'L2 extension from Sant Antoni to Parc Logístic'], ['–', 'Muntanya station'], ['–', 'Forecast for the end of excavation'], ['~', 'Most opening years move to 2028']] },
-  { date: 'Jun 2025', title: 'Waiting for a wheel', items: [['~', 'Opening years now range from 2027 to 2030'], ['~', 'Machine note: new cutting wheel, restart in the autumn']] },
-];
 const symbols = [
   { name: 'Station', note: 'tick on one side' },
   { name: 'Interchange', note: 'white ring' },
@@ -42,9 +30,9 @@ const tunnel = [
 <SectionNav sections={[
   { id: 'top', label: 'Overview' },
   { id: 'network', label: 'The network' },
-  { id: 'what-if', label: 'What if…?' },
   { id: 'works', label: 'L9/L10 works' },
-  { id: 'future', label: 'Future city' },
+  { id: 'proposals', label: 'My proposals' },
+  { id: 'future', label: 'A3 poster' },
   { id: 'valles', label: 'Beyond Barcelona' },
   { id: 'system', label: 'System' },
   { id: 'credits', label: 'End of the line' },
@@ -65,7 +53,7 @@ const tunnel = [
         {LINES.map((l, i) => <li style={`--c:${l.color};--ink:${l.ink};--i:${i}`}>{l.id}</li>)}
       </ul>
       <p class="lead">Status updates on Barcelona’s metro works, and a few lines of my own.</p>
-      <p class="summary">Since 2020 I’ve been making maps in the style of the official one: how far the L9/L10 tunnel has got, when each station is supposed to open, what the network will look like in 2030, and some what-if proposals.</p>
+      <p class="summary">Since 2020 I’ve been making maps in the style of the official one: how the L9/L10 works are going, what the network will look like in 2030, and some changes of my own.</p>
       <dl class="metadata">
         <div><dt>What</dt><dd>Status maps and line proposals</dd></div>
         <div><dt>Context</dt><dd>Personal project<br />2020–2026</dd></div>
@@ -89,89 +77,50 @@ const tunnel = [
       <MetroRules />
     </section>
 
-    <section id="what-if" class="section">
+    <!-- ── Part 2 ───────────────────────────── -->
+    <section id="works" class="section">
       <div class="split">
-        <div><h2>What if…?</h2></div>
-        <div class="copy"><p>Sometimes I just want to see what a line would look like.</p></div>
+        <div><p class="part">Part 2</p><h2>L9/L10 works.</h2></div>
+        <div class="copy">
+          <p>L9 and L10 run at both ends of the city but not through the middle. From June 2022 I made a status map every few months: the tunnel, the stations and how far along each one was.</p>
+          <p>Drag through the seven updates.</p>
+        </div>
+      </div>
+      <MetroWorks />
+    </section>
+
+    <!-- ── Part 3 ───────────────────────────── -->
+    <section id="proposals" class="section">
+      <div class="split">
+        <div><p class="part">Part 3</p><h2>My proposals.</h2></div>
+        <div class="copy"><p>Changes to the network that nobody asked for. Sometimes I just want to see what a line would look like.</p></div>
       </div>
       <div class="whatifs">
         <MetroSwap />
         <MetroVia5 />
       </div>
-    </section>
-
-    <!-- ── Part 2 ───────────────────────────── -->
-    <section id="works" class="section">
-      <div class="split">
-        <div><p class="part">Part 2</p><h2>L9/L10: always almost finished.</h2></div>
-        <div class="copy">
-          <p>L9 and L10 run at both ends of the city but not through the middle. From June 2022 I made a status map every few months: where the boring machine was, how built each station was, and when it was meant to open.</p>
-          <p>Seven updates in, the dates kept moving.</p>
-        </div>
-      </div>
-      <aside class="statement" aria-label="Lesseps station’s opening year across editions">
-        <p>Forecast:</p>
-        <p class="flipboard" aria-hidden="true"><span>2025</span><span>2028</span><span>2030</span></p>
-        <p class="sr">2025, then 2028, then 2030.</p>
-        <p class="small">Lesseps station, in three editions of the same map.</p>
-      </aside>
-
-      <MetroWorks />
-
-      <div class="subsection split">
-        <h3>Forecast vs reality.</h3>
-        <div class="copy"><p>Every update had a forecast for the boring machine. It didn’t keep many.</p></div>
-      </div>
-      <MetroTbm />
-
-      <div class="subsection split">
-        <h3>The dates slip.</h3>
-        <div class="copy"><p>Same stations, later every time.</p></div>
-      </div>
-      <MetroSlip />
-
-      <div class="subsection split">
-        <h3>Anatomy of a station.</h3>
-        <div class="copy"><p>What’s in a station label. Hover a part.</p></div>
-      </div>
-      <MetroAnatomy />
-
-      <div class="subsection split">
-        <h3>The map changes too.</h3>
-        <div class="copy"><p>The map changed a bit too, mostly to keep up with the news.</p></div>
-      </div>
-      <ol class="changelog" data-reveal>
-        {changelog.map((c, i) => (
-          <li style={`--i:${i}`}>
-            <span class="when">{c.date}</span>
-            <div><b>{c.title}</b>
-              <ul>{c.items.map(([k, t]) => <li><span class:list={['chip', { add: k === '+', del: k === '–' }]}>{k === '~' ? '±' : k}</span>{t}</li>)}</ul>
-            </div>
-          </li>
-        ))}
-      </ol>
-    </section>
-
-    <!-- ── Part 3 ───────────────────────────── -->
-    <section id="future" class="section">
-      <div class="split">
-        <div><p class="part">Part 3</p><h2>Barcelona,<br />further ahead.</h2></div>
-        <div class="copy">
-          <p>An A3 poster with everything planned or proposed on it, drawn over the city: coast, rivers, Montjuïc and Collserola.</p>
-        </div>
-      </div>
-      <MetroA3Layers />
       <div class="subsection split">
         <h3>L4 as a loop.</h3>
-        <div class="copy"><p>One idea on its own: turn L4 into a ring and give its branch to L11.</p></div>
+        <div class="copy"><p>Turn L4 into a ring and give its branch to L11.</p></div>
       </div>
       <MetroLoop />
     </section>
 
     <!-- ── Part 4 ───────────────────────────── -->
+    <section id="future" class="section">
+      <div class="split">
+        <div><p class="part">Part 4</p><h2>Barcelona,<br />further ahead.</h2></div>
+        <div class="copy">
+          <p>An A3 poster with everything planned or proposed on it, drawn over the city: coast, rivers, Montjuïc and Collserola.</p>
+        </div>
+      </div>
+      <MetroA3Layers />
+    </section>
+
+    <!-- ── Part 5 ───────────────────────────── -->
     <section id="valles" class="section">
       <div class="split">
-        <div><p class="part">Part 4</p><h2>Beyond<br />Barcelona.</h2></div>
+        <div><p class="part">Part 5</p><h2>Beyond<br />Barcelona.</h2></div>
         <div class="copy"><p>Same idea outside Barcelona: two new FGC lines along the Riera de Caldes, in FGC’s style.</p></div>
       </div>
       <MetroValles />
@@ -216,7 +165,7 @@ const tunnel = [
     <section class="section split reflection">
       <div><h2>Still under<br />construction.</h2></div>
       <div class="copy">
-        <p>Each map shows what was known at the time. Put together, they show how much the forecasts moved.</p>
+        <p>Each map is a snapshot of the network at one moment, real or imagined.</p>
       </div>
     </section>
 
@@ -297,29 +246,8 @@ const tunnel = [
   .whatifs :global(.go[aria-pressed="true"] .icon) { transform:rotate(180deg); }
   .whatifs :global(.note) { margin:.75rem 0 0; }
 
-  .statement { background:#ff6600; color:#fff; border-radius:24px; padding:clamp(1.5rem,5vw,3.5rem); margin-top:2.5rem; display:grid; grid-template-columns:auto 1fr; align-items:center; gap:.25rem 1.5rem; }
-  .statement p { margin:0; }
-  .statement > p:first-child { font-size:clamp(1.5rem,3.5vw,2.75rem); font-weight:600; letter-spacing:-.03em; }
-  .flipboard { position:relative; height:1em; font-size:clamp(3rem,10vw,7.5rem); font-weight:700; letter-spacing:-.05em; line-height:1; perspective:400px; }
-  .flipboard span { position:absolute; left:0; top:0; background:#111; color:#fff; padding:.05em .18em; border-radius:6px; animation:flipyear 7.5s infinite both; opacity:0; transform-origin:center 40%; font-variant-numeric:tabular-nums; }
-  .flipboard span:nth-child(2) { animation-delay:2.5s; }
-  .flipboard span:nth-child(3) { animation-delay:5s; }
-  @keyframes flipyear { 0% { opacity:0; transform:rotateX(-90deg); } 5%,30% { opacity:1; transform:none; } 35%,100% { opacity:0; transform:rotateX(90deg); } }
-  .statement .small { grid-column:1/-1; margin-top:1.5rem; font-size:.9375rem; opacity:.9; }
   .sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 
-  .changelog { list-style:none; margin:2rem 0 0; padding:0 0 0 1.5rem; position:relative; display:grid; gap:1.25rem; }
-  .changelog::before { content:''; position:absolute; left:6px; top:.4rem; bottom:.4rem; width:6px; border-radius:3px; background:linear-gradient(#ff6600,#1793f3); }
-  .changelog > li { position:relative; display:grid; grid-template-columns:7rem 1fr; gap:1rem; transition:opacity .5s calc(var(--i) * .1s), transform .5s calc(var(--i) * .1s); }
-  .changelog > li::before { content:''; position:absolute; left:calc(-1.5rem - 1px); top:.25rem; width:20px; height:20px; border-radius:50%; background:var(--bg); border:4px solid var(--fg); box-sizing:border-box; }
-  .changelog[data-armed]:not([data-inview]) > li { opacity:0; transform:translateX(-12px); }
-  .when { font-weight:700; font-variant-numeric:tabular-nums; padding-left:.75rem; }
-  .changelog b { display:block; font-size:1.0625rem; margin-bottom:.35rem; }
-  .changelog ul { list-style:none; padding:0; margin:0; display:grid; gap:.3rem; font-size:.875rem; }
-  .changelog ul li { display:flex; gap:.5rem; align-items:baseline; }
-  .chip { flex:none; display:inline-grid; place-items:center; width:1.3rem; height:1.3rem; border-radius:4px; font-weight:700; font-size:.8125rem; background:var(--hover-bg); color:var(--muted); }
-  .chip.add { background:#55c14f; color:#fff; }
-  .chip.del { background:#e32739; color:#fff; }
 
   .palette { list-style:none; padding:0; margin:2.5rem 0 0; display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:.6rem; }
   .palette li { position:relative; aspect-ratio:1; perspective:700px; cursor:pointer; outline:none; }
@@ -376,12 +304,8 @@ const tunnel = [
     .metadata > div { display:grid; grid-template-columns:5rem 1fr; gap:1rem; }
     .palette { grid-template-columns:repeat(3,minmax(0,1fr)); }
     .symbols { grid-template-columns:repeat(2,minmax(0,1fr)); }
-    .statement { grid-template-columns:1fr; }
-    .changelog > li { grid-template-columns:1fr; gap:.25rem; }
   }
   @media (prefers-reduced-motion:reduce) {
-    .flipboard span { animation:none; opacity:0; }
-    .flipboard span:last-child { opacity:1; }
     .tunnel .bored { animation:none; }
     .bullet-row li, .face { transition:none; }
   }

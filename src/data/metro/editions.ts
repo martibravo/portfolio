@@ -160,21 +160,3 @@ export const EDITIONS: Edition[] = [
     stations: e7,
   },
 ];
-
-/* Opening years as printed, for the slip chart (first edition → Dec 2024 → latest). */
-export const SLIP: { name: string; years: [number, number, number] }[] = [
-  { name: 'Camp Nou', years: [2026, 2028, 2030] },
-  { name: 'Campus Nord', years: [2028, 2028, 2030] },
-  { name: 'Manuel Girona', years: [2028, 2028, 2030] },
-  { name: 'Sarrià', years: [2026, 2028, 2030] },
-  { name: 'Mandri', years: [2026, 2028, 2030] },
-  { name: 'El Putxet', years: [2028, 2028, 2030] },
-  { name: 'Lesseps', years: [2025, 2028, 2030] },
-  { name: 'Sanllehy', years: [2026, 2028, 2027] },
-  { name: 'Guinardó', years: [2025, 2028, 2027] },
-  { name: 'Pl. Maragall', years: [2026, 2028, 2027] },
-  { name: 'La Sagrera', years: [2025, 2028, 2027] },
-  { name: 'Sagrera | TAV', years: [2025, 2028, 2028] },
-  { name: 'Santander', years: [2024, 2028, 2030] },
-  { name: 'Motors', years: [2028, 2028, 2028] },
-];
