@@ -1,0 +1,38 @@
+---
+/* The A3 "metro de barcelona" artwork, defined once and reused by several
+   blocks through <use>. Lines are not here: blocks draw those themselves so
+   they can recolour and animate them. */
+import a3 from '../../data/metro/a3.json';
+const title = (t: string) => t === 'metro de barcelona';
+const bold = a3.labels.filter((l) => (l.b || l.w) && !title(l.t));
+const small = a3.labels.filter((l) => !l.b && !l.w && !title(l.t));
+---
+
+<svg class="a3-defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <g id="a3-geo">
+      {a3.geo.map((g) => <path d={g.d} fill={g.fill} fill-rule={g.eo ? 'evenodd' : 'nonzero'} />)}
+    </g>
+    <g id="a3-ticks">
+      {a3.ticks.map((t) => <path d={t.d} fill={t.c} />)}
+    </g>
+    <g id="a3-stations">
+      {a3.black.map((d) => <path d={d} fill="#000" />)}
+      {a3.white.map((d) => <path d={d} fill="#fff" />)}
+    </g>
+    <g id="a3-names-bold" font-weight="700" fill="#111">
+      {a3.bullets.map((b) => <rect x={b.x} y={b.y} width={b.w} height={b.h} fill={b.c} />)}
+      {a3.rod.map((r) => <g><rect x={r.x} y={r.y} width={r.w} height={r.w} fill="#ff6600" /><text x={r.x + r.w / 2} y={r.y + r.w * 0.8} text-anchor="middle" fill="#fff" font-size={r.w * 0.85}>R</text></g>)}
+      {bold.map((t) => <text x={t.x} y={t.y} font-size={t.s} class:list={{ w: t.w }} transform={t.r ? `rotate(${t.r} ${t.x} ${t.y})` : undefined}>{t.t}</text>)}
+    </g>
+    <g id="a3-names-small" fill="#111">
+      {small.map((t) => <text x={t.x} y={t.y} font-size={t.s} class:list={{ w: t.w }} transform={t.r ? `rotate(${t.r} ${t.x} ${t.y})` : undefined}>{t.t}</text>)}
+    </g>
+  </defs>
+</svg>
+
+<style>
+  .a3-defs { position:absolute; width:0; height:0; overflow:hidden; }
+  text { font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  text.w { fill:#fff; }
+</style>

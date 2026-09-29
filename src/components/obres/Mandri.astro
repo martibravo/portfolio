@@ -1,0 +1,35 @@
+---
+/* 03d · Fourteen months in Mandri. A timetable, one row per month. */
+import { MANDRI_MONTHS } from '../../data/metro/obres';
+---
+
+<div class="mandri">
+  <a class="skip" href="#mandri-restart">Salta a la tardor de 2025 ↓</a>
+  <p class="lead">On 29 July 2024 the tunnel boring machine reached Mandri, a year after my June 2022 map said it would. Then it stopped so its cutting wheel could be replaced. You’re about to scroll through the next fourteen months.</p>
+  <table>
+    <caption class="sr">Metres bored each month at Mandri, August 2024 to October 2025</caption>
+    <tbody>
+      {MANDRI_MONTHS.map((m) => <tr><th scope="row">{m}</th><td>0 m</td></tr>)}
+      <tr id="mandri-restart" class="go"><th scope="row">octubre 2025</th><td>moving again, 1.6 km to Lesseps</td></tr>
+    </tbody>
+  </table>
+  <div class="tbm-glyph" aria-hidden="true"><span></span></div>
+  <p>I kept updating the map anyway. Some months that was the whole project: checking that nothing had changed, and writing it down.</p>
+  <p>The pause was announced as fourteen months, and that’s about how long it lasted. The only deadline in this story that was kept was the one for standing still.</p>
+</div>
+
+<style>
+  .mandri { position:relative; max-width:640px; margin:2rem 0 0; }
+  .skip { font-size:.8125rem; color:#555; }
+  .lead { margin:1rem 0; }
+  table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; margin:1rem 0 1.5rem; }
+  th, td { text-align:left; padding:.55rem .4rem; border-top:1px solid #e3e0d6; font-weight:400; }
+  th { width:12rem; }
+  td { font-weight:700; }
+  tr.go td { color:#ff6600; }
+  tr.go th, tr.go td { border-top:3px solid #111; }
+  .tbm-glyph { position:absolute; right:-4rem; top:9rem; bottom:9rem; width:30px; }
+  .tbm-glyph span { position:sticky; top:45vh; display:block; width:30px; height:18px; background:#ff6600; border:2.5px solid #111; border-radius:4px 10px 10px 4px; }
+  .sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+  @media (max-width:760px) { .tbm-glyph { display:none; } }
+</style>

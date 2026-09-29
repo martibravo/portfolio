@@ -1,0 +1,281 @@
+---
+/* 03b · Eight editions of one tunnel. The L9/L10 status map rebuilt from
+   data; a small train on a line of eight stops drives it. Percentages fill,
+   years slip, names flip, the bored tunnel grows, Novetats swaps. */
+import network from '../../data/metro/network.json';
+import geo from '../../data/metro/editions-geo.json';
+import { EDITIONS, STATIONS, YEARS, PROGRESS, NAMES } from '../../data/metro/obres';
+import { COLOR } from '../metro/lines';
+
+const T = { x: 20.5, y: -131 };
+const VB = { x: 30, y: 100, w: 1860, h: 850 };
+const P = [...geo.central.matchAll(/(-?\d+\.?\d*) (-?\d+\.?\d*)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+const seg = P.slice(1).map((p, i) => Math.hypot(p[0] - P[i][0], p[1] - P[i][1]));
+const total = seg.reduce((a, b) => a + b, 0);
+function at(t: number) {
+  let d = t * total;
+  for (let i = 0; i < seg.length; i++) {
+    if (d <= seg[i] || i === seg.length - 1) {
+      const k = seg[i] ? Math.min(d / seg[i], 1) : 0;
+      const [a, b] = [P[i], P[i + 1]];
+      return { x: a[0] + (b[0] - a[0]) * k, y: a[1] + (b[1] - a[1]) * k, ang: (Math.atan2(b[1] - a[1], b[0] - a[0]) * 180) / Math.PI };
+    }
+    d -= seg[i];
+  }
+  return { x: 0, y: 0, ang: 0 };
+}
+const S = geo.stations as Record<string, { t: number; x: number; y: number }>;
+const LESSEPS = S['Lesseps'].t;
+const SLAB = S['Guinardó'].t;
+const RINGS = new Set(['Zona Universitària', 'Mandri', 'Lesseps', 'Guinardó']);
+const CAPS = new Set(['Sarrià', 'La Sagrera', 'Sagrera | TAV']);
+const labelAt: Record<string, [number, number, string]> = {
+  'Zona Universitària': [-12, -20, 'end'], 'Campus Nord': [0, -20, 'middle'], 'Manuel Girona': [0, 34, 'middle'],
+  'Prat de la Riba': [0, -20, 'middle'], 'Sarrià': [0, -38, 'middle'], 'Mandri': [18, -4, 'start'],
+  'El Putxet': [-16, 6, 'end'], 'Lesseps': [-18, 26, 'end'], 'Muntanya': [0, -20, 'middle'], 'Sanllehy': [0, -20, 'middle'],
+  'Guinardó': [18, -8, 'start'], 'Pl. Maragall': [-16, 10, 'end'], 'La Sagrera': [-20, 18, 'end'], 'Sagrera | TAV': [0, -30, 'middle'],
+};
+const markers = Object.entries(S).map(([name, s]) => ({ name, ...(name === 'Sagrera | TAV' ? { x: s.x, y: s.y, ang: 0 } : at(s.t)) }));
+const tr = (d: string) => d.replace(/(-?\d+\.?\d*) (-?\d+\.?\d*)/g, (_, x, y) => `${(Number(x) + T.x).toFixed(1)} ${(Number(y) + T.y).toFixed(1)}`);
+const byId = Object.fromEntries(network.lines.map((l) => [l.id, l]));
+const l4stub = byId.L4.pieces.filter((p) => p.new).map((p) => tr(p.d));
+const l2ext = byId.L2.pieces.filter((p) => p.new).map((p) => tr(p.d));
+const payload = {
+  eds: EDITIONS.map((e) => ({ ...e, pos: at(e.bored) })),
+  years: YEARS, progress: PROGRESS, names: NAMES, lesseps: LESSEPS,
+};
+const e0 = EDITIONS[0];
+const bored = (t: number) => `${t} ${LESSEPS - t} ${1 - LESSEPS} 1`;
+const nameAt = (n: string, i: number) => NAMES[n]?.[i] || n;
+---
+
+<figure class="eds" data-eds data-i="0">
+  <script type="application/json" data-payload set:html={JSON.stringify(payload)} />
+
+  <header class="eds-head">
+    <div class="bullets" aria-hidden="true">
+      <span style={`--c:${COLOR.L9}`}>L9</span><span style={`--c:${COLOR.L10}`}>L10</span>
+      <span class="late" style={`--c:${COLOR.L4};--ink:#111`}>L4</span><span class="late" style={`--c:${COLOR.L2}`}>L2</span>
+    </div>
+    <p class="map-title" lang="ca">Estat de les obres <span data-scope>{e0.scope}</span> del metro de Barcelona<br /><em data-date>edició 1, sense data</em></p>
+    <button type="button" class="orig-btn" data-orig aria-pressed="false">See the original</button>
+  </header>
+
+  <div class="stage">
+    <svg viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`} role="img" aria-label="The L9/L10 status map, redrawn from data. Drag the train below to move through the editions." data-map>
+      <g class="bg" transform={`translate(${T.x} ${T.y})`}>
+        {network.lines.filter((l) => l.id !== 'L9' && l.id !== 'L10').map((l) => l.pieces.filter((p) => !p.new || l.id === 'L4').map((p) => <path d={p.d} style={`stroke:${l.color}`} />))}
+      </g>
+      <g class="grey">{l4stub.map((d) => <path d={d} />)}</g>
+      <g class="grey l2" data-l2>{l2ext.map((d) => <path d={d} />)}</g>
+      <g class="service">
+        {geo.l9.filter((p) => !p.new).map((p) => <path d={p.d} style={`stroke:${COLOR.L9}`} />)}
+        {geo.l10.filter((p) => !p.new).map((p) => <path d={p.d} style={`stroke:${COLOR.L10}`} />)}
+      </g>
+      <path class="band none" d={geo.central} />
+      <path class="band bored" data-bored d={geo.central} pathLength="1" style={`stroke-dasharray:${bored(e0.bored)}`} />
+      <path class="band slab" d={geo.central} pathLength="1" style={`stroke-dasharray:0 ${SLAB} ${1 - SLAB} 1`} />
+      {markers.map((m) => {
+        const [dx, dy, anchor] = labelAt[m.name] ?? [0, -20, 'middle'];
+        return (
+          <g class="st" data-st={m.name}>
+            {RINGS.has(m.name) && <circle cx={m.x} cy={m.y} r="11" />}
+            {CAPS.has(m.name) && <rect x={m.x - 10} y={m.y - 22} width="20" height="44" rx="10" transform={m.name === 'La Sagrera' ? `rotate(-45 ${m.x} ${m.y})` : undefined} />}
+            {!RINGS.has(m.name) && !CAPS.has(m.name) && <path d={`M${m.x} ${m.y} l0 -15`} transform={`rotate(${m.ang} ${m.x} ${m.y})`} />}
+            <text x={m.x + dx} y={m.y + dy} text-anchor={anchor} data-name={m.name}>{nameAt(m.name, 0)}</text>
+          </g>
+        );
+      })}
+      <g class="tbm" data-tbm style={`transform:translate(${at(e0.bored).x}px,${at(e0.bored).y}px)`}>
+        <rect x="-30" y="-10" width="26" height="20" rx="6" /><circle r="11" /><path d="M-8 0H8M0 -8V8" />
+      </g>
+    </svg>
+    <img class="orig" data-orig-img alt="" width="1920" height="1080" loading="lazy" />
+    <aside class="margin" data-note hidden></aside>
+  </div>
+
+  <div class="track" data-track role="slider" tabindex="0" aria-label="Edition" aria-valuemin="1" aria-valuemax={EDITIONS.length} aria-valuenow="1" aria-valuetext={e0.label}>
+    <div class="rail"></div>
+    {EDITIONS.map((e, i) => <button type="button" class="stop" tabindex="-1" style={`--p:${(i / (EDITIONS.length - 1)) * 100}%`} data-go={i}><span>{e.label}</span></button>)}
+    <span class="train" data-train aria-hidden="true"><i></i></span>
+  </div>
+  <p class="drag"><b>Eight editions of the same tunnel.</b> Drag the train.</p>
+
+  <div class="lower">
+    <section class="novetats">
+      <h4 data-box-title>{e0.box.title}</h4>
+      <ul data-box>{e0.box.items.map((it) => <li><span lang="ca">{it.ca}</span><small>{it.en}</small></li>)}</ul>
+    </section>
+    <ul class="cards">
+      {STATIONS.map((n) => {
+        const pr = PROGRESS[n][0];
+        return (
+          <li class="card" data-card={n}>
+            <p class="nm"><span class="warn" aria-hidden="true">⚠</span><span data-cname>{nameAt(n, 0) || n}</span></p>
+            <p class="pc"><b data-civil>{pr[0] == null ? 'No iniciada' : `${pr[0]}%`}</b> <b class="red" data-arch>{pr[1] == null ? '' : `${pr[1]}%`}</b></p>
+            <p class="yr" data-years><span class="y">{YEARS[n][0]}</span></p>
+            <span class="bar"><i data-bar style={`--v:${pr[0] ?? 0}%`}></i></span>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+</figure>
+
+<style>
+  .eds { margin:2rem 0 0; }
+  .eds-head { display:flex; flex-wrap:wrap; gap:1rem 1.5rem; align-items:center; }
+  .bullets { display:flex; gap:5px; }
+  .bullets span { display:grid; place-items:center; width:54px; height:54px; background:var(--c); color:var(--ink,#fff); font-weight:700; font-size:1.5rem; letter-spacing:-.05em; }
+  .bullets .late { display:none; }
+  .eds[data-l2] .bullets .late { display:grid; }
+  .map-title { margin:0; font-weight:700; font-size:clamp(1.05rem,2vw,1.4rem); line-height:1.1; letter-spacing:-.02em; max-width:30ch; }
+  .map-title em { font-weight:400; }
+  .orig-btn { margin-left:auto; border:2px solid #111; background:none; font:700 .8125rem var(--campaign); padding:.3rem .8rem; border-radius:999px; cursor:pointer; }
+  .orig-btn[aria-pressed="true"] { background:#111; color:#faf9f6; }
+  .stage { position:relative; margin-top:1rem; background:#fff; border-radius:12px; overflow:hidden; }
+  svg { display:block; width:100%; height:auto; }
+  .orig { display:none; width:100%; height:auto; }
+  .eds[data-original] svg { visibility:hidden; position:absolute; }
+  .eds[data-original] .orig { display:block; }
+  .bg path { fill:none; stroke-width:6; stroke-linejoin:round; opacity:.18; }
+  .grey path { fill:none; stroke:#c6c6c6; stroke-width:9; stroke-linejoin:round; }
+  .grey.l2 { display:none; }
+  .eds[data-l2] .grey.l2 { display:inline; }
+  .service path { fill:none; stroke-width:9; stroke-linejoin:round; }
+  .band { fill:none; stroke-linejoin:round; }
+  .none { stroke:#c6c6c6; stroke-width:16; }
+  .bored { stroke:#ffe07d; stroke-width:16; transition:stroke-dasharray .9s linear; }
+  .slab { stroke:#f59e00; stroke-width:4; }
+  .st circle, .st rect { fill:#fff; stroke:#111; stroke-width:4.5; }
+  .st path { stroke:#111; stroke-width:4; }
+  .st text { font:700 15px var(--campaign); fill:#111; paint-order:stroke; stroke:#fff; stroke-width:4px; }
+  .st.gone { display:none; }
+  .tbm { transition:transform .9s linear; }
+  .tbm rect { fill:#ff6600; stroke:#111; stroke-width:2.5; }
+  .tbm circle { fill:#ffd24a; stroke:#111; stroke-width:2.5; }
+  .tbm path { stroke:#111; stroke-width:2; }
+  .eds[data-i="0"] .tbm { display:none; }
+  .margin { position:absolute; right:.75rem; bottom:.75rem; max-width:17rem; background:#fff; border:2px solid #111; padding:.5rem .7rem; font-size:.8125rem; line-height:1.35; }
+  @media (max-width:640px) { .st text { display:none; } .margin { position:static; max-width:none; border-width:0 0 0 3px; } }
+
+  .track { position:relative; height:64px; margin:1.25rem 14px 0; touch-action:none; cursor:grab; outline-offset:6px; }
+  .rail { position:absolute; left:0; right:0; top:18px; height:6px; background:linear-gradient(90deg,#ff6600,#ff6600); border-radius:3px; }
+  .stop { position:absolute; left:var(--p); top:10px; transform:translateX(-50%); border:0; background:none; padding:0; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:10px; font:700 .6875rem var(--campaign); color:#555; white-space:nowrap; }
+  .stop::before { content:''; width:16px; height:16px; border-radius:50%; background:#fff; border:4px solid #111; box-sizing:border-box; margin-top:3px; }
+  .stop.on { color:#111; }
+  .train { position:absolute; left:0; top:4px; width:46px; height:26px; transform:translateX(-50%); pointer-events:none; transition:left .25s linear; }
+  .train i { display:block; width:100%; height:100%; background:#ff6600; border:3px solid #111; border-radius:6px 14px 14px 6px; box-sizing:border-box; }
+  .train i::after { content:''; position:absolute; right:7px; top:6px; width:9px; height:7px; background:#cfe8ff; border:2px solid #111; border-radius:2px; }
+  .track[data-dragging] .train { transition:none; }
+  .drag { margin:.4rem 0 0; font-size:.875rem; }
+  @media (max-width:640px) { .stop:nth-child(odd):not(:first-of-type) span { visibility:hidden; } }
+
+  .lower { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.6fr); gap:1.25rem; margin-top:1.5rem; align-items:start; }
+  .novetats { border:3px solid #111; padding:0; background:#fff; }
+  .novetats h4 { margin:0; background:#111; color:#fff; font:700 1rem var(--campaign); padding:.35rem .7rem; }
+  .novetats ul { margin:0; padding:.6rem .7rem .7rem 1.6rem; font-size:.875rem; line-height:1.35; }
+  .novetats :global(li) { margin-bottom:.45rem; }
+  .novetats :global(small) { display:block; color:#666; font-size:.75rem; }
+  .cards { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:.5rem; }
+  .card { background:#fff; padding:.5rem .6rem .6rem; font-size:.8125rem; position:relative; }
+  .card p { margin:0; }
+  .nm { font-weight:700; display:flex; gap:.3rem; align-items:baseline; line-height:1.2; }
+  .warn { color:#e0a800; }
+  .pc { font-variant-numeric:tabular-nums; margin-top:.2rem !important; }
+  .pc .red { color:#e32739; }
+  .yr { display:flex; flex-wrap:wrap; gap:.25rem; margin-top:.35rem !important; }
+  .yr :global(.y) { position:relative; display:inline-block; background:#111; color:#fff; font-weight:700; font-size:.75rem; padding:0 .3rem; font-variant-numeric:tabular-nums; }
+  .yr :global(.y.old) { background:#fff; color:#111; box-shadow:inset 0 0 0 1.5px #111; }
+  .yr :global(.y.old)::after { content:''; position:absolute; left:-2px; right:-2px; top:50%; height:2px; background:#e32739; transform-origin:left; animation:strike .35s linear both; }
+  @keyframes strike { from { transform:scaleX(0); } }
+  .bar { display:block; height:4px; background:#eee; margin-top:.45rem; }
+  .bar i { display:block; height:100%; width:var(--v); background:#111; transition:width .9s linear; }
+  .card.off { opacity:.35; }
+  .card.off .nm span:last-child { text-decoration:line-through; }
+  @media (max-width:760px) { .lower { grid-template-columns:1fr; } }
+  @media (prefers-reduced-motion:reduce) { .bored, .tbm, .bar i, .train { transition:none; } .yr :global(.y.old)::after { animation:none; } }
+</style>
+
+<script>
+  type Ed = { id: number; label: string; date: string | null; image: string; scope: string; bored: number; l2: boolean; note?: string; box: { title: string; items: { ca: string; en: string }[] }; pos: { x: number; y: number } };
+  function initEds() {
+    document.querySelectorAll<HTMLElement>('[data-eds]:not([data-initialized])').forEach((fig) => {
+      fig.dataset.initialized = '';
+      const D = JSON.parse(fig.querySelector('[data-payload]')!.textContent!) as { eds: Ed[]; years: Record<string, string[]>; progress: Record<string, [number | null, number | null][]>; names: Record<string, string[]>; lesseps: number };
+      const $ = <T extends Element = HTMLElement>(s: string) => fig.querySelector<T>(s)!;
+      const track = $('[data-track]'); const train = $('[data-train]');
+      const stops = [...fig.querySelectorAll<HTMLButtonElement>('[data-go]')];
+      const N = D.eds.length;
+      let cur = -1;
+
+      const show = (i: number) => {
+        if (i === cur) return;
+        cur = i;
+        const e = D.eds[i];
+        fig.dataset.i = String(i);
+        if (e.l2) fig.dataset.l2 = ''; else delete fig.dataset.l2;
+        track.setAttribute('aria-valuenow', String(i + 1));
+        track.setAttribute('aria-valuetext', e.label);
+        stops.forEach((s, j) => s.classList.toggle('on', j === i));
+        train.style.left = `${(i / (N - 1)) * 100}%`;
+        $('[data-scope]').textContent = e.scope;
+        $('[data-date]').textContent = e.date ? `a ${e.date}` : 'edició 1, sense data';
+        $<SVGPathElement>('[data-bored]').style.strokeDasharray = `${e.bored} ${D.lesseps - e.bored} ${1 - D.lesseps} 1`;
+        $<SVGGElement>('[data-tbm]').style.transform = `translate(${e.pos.x}px,${e.pos.y}px)`;
+        fig.querySelectorAll<SVGTextElement>('[data-name]').forEach((t) => {
+          const n = t.dataset.name!;
+          const nm = D.names[n]?.[i];
+          if (nm !== undefined) { t.textContent = nm || n; t.parentElement!.classList.toggle('gone', nm === ''); }
+        });
+        // Novetats
+        $('[data-box-title]').textContent = e.box.title;
+        const ul = $('[data-box]'); ul.innerHTML = '';
+        e.box.items.forEach((it) => { const li = document.createElement('li'); const ca = document.createElement('span'); ca.lang = 'ca'; ca.textContent = it.ca; const en = document.createElement('small'); en.textContent = it.en; li.append(ca, en); ul.append(li); });
+        const note = $('[data-note]'); note.hidden = !e.note; note.textContent = e.note ?? '';
+        // cards
+        fig.querySelectorAll<HTMLElement>('[data-card]').forEach((card) => {
+          const n = card.dataset.card!;
+          const nm = D.names[n]?.[i];
+          card.classList.toggle('off', nm === '');
+          card.querySelector('[data-cname]')!.textContent = nm || n;
+          const [c, a] = D.progress[n][i];
+          card.querySelector('[data-civil]')!.textContent = c == null ? 'No iniciada' : `${c}%`;
+          card.querySelector('[data-arch]')!.textContent = a == null ? '' : `${a}%`;
+          card.querySelector<HTMLElement>('[data-bar]')!.style.setProperty('--v', `${c ?? 0}%`);
+          // slipped years: every distinct year so far, all but the last struck through
+          const seen: string[] = [];
+          D.years[n].slice(0, i + 1).forEach((y) => { if (y && y !== seen[seen.length - 1]) seen.push(y); });
+          const box = card.querySelector('[data-years]')!;
+          box.innerHTML = '';
+          seen.forEach((y, k) => { const s = document.createElement('span'); s.className = k < seen.length - 1 ? 'y old' : 'y'; s.textContent = y; box.append(s); });
+        });
+      };
+
+      // drag the train
+      const fromX = (x: number) => { const r = track.getBoundingClientRect(); return Math.round(Math.min(1, Math.max(0, (x - r.left) / r.width)) * (N - 1)); };
+      track.addEventListener('pointerdown', (ev) => { track.setPointerCapture(ev.pointerId); track.dataset.dragging = ''; show(fromX(ev.clientX)); });
+      track.addEventListener('pointermove', (ev) => { if (track.dataset.dragging !== undefined) show(fromX(ev.clientX)); });
+      const end = () => delete track.dataset.dragging;
+      track.addEventListener('pointerup', end); track.addEventListener('pointercancel', end);
+      track.addEventListener('keydown', (ev) => {
+        if (ev.key === 'ArrowRight' || ev.key === 'ArrowUp') { show(Math.min(N - 1, cur + 1)); ev.preventDefault(); }
+        if (ev.key === 'ArrowLeft' || ev.key === 'ArrowDown') { show(Math.max(0, cur - 1)); ev.preventDefault(); }
+        if (ev.key === 'Home') show(0); if (ev.key === 'End') show(N - 1);
+      });
+      // original exports
+      const btn = $<HTMLButtonElement>('[data-orig]'); const img = $<HTMLImageElement>('[data-orig-img]');
+      btn.addEventListener('click', () => {
+        const on = fig.dataset.original === undefined;
+        if (on) { fig.dataset.original = ''; img.src = `/images/graphic-design/metro/${D.eds[cur].image}.webp`; img.alt = `Original status map, ${D.eds[cur].label}`; }
+        else delete fig.dataset.original;
+        btn.setAttribute('aria-pressed', String(on));
+      });
+      const origSync = new MutationObserver(() => { if (fig.dataset.original !== undefined) img.src = `/images/graphic-design/metro/${D.eds[cur].image}.webp`; });
+      origSync.observe(fig, { attributes: true, attributeFilter: ['data-i'] });
+      show(0);
+    });
+  }
+  initEds();
+  document.addEventListener('astro:page-load', initEds);
+</script>

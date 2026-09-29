@@ -1,0 +1,74 @@
+---
+/* The LED strip above a train's doors: one station per block, the current one
+   lit, the next one blinking. */
+const STOPS = [
+  { id: 'sense-servei', name: 'Caldes' },
+  { id: 'en-servei', name: 'Còpia' },
+  { id: 'escala', name: 'Escala' },
+  { id: 'obres', name: 'Obres' },
+  { id: 'i-si', name: 'I si…?' },
+  { id: 'projectada', name: '2040' },
+  { id: 'propera', name: 'Caldes' },
+  { id: 'normes', name: 'Normes' },
+  { id: 'sortides', name: 'Sortides' },
+];
+---
+
+<nav class="sinoptic" aria-label="Page sections" data-sinoptic>
+  <ol>
+    {STOPS.map((s, i) => (
+      <li data-stop={s.id}><a href={`#${s.id}`}><span class="dot" aria-hidden="true"></span><span class="nm">{s.name}</span></a></li>
+    ))}
+  </ol>
+  <p class="next" aria-live="polite"><b class="cur" data-cur>{STOPS[0].name}</b><span class="sep"> · </span><span>Propera estació:</span> <b data-next>{STOPS[1].name}</b></p>
+</nav>
+
+<style>
+  .sinoptic { position:sticky; top:0; z-index:40; display:flex; align-items:center; gap:1.5rem; padding:.55rem 0; background:#faf9f6; border-bottom:1px solid #e3e0d6; font-family:var(--campaign); }
+  ol { flex:1; list-style:none; margin:0; padding:0; display:flex; justify-content:space-between; position:relative; }
+  ol::before { content:''; position:absolute; left:6px; right:6px; top:6px; height:3px; background:#111; }
+  li { position:relative; }
+  a { display:flex; flex-direction:column; align-items:center; gap:.3rem; text-decoration:none; color:#777; font-size:.6875rem; font-weight:700; white-space:nowrap; }
+  .dot { width:15px; height:15px; border-radius:50%; background:#faf9f6; border:3px solid #111; box-sizing:border-box; position:relative; z-index:1; }
+  li.passed .dot { background:#111; }
+  li.on .dot { background:#ff6600; border-color:#111; }
+  li.on a { color:#111; }
+  li.next .dot { animation:blink 1s steps(2,jump-none) infinite; }
+  @keyframes blink { 50% { background:#ff6600; } }
+  .next { margin:0; font-size:.75rem; white-space:nowrap; color:#555; }
+  .next b { color:#111; }
+  .cur, .sep { display:none; }
+  @media (max-width:760px) {
+    ol { display:none; }
+    .sinoptic { justify-content:flex-start; }
+    .cur, .sep { display:inline; }
+  }
+  @media (prefers-reduced-motion:reduce) { li.next .dot { animation:none; background:#ffb27a; } }
+</style>
+
+<script>
+  function initSinoptic() {
+    const nav = document.querySelector<HTMLElement>('[data-sinoptic]:not([data-initialized])');
+    if (!nav) return;
+    nav.dataset.initialized = '';
+    const stops = [...nav.querySelectorAll<HTMLElement>('[data-stop]')];
+    const sections = stops.map((s) => document.getElementById(s.dataset.stop!)).filter(Boolean) as HTMLElement[];
+    const next = nav.querySelector('[data-next]')!;
+    const cur = nav.querySelector('[data-cur]')!;
+    const set = (i: number) => {
+      stops.forEach((s, j) => { s.classList.toggle('on', j === i); s.classList.toggle('passed', j < i); s.classList.toggle('next', j === i + 1); });
+      cur.textContent = stops[i].querySelector('.nm')?.textContent ?? '';
+      next.textContent = stops[i + 1]?.querySelector('.nm')?.textContent ?? 'Final de trajecte';
+    };
+    const update = () => {
+      const y = window.innerHeight * 0.35;
+      let cur = 0;
+      sections.forEach((sec, i) => { if (sec.getBoundingClientRect().top <= y) cur = i; });
+      set(cur);
+    };
+    addEventListener('scroll', update, { passive: true });
+    update();
+  }
+  initSinoptic();
+  document.addEventListener('astro:page-load', initSinoptic);
+</script>
