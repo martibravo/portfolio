@@ -144,11 +144,3 @@ export const EDITIONS: Edition[] = [
     note: 'Six months later, four stations got closer and eight got further away.',
   },
 ];
-
-export const CHART_STATIONS = ['Santander', 'Lesseps', 'Guinardó', 'Sagrera | TAV', 'La Sagrera', 'Camp Nou', 'Sarrià', 'Mandri', 'Sanllehy', 'Pl. Maragall', 'Campus Nord', 'Manuel Girona', 'El Putxet', 'Motors'];
-
-export const MANDRI_MONTHS = [
-  'agost 2024', 'setembre 2024', 'octubre 2024', 'novembre 2024', 'desembre 2024',
-  'gener 2025', 'febrer 2025', 'març 2025', 'abril 2025', 'maig 2025', 'juny 2025',
-  'juliol 2025', 'agost 2025', 'setembre 2025',
-];

@@ -4,7 +4,7 @@
    they can recolour and animate them. */
 import a3 from '../../data/metro/a3.json';
 const title = (t: string) => t === 'metro de barcelona';
-const bold = a3.labels.filter((l) => (l.b || l.w) && !title(l.t));
+const bold = a3.labels.filter((l) => (l.b || l.w || (l as { k?: number }).k) && !title(l.t));
 const small = a3.labels.filter((l) => !l.b && !l.w && !title(l.t));
 ---
 
@@ -23,7 +23,7 @@ const small = a3.labels.filter((l) => !l.b && !l.w && !title(l.t));
     <g id="a3-names-bold" font-weight="700" fill="#111">
       {a3.bullets.map((b) => <rect x={b.x} y={b.y} width={b.w} height={b.h} fill={b.c} />)}
       {a3.rod.map((r) => <g><rect x={r.x} y={r.y} width={r.w} height={r.w} fill="#ff6600" /><text x={r.x + r.w / 2} y={r.y + r.w * 0.8} text-anchor="middle" fill="#fff" font-size={r.w * 0.85}>R</text></g>)}
-      {bold.map((t) => <text x={t.x} y={t.y} font-size={t.s} class:list={{ w: t.w }} transform={t.r ? `rotate(${t.r} ${t.x} ${t.y})` : undefined}>{t.t}</text>)}
+      {bold.map((t) => <text x={t.x} y={t.y} font-size={t.s} text-anchor={(t as { anchor?: string }).anchor} class:list={{ w: t.w }} transform={t.r ? `rotate(${t.r} ${t.x} ${t.y})` : undefined}>{t.t}</text>)}
     </g>
     <g id="a3-names-small" fill="#111">
       {small.map((t) => <text x={t.x} y={t.y} font-size={t.s} class:list={{ w: t.w }} transform={t.r ? `rotate(${t.r} ${t.x} ${t.y})` : undefined}>{t.t}</text>)}

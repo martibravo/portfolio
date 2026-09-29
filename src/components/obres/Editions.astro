@@ -8,7 +8,7 @@ import { EDITIONS, STATIONS, YEARS, PROGRESS, NAMES } from '../../data/metro/obr
 import { COLOR } from '../metro/lines';
 
 const T = { x: 20.5, y: -131 };
-const VB = { x: 30, y: 100, w: 1860, h: 850 };
+const VB = { x: 560, y: 90, w: 1260, h: 610 };
 const P = [...geo.central.matchAll(/(-?\d+\.?\d*) (-?\d+\.?\d*)/g)].map((m) => [Number(m[1]), Number(m[2])]);
 const seg = P.slice(1).map((p, i) => Math.hypot(p[0] - P[i][0], p[1] - P[i][1]));
 const total = seg.reduce((a, b) => a + b, 0);
@@ -29,9 +29,10 @@ const LESSEPS = S['Lesseps'].t;
 const SLAB = S['Guinardó'].t;
 const RINGS = new Set(['Zona Universitària', 'Mandri', 'Lesseps', 'Guinardó']);
 const CAPS = new Set(['Sarrià', 'La Sagrera', 'Sagrera | TAV']);
-const labelAt: Record<string, [number, number, string]> = {
-  'Zona Universitària': [-12, -20, 'end'], 'Campus Nord': [0, -20, 'middle'], 'Manuel Girona': [0, 34, 'middle'],
-  'Prat de la Riba': [0, -20, 'middle'], 'Sarrià': [0, -38, 'middle'], 'Mandri': [18, -4, 'start'],
+// [dx, dy, anchor, rotate]: the crowded top run gets diagonal labels, like the network's own maps
+const labelAt: Record<string, [number, number, string, number?]> = {
+  'Zona Universitària': [-16, 5, 'end'], 'Campus Nord': [4, -16, 'start', -40], 'Manuel Girona': [4, -16, 'start', -40],
+  'Prat de la Riba': [4, -16, 'start', -40], 'Sarrià': [6, -30, 'start', -40], 'Mandri': [18, -4, 'start'],
   'El Putxet': [-16, 6, 'end'], 'Lesseps': [-18, 26, 'end'], 'Muntanya': [0, -20, 'middle'], 'Sanllehy': [0, -20, 'middle'],
   'Guinardó': [18, -8, 'start'], 'Pl. Maragall': [-16, 10, 'end'], 'La Sagrera': [-20, 18, 'end'], 'Sagrera | TAV': [0, -30, 'middle'],
 };
@@ -61,6 +62,8 @@ const nameAt = (n: string, i: number) => NAMES[n]?.[i] || n;
     <button type="button" class="orig-btn" data-orig aria-pressed="false">See the original</button>
   </header>
 
+  <div class="body">
+  <div class="left">
   <div class="stage">
     <svg viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`} role="img" aria-label="The L9/L10 status map, redrawn from data. Drag the train below to move through the editions." data-map>
       <g class="bg" transform={`translate(${T.x} ${T.y})`}>
@@ -76,13 +79,13 @@ const nameAt = (n: string, i: number) => NAMES[n]?.[i] || n;
       <path class="band bored" data-bored d={geo.central} pathLength="1" style={`stroke-dasharray:${bored(e0.bored)}`} />
       <path class="band slab" d={geo.central} pathLength="1" style={`stroke-dasharray:0 ${SLAB} ${1 - SLAB} 1`} />
       {markers.map((m) => {
-        const [dx, dy, anchor] = labelAt[m.name] ?? [0, -20, 'middle'];
+        const [dx, dy, anchor, rot] = labelAt[m.name] ?? [0, -20, 'middle'];
         return (
           <g class="st" data-st={m.name}>
             {RINGS.has(m.name) && <circle cx={m.x} cy={m.y} r="11" />}
             {CAPS.has(m.name) && <rect x={m.x - 10} y={m.y - 22} width="20" height="44" rx="10" transform={m.name === 'La Sagrera' ? `rotate(-45 ${m.x} ${m.y})` : undefined} />}
             {!RINGS.has(m.name) && !CAPS.has(m.name) && <path d={`M${m.x} ${m.y} l0 -15`} transform={`rotate(${m.ang} ${m.x} ${m.y})`} />}
-            <text x={m.x + dx} y={m.y + dy} text-anchor={anchor} data-name={m.name}>{nameAt(m.name, 0)}</text>
+            <text x={m.x + dx} y={m.y + dy} text-anchor={anchor} transform={rot ? `rotate(${rot} ${m.x + dx} ${m.y + dy})` : undefined} data-name={m.name}>{nameAt(m.name, 0)}</text>
           </g>
         );
       })}
@@ -92,6 +95,10 @@ const nameAt = (n: string, i: number) => NAMES[n]?.[i] || n;
     </svg>
     <img class="orig" data-orig-img alt="" width="1920" height="1080" loading="lazy" />
     <aside class="margin" data-note hidden></aside>
+    <section class="novetats">
+      <h4 data-box-title>{e0.box.title}</h4>
+      <ul data-box>{e0.box.items.map((it) => <li><span lang="ca">{it.ca}</span><small>{it.en}</small></li>)}</ul>
+    </section>
   </div>
 
   <div class="track" data-track role="slider" tabindex="0" aria-label="Edition" aria-valuemin="1" aria-valuemax={EDITIONS.length} aria-valuenow="1" aria-valuetext={e0.label}>
@@ -101,29 +108,25 @@ const nameAt = (n: string, i: number) => NAMES[n]?.[i] || n;
   </div>
   <p class="drag"><b>Eight editions of the same tunnel.</b> Drag the train.</p>
 
-  <div class="lower">
-    <section class="novetats">
-      <h4 data-box-title>{e0.box.title}</h4>
-      <ul data-box>{e0.box.items.map((it) => <li><span lang="ca">{it.ca}</span><small>{it.en}</small></li>)}</ul>
-    </section>
-    <ul class="cards">
-      {STATIONS.map((n) => {
-        const pr = PROGRESS[n][0];
-        return (
-          <li class="card" data-card={n}>
-            <p class="nm"><span class="warn" aria-hidden="true">⚠</span><span data-cname>{nameAt(n, 0) || n}</span></p>
-            <p class="pc"><b data-civil>{pr[0] == null ? 'No iniciada' : `${pr[0]}%`}</b> <b class="red" data-arch>{pr[1] == null ? '' : `${pr[1]}%`}</b></p>
-            <p class="yr" data-years><span class="y">{YEARS[n][0]}</span></p>
-            <span class="bar"><i data-bar style={`--v:${pr[0] ?? 0}%`}></i></span>
-          </li>
-        );
-      })}
-    </ul>
+  </div>
+  <ol class="stations" aria-label="Stations in this edition">
+    {STATIONS.map((n) => {
+      const pr = PROGRESS[n][0];
+      return (
+        <li class="card" data-card={n}>
+          <span class="nm" data-cname>{nameAt(n, 0) || n}</span>
+          <span class="yr" data-years><span class="y">{YEARS[n][0]}</span></span>
+          <span class="bar"><i data-bar style={`--v:${pr[0] ?? 0}%`}></i></span>
+          <span class="pc"><b data-civil>{pr[0] == null ? 'No iniciada' : `${pr[0]}%`}</b><b class="red" data-arch>{pr[1] == null ? '' : `${pr[1]}%`}</b></span>
+        </li>
+      );
+    })}
+  </ol>
   </div>
 </figure>
 
 <style>
-  .eds { margin:2rem 0 0; }
+  .eds { margin:2rem 0 0; margin-inline:calc(50% - min(720px, 50vw - 16px)); }
   .eds-head { display:flex; flex-wrap:wrap; gap:1rem 1.5rem; align-items:center; }
   .bullets { display:flex; gap:5px; }
   .bullets span { display:grid; place-items:center; width:54px; height:54px; background:var(--c); color:var(--ink,#fff); font-weight:700; font-size:1.5rem; letter-spacing:-.05em; }
@@ -156,10 +159,10 @@ const nameAt = (n: string, i: number) => NAMES[n]?.[i] || n;
   .tbm circle { fill:#ffd24a; stroke:#111; stroke-width:2.5; }
   .tbm path { stroke:#111; stroke-width:2; }
   .eds[data-i="0"] .tbm { display:none; }
-  .margin { position:absolute; right:.75rem; bottom:.75rem; max-width:17rem; background:#fff; border:2px solid #111; padding:.5rem .7rem; font-size:.8125rem; line-height:1.35; }
+  .margin { position:absolute; right:.75rem; top:.75rem; max-width:17rem; background:#fff; border:2px solid #111; padding:.5rem .7rem; font-size:.8125rem; line-height:1.35; }
   @media (max-width:640px) { .st text { display:none; } .margin { position:static; max-width:none; border-width:0 0 0 3px; } }
 
-  .track { position:relative; height:64px; margin:1.25rem 14px 0; touch-action:none; cursor:grab; outline-offset:6px; }
+  .track { position:relative; height:64px; margin:1.25rem 36px 0; touch-action:none; cursor:grab; outline-offset:6px; }
   .rail { position:absolute; left:0; right:0; top:18px; height:6px; background:linear-gradient(90deg,#ff6600,#ff6600); border-radius:3px; }
   .stop { position:absolute; left:var(--p); top:10px; transform:translateX(-50%); border:0; background:none; padding:0; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:10px; font:700 .6875rem var(--campaign); color:#555; white-space:nowrap; }
   .stop::before { content:''; width:16px; height:16px; border-radius:50%; background:#fff; border:4px solid #111; box-sizing:border-box; margin-top:3px; }
@@ -171,29 +174,28 @@ const nameAt = (n: string, i: number) => NAMES[n]?.[i] || n;
   .drag { margin:.4rem 0 0; font-size:.875rem; }
   @media (max-width:640px) { .stop:nth-child(odd):not(:first-of-type) span { visibility:hidden; } }
 
-  .lower { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.6fr); gap:1.25rem; margin-top:1.5rem; align-items:start; }
-  .novetats { border:3px solid #111; padding:0; background:#fff; }
-  .novetats h4 { margin:0; background:#111; color:#fff; font:700 1rem var(--campaign); padding:.35rem .7rem; }
-  .novetats ul { margin:0; padding:.6rem .7rem .7rem 1.6rem; font-size:.875rem; line-height:1.35; }
-  .novetats :global(li) { margin-bottom:.45rem; }
-  .novetats :global(small) { display:block; color:#666; font-size:.75rem; }
-  .cards { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:.5rem; }
-  .card { background:#fff; padding:.5rem .6rem .6rem; font-size:.8125rem; position:relative; }
-  .card p { margin:0; }
-  .nm { font-weight:700; display:flex; gap:.3rem; align-items:baseline; line-height:1.2; }
-  .warn { color:#e0a800; }
-  .pc { font-variant-numeric:tabular-nums; margin-top:.2rem !important; }
+  .body { display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr); gap:1.25rem; margin-top:1rem; align-items:start; }
+  .left { min-width:0; }
+  .novetats { position:absolute; left:.75rem; bottom:.75rem; width:min(46%,26rem); border:3px solid #111; background:#fff; }
+  .novetats h4 { margin:0; background:#111; color:#fff; font:700 .875rem var(--campaign); padding:.25rem .6rem; }
+  .novetats ul { margin:0; padding:.45rem .6rem .5rem 1.4rem; font-size:.75rem; line-height:1.3; max-height:13.5rem; overflow:auto; }
+  .novetats :global(li) { margin-bottom:.3rem; }
+  .novetats :global(small) { display:block; color:#666; font-size:.6875rem; }
+  .stations { list-style:none; margin:0; padding:0; border-top:3px solid #111; }
+  .card { display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"nm yr" "bar pc"; gap:.25rem .75rem; align-items:center; padding:.5rem 0; border-bottom:1px solid #e3e0d6; font-size:.8125rem; }
+  .nm { grid-area:nm; font-weight:700; line-height:1.2; }
+  .yr { grid-area:yr; display:flex; gap:.2rem; justify-content:flex-end; }
+  .bar { grid-area:bar; display:block; height:6px; background:#ebe8df; }
+  .bar i { display:block; height:100%; width:var(--v); background:#111; transition:width .9s linear; }
+  .pc { grid-area:pc; display:flex; gap:.5rem; justify-content:flex-end; font-variant-numeric:tabular-nums; font-size:.75rem; }
   .pc .red { color:#e32739; }
-  .yr { display:flex; flex-wrap:wrap; gap:.25rem; margin-top:.35rem !important; }
-  .yr :global(.y) { position:relative; display:inline-block; background:#111; color:#fff; font-weight:700; font-size:.75rem; padding:0 .3rem; font-variant-numeric:tabular-nums; }
+  .yr :global(.y) { position:relative; display:inline-block; background:#111; color:#fff; font-weight:700; font-size:.6875rem; padding:0 .3rem; font-variant-numeric:tabular-nums; }
   .yr :global(.y.old) { background:#fff; color:#111; box-shadow:inset 0 0 0 1.5px #111; }
   .yr :global(.y.old)::after { content:''; position:absolute; left:-2px; right:-2px; top:50%; height:2px; background:#e32739; transform-origin:left; animation:strike .35s linear both; }
   @keyframes strike { from { transform:scaleX(0); } }
-  .bar { display:block; height:4px; background:#eee; margin-top:.45rem; }
-  .bar i { display:block; height:100%; width:var(--v); background:#111; transition:width .9s linear; }
   .card.off { opacity:.35; }
-  .card.off .nm span:last-child { text-decoration:line-through; }
-  @media (max-width:760px) { .lower { grid-template-columns:1fr; } }
+  .card.off .nm { text-decoration:line-through; }
+  @media (max-width:980px) { .body { grid-template-columns:1fr; } .novetats { position:static; width:auto; margin-top:.75rem; } .novetats ul { max-height:none; } }
   @media (prefers-reduced-motion:reduce) { .bored, .tbm, .bar i, .train { transition:none; } .yr :global(.y.old)::after { animation:none; } }
 </style>
 
