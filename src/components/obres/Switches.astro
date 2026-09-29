@@ -1,23 +1,26 @@
 ---
-/* 04 · I si…? Three sets of points on one ghosted network. Throwing a lever
+/* 04 · I si…? Four sets of points on one ghosted network. Throwing a lever
    repaints the track from the junction outward, at train speed; throwing it
    back runs home. */
 import a3 from '../../data/metro/a3.json';
 import sw from '../../data/metro/a3-switches.json';
 import { COLOR } from '../metro/lines';
 
+const L13 = '#00a3a1';   // a colour no line on the map uses
 const ghost = a3.lines.filter((l) => !['L2', 'L5', 'L9', 'L10', 'L4', 'L11'].includes(l.id));
 const line = (id: string) => a3.lines.find((l) => l.id === id)!.d;
 const cards = [
   { n: 1, at: sw.sf, title: 'Sagrada Família', problem: 'L2 and L5 meet at Sagrada Família. The original plan had L2 going north to Vall d’Hebron and L5 east to Badalona, until a problem with the tunnel’s depth during construction changed it.', move: 'Give each line back the branch it was planned with: L5 carries on east to Badalona, L2 turns north to Vall d’Hebron.' },
   { n: 2, at: sw.cb, title: 'The middle of Line 9', problem: 'Both ends of L9 and L10 already meet L5, at Collblanc and at La Sagrera. Lots of people ride L5’s central section for the trips they’d make on L9 once its middle is finished.', move: 'Join L9 and L10 up through L5’s stations (Collblanc, Sants, Hospital Clínic, Diagonal, Verdaguer, Sagrada Família, La Sagrera) instead of the route along the top of the city.' },
+  { n: 4, at: sw.l13.at, title: 'L13', problem: 'L3 and L4 come within a kilometre of each other at Drassanes and Barceloneta, on the same stretch of waterfront. Going from the west of the city to the sea or Poblenou today means changing in the centre.', move: 'One tunnel under Passeig de Colom, from Drassanes to Barceloneta. L13 runs alongside L3 from Sant Feliu, through the tunnel, and alongside L4 all the way to La Sagrera.' },
   { n: 3, at: [1449, 489], title: 'L4 and L11', problem: 'L11 is five stations long, from Trinitat Nova to Can Cuiàs. L4 ends in a branch up to Trinitat Nova.', move: 'Close L4 into a circle that links the whole north of the city, and turn L11 into a real line: from Ciutat Meridiana all the way to the Vila Olímpica.' },
 ];
+cards.sort((a, b) => a.n - b.n);
 ---
 
 <div class="switches" data-switches>
   <div class="map">
-    <svg viewBox="300 150 2150 1210" preserveAspectRatio="xMinYMid meet" role="img" aria-label="A ghosted Barcelona network with three sets of points: Sagrada Família, the middle of Line 9, and L4 and L11.">
+    <svg viewBox="230 120 2220 1250" preserveAspectRatio="xMinYMid meet" role="img" aria-label="A ghosted Barcelona network with four sets of points: Sagrada Família, the middle of Line 9, L4 and L11, and a new L13 through a tunnel from Drassanes to Barceloneta.">
       <rect x="0" y="0" width="2600" height="1500" fill="#faf9f6" />
       <use href="#a3-geo" />
       <g class="ghost">{ghost.map((l) => <path d={l.d} style={`stroke:${l.color}`} />)}</g>
@@ -31,6 +34,8 @@ const cards = [
       <g class="s1 base"><path d={sw.swap.l5b} style={`stroke:${COLOR.L5}`} /><path d={sw.swap.l2b} style={`stroke:${COLOR.L2}`} /><path d={sw.swap.l5a} style={`stroke:${COLOR.L5}`} /><path d={sw.swap.l2a} style={`stroke:${COLOR.L2}`} /></g>
       <g class="s1 paint"><path d={sw.swap.l5a} pathLength="1" style={`stroke:${COLOR.L2}`} /><path d={sw.swap.l2a} pathLength="1" style={`stroke:${COLOR.L5}`} /></g>
       <g class="s2 via"><path d={sw.via.m9} pathLength="1" style={`stroke:${COLOR.L9}`} /><path d={sw.via.m10} pathLength="1" style={`stroke:${COLOR.L10}`} /></g>
+      <!-- switch 4: L13, drawn from the new tunnel outward -->
+      <g class="s4 l13"><path d={sw.l13.west} pathLength="1" style={`stroke:${L13}`} /><path d={sw.l13.east} pathLength="1" style={`stroke:${L13}`} /></g>
       <use href="#a3-names-bold" class="names" />
       {cards.map((c) => <g class="points"><circle cx={c.at[0]} cy={c.at[1]} r="22" /><text x={c.at[0]} y={c.at[1] + 7} text-anchor="middle">{c.n}</text></g>)}
     </svg>
@@ -60,10 +65,10 @@ const cards = [
   path { fill:none; stroke-width:5; stroke-linejoin:round; }
   .ghost path { opacity:.16; }
   .names { opacity:.55; }
-  .ring path, .via path, .paint path { stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset var(--dur,1.6s) linear; }
+  .ring path, .via path, .paint path, .l13 path { stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset var(--dur,1.6s) linear; }
   .cut path { stroke:#c6c6c6; stroke-width:7; opacity:0; transition:opacity .3s; }
   .plan path { transition:opacity .3s; }
-  [data-s1] .paint path, [data-s2] .via path, [data-s3] .ring path { stroke-dashoffset:0; }
+  [data-s1] .paint path, [data-s2] .via path, [data-s3] .ring path, [data-s4] .l13 path { stroke-dashoffset:0; }
   [data-s2] .cut path { opacity:1; }
   [data-s3] .plan path { opacity:0; transition-delay:0s; }
   .points circle { fill:#111; }
@@ -87,7 +92,7 @@ const cards = [
     .map { position:sticky; top:2.4rem; z-index:2; }
     .map svg { aspect-ratio:1300/880; }
   }
-  @media (prefers-reduced-motion:reduce) { .ring path, .via path, .paint path, .rod { transition:none; } }
+  @media (prefers-reduced-motion:reduce) { .ring path, .via path, .paint path, .l13 path, .rod { transition:none; } }
 </style>
 
 <script>
@@ -95,7 +100,7 @@ const cards = [
     document.querySelectorAll<HTMLElement>('[data-switches]:not([data-initialized])').forEach((root) => {
       root.dataset.initialized = '';
       // train speed: every repaint runs at the same map-units-per-second
-      root.querySelectorAll<SVGPathElement>('.ring path, .via path, .paint path').forEach((p) => {
+      root.querySelectorAll<SVGPathElement>('.ring path, .via path, .paint path, .l13 path').forEach((p) => {
         p.style.setProperty('--dur', `${(p.getTotalLength() / 700).toFixed(2)}s`);
       });
       root.querySelectorAll<HTMLButtonElement>('[data-lever]').forEach((b) => {
