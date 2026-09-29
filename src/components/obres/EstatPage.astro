@@ -1,0 +1,202 @@
+---
+/* Estat de les obres: the Metro Map 2040 case study. One line, nine stations:
+   Inici · Sense servei · Còpia · Escala · Obres · I si…? · 2040 · Caldes · Normes · Sortides. */
+import A3Defs from './A3Defs.astro';
+import Sinoptic from './Sinoptic.astro';
+import Intro from './Intro.astro';
+import Opening from './Opening.astro';
+import EnServei from './EnServei.astro';
+import Editions from './Editions.astro';
+import Switches from './Switches.astro';
+import Map2040 from './Map2040.astro';
+import Caldes from './Caldes.astro';
+import Escala from './Escala.astro';
+import Board from './Board.astro';
+import MetroValles from '../metro/MetroValles.astro';
+
+const DIARI = 'https://www.diaridebarcelona.cat/w/linia9-metro-mai-arriba';
+const rules = [
+  { n: 1, t: 'Learn the handwriting first.', d: 'I copied the official map before I changed a single line. Every project starts the same way for me: finding out how the thing already works, and why.' },
+  { n: 2, t: 'Leave things out on purpose.', d: 'A metro map is mostly what’s missing. Most of my design work is deciding what the person in front of it doesn’t need to see yet.' },
+  { n: 3, t: 'Keep the map true after launch.', d: 'Eight editions, including a year with the boring machine parked at Mandri. I’m the one still maintaining the thing a year after it ships.' },
+  { n: 4, t: 'Make public things readable.', d: 'When the official progress reports on Line 9 stopped, my map kept going, and a newspaper ended up using it. Turning public information into something people can actually check is the work I want to do more of.' },
+];
+---
+
+<div class="obres" id="top">
+  <A3Defs />
+  <Sinoptic />
+
+  <Intro />
+
+  <Opening />
+
+  <EnServei />
+
+  <section id="escala" class="block">
+    <p class="tag" lang="ca">No és a escala <span lang="en">Not to scale</span></p>
+    <h2>Then I learned to lie properly.</h2>
+    <div class="copy">
+      <p>Underground, Barcelona is a mess. Lines bend around old foundations, dive under each other, run a kilometre without a stop and then cram three stations into the centre.</p>
+      <p>A good metro map throws away almost everything true about the city (distance, direction, the curve of the coast). It keeps the one thing you need on a platform with a train coming: what connects to what.</p>
+    </div>
+    <Escala />
+    <p class="after">The map leaves out most of the city. That’s the job.</p>
+  </section>
+
+  <section id="obres" class="block">
+    <p class="tag" lang="ca">En construcció <span lang="en">Under construction</span></p>
+    <h2>Then I started keeping score.</h2>
+    <div class="split">
+      <div class="copy">
+        <p>Work on Line 9 started in September 2003, in Badalona. It was meant to be finished in 2007. When it’s done it’ll be the longest underground metro line in Europe, and it has been under construction for <b data-years-l9>23</b> of my <b data-age>25</b> years.</p>
+        <p>It’s also personal. When I went to college, Line 9 from La Sagrera to Campus Nord was my route. Finished, it would have saved me hours every week.</p>
+        <p>The official map only shows what’s open. I wanted to see the gap: every station’s civil works, every percentage, every promised date. So I started a second map, and I’ve redrawn it by hand eight times since.</p>
+        <p>In April 2023 the official progress reports stopped, and for the next year the figures only came out through formal information requests. The map kept going. In March 2024, writing about how little was being published, the Diari de Barcelona used my December 2023 edition to show where the works stood.</p>
+      </div>
+      <a class="press" href={DIARI}>
+        <span class="press-tag">In the press · March 2024</span>
+        <b>Diari de Barcelona</b>
+        <span>On how little was being published about Line 9, using my December 2023 edition, credited to @martibn_ ↗</span>
+      </a>
+    </div>
+
+    <Editions />
+
+  </section>
+
+  <section id="i-si" class="block">
+    <p class="tag" lang="ca">I si…? <span lang="en">What if?</span></p>
+    <h2>Then I started arguing with it.</h2>
+    <div class="copy">
+      <p>Once you can draw a network, you start seeing its seams: the branch that went the wrong way, the transfer that’s really a walk down a corridor. These are proposals nobody asked me for.</p>
+      <p>Each one is a single change. Throw the switch and see what it does to everything else.</p>
+      <p class="hint" lang="ca">Canvia l’agulla <span>Throw the switch</span></p>
+    </div>
+    <Switches />
+  </section>
+
+  <section id="projectada" class="block">
+    <p class="tag" lang="ca">Projectada <span lang="en">Planned</span></p>
+    <h2>Then I drew the one that doesn’t exist yet.</h2>
+    <div class="copy">
+      <p>This is Barcelona’s metro as I think it will look around 2040–2050: everything in the official plans, plus a few moves of my own.</p>
+      <p>It’s also the first map where I stopped imitating anyone. No logos, no borrowed legend. A lowercase title, cream paper, the sea in pale teal, the Llobregat and the Besòs as the edges of the world.</p>
+    </div>
+    <Map2040 />
+  </section>
+
+  <section id="propera" class="block">
+    <p class="tag" lang="ca">Propera estació <span lang="en">Next stop</span></p>
+    <h2>So I drew Caldes a train.</h2>
+    <div class="copy">
+      <p>Metro del Vallès, Zona de la Riera de Caldes. Two new lines: C1 from Sabadell through Castellar and Sentmenat, and C2 down to Mollet, more or less where El Calderí used to run. And the R9, all the way from Plaça de Catalunya.</p>
+      <p>All three end at l’Estació, outside the window I grew up behind.</p>
+      <p>It’s the least realistic map on this page. Nobody asked for it. I’d still be first on the platform, and I wouldn’t have far to walk.</p>
+    </div>
+    <Caldes />
+    <div class="original-valles"><p class="small-cap">The map as I drew it</p><MetroValles /></div>
+  </section>
+
+  <section id="normes" class="block">
+    <p class="tag" lang="ca">Normes d’ús <span lang="en">Rules of use</span></p>
+    <h2>What six years of this taught me</h2>
+    <ol class="normes">
+      {rules.map((r) => (
+        <li>
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            {r.n === 1 && <><circle cx="26" cy="32" r="14" /><circle cx="38" cy="32" r="14" class="o" /></>}
+            {r.n === 2 && <><path d="M6 32H58" class="ln" /><path d="M20 32V20M44 32V20" class="tk" /><path d="M32 32V20" class="tk gone" /></>}
+            {r.n === 3 && <><rect x="10" y="22" width="44" height="20" class="yb" /><path d="M8 32H56" class="st" /></>}
+            {r.n === 4 && <><rect x="6" y="18" width="52" height="28" rx="3" class="bd" /><path d="M14 28H40M14 36H30" class="bl" /></>}
+          </svg>
+          <p><b>{r.n}. {r.t}</b> {r.d}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section id="sortides" class="block">
+    <p class="tag" lang="ca">Properes sortides <span lang="en">Next departures</span></p>
+    <nav class="departures" aria-label="Next departures">
+      <div class="dep-head"><span>Destinació</span><span>Via</span><span>Sortida</span></div>
+      <a href="/about/"><span>Contacte</span><span>about</span><span>ara</span></a>
+      <a href="/downloads/metro-barcelona-a3-maps.pdf" download><span>Metro Map 2040</span><span>poster, PDF</span><span>2 min</span></a>
+      <a href="/downloads/metro-network-maps.pdf" download><span>Xarxa de Metro</span><span>network map, PDF</span><span>4 min</span></a>
+      <a href="/graphic-design/"><span>Graphic design</span><span>more work</span><span>6 min</span></a>
+    </nav>
+    <footer class="foot">
+      <p>Not affiliated with TMB, FGC or the Generalitat. Just a fan with a pen tool.</p>
+      <p><b lang="ca">Any de finalització: n/d.</b></p>
+    </footer>
+  </section>
+</div>
+
+<style>
+  :global(body:has(.obres)) { background:#faf9f6; color:#111; --bg:#faf9f6; --fg:#111; --muted:#666; --border:#e3e0d6; --hover-bg:#f1eee5; color-scheme:light; }
+  :global(body:has(.obres) .site) { max-width:1200px; }
+  .obres { font-family:var(--campaign); font-size:1rem; line-height:1.55; font-variant-numeric:tabular-nums; }
+  .obres :global(h2) { font-family:var(--campaign); font-weight:600; font-size:clamp(2rem,4.4vw,3.4rem); line-height:1.02; letter-spacing:-.045em; margin:0 0 1.25rem; }
+  .obres :global(.tag) { display:inline-block; background:#111; color:#fff; font-weight:700; font-size:.8125rem; text-transform:uppercase; letter-spacing:.06em; padding:.15rem .5rem; margin:0 0 1rem; }
+  .obres :global(.tag)::before, .obres :global(.tag)::after { content:none; }
+  .obres :global(.tag span) { font-weight:400; text-transform:none; letter-spacing:0; opacity:.7; margin-left:.4rem; }
+  .obres :global(.copy) { max-width:60ch; }
+  .obres :global(.copy p) { margin:0 0 1rem; }
+  .obres :global(.block) { padding:clamp(4rem,9vw,7rem) 0 0; scroll-margin-top:4rem; }
+  .obres :global(figcaption) { font-size:.8125rem; color:#666; margin-top:.5rem; }
+  .split { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); gap:2rem; align-items:start; }
+  .press { display:block; border:3px solid #111; background:#fff; padding:.8rem 1rem; text-decoration:none; color:#111; }
+  .press span { display:block; font-size:.8125rem; color:#555; }
+  .press .press-tag { color:#111; font-weight:700; text-transform:uppercase; font-size:.6875rem; letter-spacing:.06em; margin-bottom:.4rem; }
+  .press b { display:block; font-size:1.25rem; line-height:1.15; letter-spacing:-.02em; margin-bottom:.4rem; }
+  .after { margin:1rem 0 0; font-weight:700; }
+  .hint { font-weight:700; }
+  .hint span { font-weight:400; color:#666; margin-left:.4rem; }
+  .original-valles { margin-top:3rem; }
+  .small-cap { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#666; margin:0; }
+  .normes { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.25rem 2rem; }
+  .normes li { display:grid; grid-template-columns:64px 1fr; gap:1rem; align-items:start; border-top:3px solid #111; padding-top:1rem; }
+  .normes p { margin:0; font-size:.9375rem; }
+  .normes svg { width:64px; height:64px; }
+  .normes circle { fill:#fff; stroke:#111; stroke-width:5; }
+  .normes .o { fill:none; stroke:#e32739; }
+  .normes .ln { stroke:#317bc8; stroke-width:8; }
+  .normes .tk { stroke:#317bc8; stroke-width:6; }
+  .normes .gone { stroke-dasharray:3 3; opacity:.4; }
+  .normes .yb { fill:#111; }
+  .normes .st { stroke:#e32739; stroke-width:4; }
+  .normes .bd { fill:#141414; }
+  .normes .bl { stroke:#ffb300; stroke-width:5; }
+  .departures { background:#141414; color:#ffb300; border-radius:6px; padding:.8rem 1.1rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+  .departures > * { display:grid; grid-template-columns:1.4fr 1fr 6rem; gap:1rem; padding:.45rem 0; }
+  .dep-head { color:#b98a1c; font-size:.6875rem; letter-spacing:.08em; }
+  .departures a { color:#ffb300; text-decoration:none; border-top:1px solid #333; font-size:clamp(.9rem,2vw,1.2rem); }
+  .departures a span:nth-child(2) { color:#fff4d6; font-weight:400; text-transform:none; letter-spacing:0; }
+  .departures a span:last-child { text-align:right; }
+  .departures a:hover span:first-child, .departures a:focus-visible span:first-child { text-decoration:underline; }
+  .foot { margin:2rem 0 3rem; font-size:.8125rem; color:#666; }
+  .foot p { margin:0 0 .3rem; }
+  .foot b { color:#111; }
+  @media (max-width:760px) {
+    .split, .normes { grid-template-columns:1fr; }
+    .departures > * { grid-template-columns:1fr 4.5rem; }
+    .departures > * span:nth-child(2) { display:none; }
+  }
+</style>
+
+<script>
+  /* "23 of my 25": years since Line 9 work began (Sept 2003) and Martí's age
+     (born 4 July 2001), both computed from today so they never go stale. */
+  function counters() {
+    const now = new Date();
+    const years = (y: number, m: number, d: number) => {
+      let n = now.getFullYear() - y;
+      if (now.getMonth() + 1 < m || (now.getMonth() + 1 === m && now.getDate() < d)) n--;
+      return n;
+    };
+    document.querySelectorAll('[data-years-l9]').forEach((el) => { el.textContent = String(years(2003, 9, 1)); });
+    document.querySelectorAll('[data-age]').forEach((el) => { el.textContent = String(years(2001, 7, 4)); });
+  }
+  counters();
+  document.addEventListener('astro:page-load', counters);
+</script>

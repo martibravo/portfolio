@@ -16,6 +16,7 @@ const workSchema = z.object({
   duration:    z.string().optional(),
   deliverables: z.array(z.string()).default([]),
   disclaimer:  z.string().optional(),
+  about:       z.object({ name: z.string(), description: z.string() }).optional(),
 });
 
 export const collections = {

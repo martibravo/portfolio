@@ -1,0 +1,73 @@
+---
+/* 02 · No és a escala. One slider: the network on its real alignment
+   (OpenStreetMap) at one end, the 2020 diagram at the other. Every line is
+   resampled to the same number of points and interpolated. */
+import morph from '../../data/metro/morph.json';
+const toD = (a: number[][]) => 'M' + a.map((p) => `${p[0]} ${p[1]}`).join(' L');
+const A = morph.lines.find((l) => l.id === 'L7')!;
+const B = morph.lines.find((l) => l.id === 'L9S')!;
+---
+
+<figure class="escala" data-escala>
+  <script type="application/json" data-payload set:html={JSON.stringify(morph)} />
+  <svg viewBox="0 120 1920 1180" role="img" aria-label="Barcelona’s metro lines, morphing between their real alignment and the straightened diagram.">
+    <rect x="-500" y="-500" width="3000" height="2500" fill="#faf9f6" />
+    <g class="bg-city" data-bg-city>
+      <path d={morph.bg.sea} fill="#c6dedb" />
+      {morph.bg.rivers.map((r) => <path d={r.d} fill="none" stroke="#a9cecb" stroke-width={r.w * 3} stroke-linejoin="round" />)}
+    </g>
+    <g class="bg-map" data-bg-map opacity="0"><use href="#a3-geo-notram" /></g>
+    <g class="ln">{morph.lines.map((l) => <path d={toD(l.city)} style={`stroke:${l.color}`} data-id={l.id} />)}</g>
+  </svg>
+  <div class="control">
+    <span lang="ca"><b>La ciutat</b> The city</span>
+    <input type="range" min="0" max="1000" value="0" aria-label="From the real city to the map" data-t />
+    <span lang="ca"><b>El mapa</b> The map</span>
+  </div>
+  <p class="readout">On this map, a kilometre of <b style={`color:${A.color}`}>L7</b> looks <b data-ratio>1.0</b>× as long as a kilometre of <b style={`color:${B.color}`}>L9 Sud</b>.</p>
+  <figcaption>At one end, the lines on their real alignment, turned to sit like the map (map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors). At the other, the same lines on my <i>metro de barcelona</i> map. Every station slides to its own place. Drag to straighten the city.</figcaption>
+</figure>
+
+<style>
+  .escala { margin:2rem 0 0; background:#fff; border-radius:12px; padding:1rem; }
+  svg { border-radius:8px; }
+  svg { display:block; width:100%; height:auto; }
+  .ln path { fill:none; stroke-width:7; stroke-linejoin:miter; stroke-miterlimit:3; stroke-linecap:round; }
+  .control { display:grid; grid-template-columns:auto 1fr auto; gap:1rem; align-items:center; margin-top:.75rem; font-size:.8125rem; }
+  .control b { display:block; font-size:.9375rem; }
+  input { accent-color:#111; }
+  .readout { margin:.75rem 0 0; font-size:1rem; font-variant-numeric:tabular-nums; }
+</style>
+
+<script>
+  function initEscala() {
+    document.querySelectorAll<HTMLElement>('[data-escala]:not([data-initialized])').forEach((fig) => {
+      fig.dataset.initialized = '';
+      const D = JSON.parse(fig.querySelector('[data-payload]')!.textContent!) as { lines: { id: string; city: number[][]; map: number[][]; km: number }[] };
+      const paths = new Map([...fig.querySelectorAll<SVGPathElement>('path')].map((p) => [p.dataset.id!, p]));
+      const input = fig.querySelector<HTMLInputElement>('[data-t]')!;
+      const bgC = fig.querySelector<SVGGElement>('[data-bg-city]')!, bgM = fig.querySelector<SVGGElement>('[data-bg-map]')!;
+      const out = fig.querySelector('[data-ratio]')!;
+      const len = (a: number[][]) => a.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - a[i][0], p[1] - a[i][1]), 0);
+      const A = D.lines.find((l) => l.id === 'L7')!, B = D.lines.find((l) => l.id === 'L9S')!;
+      const update = () => {
+        const t = Number(input.value) / 1000;
+        const cur: Record<string, number[][]> = {};
+        D.lines.forEach((l) => {
+          const pts = l.city.map((c, i) => [c[0] + (l.map[i][0] - c[0]) * t, c[1] + (l.map[i][1] - c[1]) * t]);
+          cur[l.id] = pts;
+          paths.get(l.id)!.setAttribute('d', 'M' + pts.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' L'));
+        });
+        bgC.setAttribute('opacity', String(1 - t)); bgM.setAttribute('opacity', String(t));
+        const r = (len(cur.L7) / A.km) / (len(cur.L9S) / B.km);
+        out.textContent = r.toFixed(1);
+      };
+      input.addEventListener('input', update);
+      // announce the ratio once the reader lets go, not on every step
+      input.addEventListener('change', () => input.setAttribute('aria-valuetext', `${Math.round(Number(input.value) / 10)}% of the way to the map; a kilometre of L7 looks ${out.textContent} times as long as one of L9 Sud`));
+      update();
+    });
+  }
+  initEscala();
+  document.addEventListener('astro:page-load', initEscala);
+</script>

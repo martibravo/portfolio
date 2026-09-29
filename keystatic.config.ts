@@ -40,6 +40,10 @@ const workCollection = (label: string, dirName: string) =>
         label: 'Deliverables',
       }),
       disclaimer: fields.text({ label: 'Disclaimer', multiline: true }),
+      about: fields.object({
+        name: fields.text({ label: 'Name' }),
+        description: fields.text({ label: 'Description' }),
+      }, { label: 'About (structured data subject)' }),
       content: fields.mdx({
         label: 'Content',
         components: {

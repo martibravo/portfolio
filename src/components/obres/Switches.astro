@@ -1,0 +1,107 @@
+---
+/* 04 · I si…? Three sets of points on one ghosted network. Throwing a lever
+   repaints the track from the junction outward, at train speed; throwing it
+   back runs home. */
+import a3 from '../../data/metro/a3.json';
+import sw from '../../data/metro/a3-switches.json';
+import { COLOR } from '../metro/lines';
+
+const ghost = a3.lines.filter((l) => !['L2', 'L5', 'L9', 'L10', 'L4', 'L11'].includes(l.id));
+const line = (id: string) => a3.lines.find((l) => l.id === id)!.d;
+const cards = [
+  { n: 1, at: sw.sf, title: 'Sagrada Família', problem: 'L2 and L5 meet at Sagrada Família. The original plan had L2 going north to Vall d’Hebron and L5 east to Badalona, until a problem with the tunnel’s depth during construction changed it.', move: 'Give each line back the branch it was planned with: L5 carries on east to Badalona, L2 turns north to Vall d’Hebron.' },
+  { n: 2, at: sw.cb, title: 'The middle of Line 9', problem: 'Both ends of L9 and L10 already meet L5, at Collblanc and at La Sagrera. Lots of people ride L5’s central section for the trips they’d make on L9 once its middle is finished.', move: 'Join L9 and L10 up through L5’s stations (Collblanc, Sants, Hospital Clínic, Diagonal, Verdaguer, Sagrada Família, La Sagrera) instead of the route along the top of the city.' },
+  { n: 3, at: [1449, 489], title: 'L4 and L11', problem: 'L11 is five stations long, from Trinitat Nova to Can Cuiàs. L4 ends in a branch up to Trinitat Nova.', move: 'Close L4 into a circle that links the whole north of the city, and turn L11 into a real line: from Ciutat Meridiana all the way to the Vila Olímpica.' },
+];
+---
+
+<div class="switches" data-switches>
+  <div class="map">
+    <svg viewBox="360 230 1300 880" role="img" aria-label="A ghosted Barcelona network with three sets of points: Sagrada Família, the middle of Line 9, and L4 and L11.">
+      <use href="#a3-geo" />
+      <g class="ghost">{ghost.map((l) => <path d={l.d} style={`stroke:${l.color}`} />)}</g>
+      <!-- switch 3: L4 / L11 -->
+      <g class="s3 plan"><path d={sw.loop.planL4} style={`stroke:${COLOR.L4}`} /><path d={sw.loop.planL11} style={`stroke:${COLOR.L11}`} /></g>
+      <g class="s3 ring"><path d={sw.loop.ringL4} pathLength="1" style={`stroke:${COLOR.L4}`} /><path d={sw.loop.ringL11} pathLength="1" style={`stroke:${COLOR.L11}`} /></g>
+      <!-- switch 2: L9/L10 through L5 -->
+      <g class="s2 base"><path d={line('L9')} style={`stroke:${COLOR.L9}`} /><path d={line('L10')} style={`stroke:${COLOR.L10}`} /></g>
+      <g class="s2 cut"><path d={sw.via.c9} /><path d={sw.via.c10} /></g>
+      <!-- switch 1: L2 / L5 -->
+      <g class="s1 base"><path d={sw.swap.l5b} style={`stroke:${COLOR.L5}`} /><path d={sw.swap.l2b} style={`stroke:${COLOR.L2}`} /><path d={sw.swap.l5a} style={`stroke:${COLOR.L5}`} /><path d={sw.swap.l2a} style={`stroke:${COLOR.L2}`} /></g>
+      <g class="s1 paint"><path d={sw.swap.l5a} pathLength="1" style={`stroke:${COLOR.L2}`} /><path d={sw.swap.l2a} pathLength="1" style={`stroke:${COLOR.L5}`} /></g>
+      <g class="s2 via"><path d={sw.via.m9} pathLength="1" style={`stroke:${COLOR.L9}`} /><path d={sw.via.m10} pathLength="1" style={`stroke:${COLOR.L10}`} /></g>
+      <use href="#a3-names-bold" class="names" />
+      {cards.map((c) => <g class="points"><circle cx={c.at[0]} cy={c.at[1]} r="22" /><text x={c.at[0]} y={c.at[1] + 7} text-anchor="middle">{c.n}</text></g>)}
+    </svg>
+  </div>
+  <ol class="cards">
+    {cards.map((c) => (
+      <li class="card" data-card={c.n}>
+        <div class="card-head">
+          <span class="num">{c.n}</span><h3>{c.title}</h3>
+          <button type="button" class="lever" data-lever={c.n} aria-pressed="false" aria-label={`Throw the switch: ${c.title}`}><span class="rod" aria-hidden="true"></span></button>
+        </div>
+        <dl>
+          <div><dt>The problem</dt><dd>{c.problem}</dd></div>
+          <div><dt>The move</dt><dd>{c.move}</dd></div>
+          <div><dt>Estat</dt><dd lang="ca">proposta. Ningú m’ho ha demanat. <small>(Proposal. Nobody asked me.)</small></dd></div>
+        </dl>
+      </li>
+    ))}
+  </ol>
+</div>
+
+<style>
+  .switches { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:1.5rem; margin-top:2rem; align-items:start; }
+  .map { position:sticky; top:4.5rem; background:#faf9f6; border-radius:12px; overflow:hidden; box-shadow:0 0 0 1px #e3e0d6; }
+  svg { display:block; width:100%; height:auto; }
+  path { fill:none; stroke-width:5; stroke-linejoin:round; }
+  .ghost path { opacity:.16; }
+  .names { opacity:.55; }
+  .ring path, .via path, .paint path { stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset var(--dur,1.6s) linear; }
+  .cut path { stroke:#c6c6c6; stroke-width:7; opacity:0; transition:opacity .3s; }
+  .plan path { transition:opacity .3s; }
+  [data-s1] .paint path, [data-s2] .via path, [data-s3] .ring path { stroke-dashoffset:0; }
+  [data-s2] .cut path { opacity:1; }
+  [data-s3] .plan path { opacity:0; transition-delay:0s; }
+  .points circle { fill:#111; }
+  .points text { fill:#fff; font:700 24px var(--campaign); }
+  .cards { list-style:none; margin:0; padding:0; display:grid; gap:1rem; }
+  .card { background:#fff; border:2px solid #111; padding:.9rem 1rem; }
+  .card-head { display:flex; align-items:center; gap:.6rem; }
+  .num { display:inline-grid; place-items:center; width:1.6rem; height:1.6rem; border-radius:50%; background:#111; color:#fff; font-weight:700; font-size:.8125rem; }
+  h3 { margin:0; font-size:1.125rem; letter-spacing:-.02em; flex:1; }
+  .lever { position:relative; width:52px; height:52px; border:0; border-radius:8px; background:#eee; cursor:pointer; }
+  .lever::after { content:''; position:absolute; left:14px; right:14px; bottom:9px; height:8px; background:#111; border-radius:2px; }
+  .rod { position:absolute; left:50%; bottom:14px; width:6px; height:30px; margin-left:-3px; background:#111; border-radius:3px; transform-origin:bottom center; transform:rotate(-32deg); transition:transform .25s steps(3,end); }
+  .rod::before { content:''; position:absolute; top:-7px; left:-5px; width:16px; height:16px; border-radius:50%; background:#e32739; }
+  .lever[aria-pressed="true"] .rod { transform:rotate(32deg); }
+  dl { margin:.7rem 0 0; display:grid; gap:.5rem; font-size:.875rem; line-height:1.4; }
+  dt { font-weight:700; font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:#666; }
+  dd { margin:0; }
+  dd small { color:#666; }
+  @media (max-width:860px) { .switches { grid-template-columns:1fr; } .map { position:sticky; top:3rem; z-index:2; } }
+  @media (prefers-reduced-motion:reduce) { .ring path, .via path, .paint path, .rod { transition:none; } }
+</style>
+
+<script>
+  function initSwitches() {
+    document.querySelectorAll<HTMLElement>('[data-switches]:not([data-initialized])').forEach((root) => {
+      root.dataset.initialized = '';
+      // train speed: every repaint runs at the same map-units-per-second
+      root.querySelectorAll<SVGPathElement>('.ring path, .via path, .paint path').forEach((p) => {
+        p.style.setProperty('--dur', `${(p.getTotalLength() / 700).toFixed(2)}s`);
+      });
+      root.querySelectorAll<HTMLButtonElement>('[data-lever]').forEach((b) => {
+        b.addEventListener('click', () => {
+          const key = `s${b.dataset.lever}`;
+          const on = root.dataset[key] === undefined;
+          if (on) root.dataset[key] = ''; else delete root.dataset[key];
+          b.setAttribute('aria-pressed', String(on));
+        });
+      });
+    });
+  }
+  initSwitches();
+  document.addEventListener('astro:page-load', initSwitches);
+</script>

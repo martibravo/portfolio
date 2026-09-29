@@ -52,11 +52,7 @@ const creativeWork = isCaseStudy ? {
   },
   dateCreated: entry.data.date.toISOString().slice(0, 10),
   inLanguage: ['en', 'ca'],
-  about: {
-    '@type': 'Thing',
-    name: 'Bicing',
-    description: "Barcelona's public bicycle-sharing system",
-  },
+  about: entry.data.about?.name ? { '@type': 'Thing', ...entry.data.about } : undefined,
 } : undefined;
 ---
 

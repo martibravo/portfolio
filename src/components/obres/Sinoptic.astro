@@ -1,0 +1,96 @@
+---
+/* The line diagram above a train's doors: one station per block, the current
+   one lit, the next one blinking, the line in red. On big screens it hangs at
+   the side like the other case studies' section nav; below that it runs along
+   the top; on phones it shrinks to "current · next". */
+const STOPS = [
+  { id: 'inici', name: 'Inici' },
+  { id: 'sense-servei', name: 'Sense servei' },
+  { id: 'en-servei', name: 'Còpia' },
+  { id: 'escala', name: 'Escala' },
+  { id: 'obres', name: 'Obres' },
+  { id: 'i-si', name: 'I si…?' },
+  { id: 'projectada', name: '2040' },
+  { id: 'propera', name: 'Caldes' },
+  { id: 'normes', name: 'Normes' },
+  { id: 'sortides', name: 'Sortides' },
+];
+---
+
+<nav class="sinoptic" aria-label="Page sections" data-sinoptic>
+  <ol lang="ca">
+    {STOPS.map((s) => (
+      <li data-stop={s.id}><a href={`#${s.id}`}><span class="dot" aria-hidden="true"></span><span class="nm">{s.name}</span></a></li>
+    ))}
+  </ol>
+  <p class="upcoming" lang="ca"><b class="cur" data-cur>{STOPS[0].name}</b><span class="sep"> · </span><span>Propera estació:</span> <b data-next>{STOPS[1].name}</b></p>
+</nav>
+
+<style>
+  .sinoptic { --red:#e32739; position:sticky; top:0; z-index:40; display:flex; align-items:center; gap:1.5rem; padding:.55rem 0; background:#faf9f6; border-bottom:1px solid #e3e0d6; font-family:var(--campaign); }
+  ol { flex:1; list-style:none; margin:0; padding:0; display:flex; justify-content:space-between; position:relative; }
+  /* the line runs from the centre of the first dot to the centre of the last */
+  ol::before { content:''; position:absolute; left:7.5px; right:7.5px; top:6px; height:3px; background:var(--red); }
+  li { position:relative; }
+  a { display:flex; flex-direction:column; align-items:center; gap:.3rem; text-decoration:none; color:#666; font-size:.6875rem; font-weight:700; white-space:nowrap; }
+  li:first-child a { align-items:flex-start; }
+  li:last-child a { align-items:flex-end; }
+  .dot { width:15px; height:15px; border-radius:50%; background:#faf9f6; border:3px solid var(--red); box-sizing:border-box; position:relative; z-index:1; flex:none; }
+  li.passed .dot { background:var(--red); }
+  li.on .dot { background:#fff; border-color:#111; box-shadow:0 0 0 3px var(--red); }
+  li.on a { color:#111; }
+  li.next .dot { animation:blink 1s steps(2,jump-none) infinite; }
+  @keyframes blink { 50% { background:var(--red); } }
+  .upcoming { margin:0; font-size:.75rem; white-space:nowrap; color:#555; }
+  .upcoming b { color:#111; }
+  .cur, .sep { display:none; }
+
+  /* big screens: down the left side, like the Bicing case study's section nav */
+  @media (min-width:1200px) {
+    .sinoptic { position:fixed; left:1.25rem; top:50%; transform:translateY(-50%); width:170px; flex-direction:column; align-items:stretch; gap:1rem; padding:0; background:none; border:0; }
+    ol { flex-direction:column; justify-content:flex-start; gap:0; }
+    ol::before { left:6px; right:auto; width:3px; height:auto; top:1rem; bottom:1rem; }
+    li { height:2rem; }
+    a, li:first-child a, li:last-child a { flex-direction:row; align-items:center; gap:.7rem; height:100%; font-size:.8125rem; }
+    .upcoming { white-space:normal; font-size:.75rem; padding-left:calc(15px + .7rem); }
+    :global(body:has(.sinoptic) .site) { width:calc(100% - 240px); max-width:1200px; margin-left:max(216px,calc((100vw - 1200px)/2)); margin-right:24px; }
+  }
+  @media (max-width:760px) {
+    ol { display:none; }
+    .sinoptic { justify-content:flex-start; }
+    .cur, .sep { display:inline; }
+  }
+  @media (prefers-reduced-motion:reduce) { li.next .dot { animation:none; background:#f4a3aa; } }
+</style>
+
+<script>
+  function initSinoptic() {
+    const nav = document.querySelector<HTMLElement>('[data-sinoptic]:not([data-initialized])');
+    if (!nav) return;
+    nav.dataset.initialized = '';
+    const stops = [...nav.querySelectorAll<HTMLElement>('[data-stop]')];
+    const sections = stops.map((s) => document.getElementById(s.dataset.stop!)).filter(Boolean) as HTMLElement[];
+    const next = nav.querySelector('[data-next]')!;
+    const cur = nav.querySelector('[data-cur]')!;
+    const set = (i: number) => {
+      stops.forEach((s, j) => {
+        s.classList.toggle('on', j === i); s.classList.toggle('passed', j < i); s.classList.toggle('next', j === i + 1);
+        const a = s.querySelector('a')!;
+        if (j === i) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current');
+      });
+      cur.textContent = stops[i].querySelector('.nm')?.textContent ?? '';
+      next.textContent = stops[i + 1]?.querySelector('.nm')?.textContent ?? 'Final de trajecte';
+    };
+    const update = () => {
+      const y = window.innerHeight * 0.35;
+      let c = 0;
+      sections.forEach((sec, i) => { if (sec.getBoundingClientRect().top <= y) c = i; });
+      if (window.scrollY > 0 && Math.ceil(window.scrollY + window.innerHeight) >= document.documentElement.scrollHeight - 2) c = sections.length - 1;
+      set(c);
+    };
+    addEventListener('scroll', update, { passive: true });
+    update();
+  }
+  initSinoptic();
+  document.addEventListener('astro:page-load', initSinoptic);
+</script>

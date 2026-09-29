@@ -1,0 +1,93 @@
+---
+/* 05 · Projectada. The A3 map, full bleed, pannable and zoomable like a web
+   map. Every station keeps its name at every zoom. */
+import a3 from '../../data/metro/a3.json';
+---
+
+<figure class="m2040" data-m2040>
+  <div class="frame">
+    <svg viewBox="0 0 1920 1357" data-vb role="img" aria-label="Metro de Barcelona around 2040–2050: every line in the official plans and a few of my own, drawn over the coast, the Llobregat and the Besòs.">
+      <rect x="-4000" y="-4000" width="10000" height="10000" fill="#c6dedb" />
+      <use href="#a3-geo" />
+      <g class="lines">{a3.lines.map((l) => <path d={l.d} style={`stroke:${l.color}`} />)}</g>
+      <use href="#a3-ticks" /><use href="#a3-stations" /><use href="#a3-names-bold" />
+      <use href="#a3-names-small" />
+      <text x="76" y="112" class="title">metro de barcelona</text>
+    </svg>
+    <div class="zoom" role="group" aria-label="Zoom">
+      <button type="button" data-z="in" aria-label="Zoom in">+</button>
+      <button type="button" data-z="out" aria-label="Zoom out">−</button>
+      <button type="button" data-z="reset" aria-label="Reset view">⤢</button>
+    </div>
+  </div>
+  <figcaption>Drag to move. Zoom with the buttons, <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + scroll, or two fingers. <a href="/downloads/metro-barcelona-a3-maps.pdf" download>Download the poster (PDF)</a></figcaption>
+</figure>
+
+<style>
+  .m2040 { margin:2rem calc(50% - 50vw) 0; }
+  /* with the section nav down the side, stay inside the content column */
+  @media (min-width:1200px) { .m2040 { margin-inline:0; } .frame { border-radius:12px; } }
+  .frame { position:relative; height:min(88vh, 70vw); min-height:420px; background:#c6dedb; overflow:hidden; touch-action:pan-y; cursor:grab; }
+  .frame:active { cursor:grabbing; }
+  svg { width:100%; height:100%; display:block; }
+  .lines path { fill:none; stroke-width:5; stroke-linejoin:round; }
+  .title { font:700 48px var(--campaign); fill:#222; letter-spacing:-.02em; }
+  .zoom { position:absolute; right:1rem; top:1rem; display:grid; gap:4px; }
+  .zoom button { width:40px; height:40px; border:2px solid #111; background:#faf9f6; font:700 1.2rem var(--campaign); cursor:pointer; }
+  figcaption { max-width:1200px; margin:.6rem auto 0; padding:0 1.5rem; font-size:.8125rem; color:#666; }
+  figcaption a { color:#111; font-weight:700; }
+  kbd { font:inherit; font-size:.75rem; border:1px solid #bbb; border-radius:3px; padding:0 .25rem; }
+</style>
+
+<script>
+  function initMap2040() {
+    document.querySelectorAll<HTMLElement>('[data-m2040]:not([data-initialized])').forEach((fig) => {
+      fig.dataset.initialized = '';
+      const svg = fig.querySelector<SVGSVGElement>('[data-vb]')!;
+      const frame = fig.querySelector<HTMLElement>('.frame')!;
+      const FULL = { x: 0, y: 0, w: 1920, h: 1357 };
+      let vb = { ...FULL };
+      const apply = () => {
+        svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+      };
+      const toSvg = (cx: number, cy: number) => { const p = svg.createSVGPoint(); p.x = cx; p.y = cy; return p.matrixTransform(svg.getScreenCTM()!.inverse()); };
+      const zoom = (k: number, cx?: number, cy?: number) => {
+        const r = frame.getBoundingClientRect();
+        const c = toSvg(cx ?? r.left + r.width / 2, cy ?? r.top + r.height / 2);
+        const w = Math.min(FULL.w * 1.2, Math.max(FULL.w / 8, vb.w / k));
+        const s = w / vb.w;
+        vb = { x: c.x - (c.x - vb.x) * s, y: c.y - (c.y - vb.y) * s, w, h: vb.h * s };
+        apply();
+      };
+      // plain scrolling keeps scrolling the page; Ctrl/⌘ (and trackpad pinch, which arrives as ctrl+wheel) zooms
+      frame.addEventListener('wheel', (e) => { if (!e.ctrlKey && !e.metaKey) return; e.preventDefault(); zoom(e.deltaY < 0 ? 1.15 : 1 / 1.15, e.clientX, e.clientY); }, { passive: false });
+      const ptrs = new Map<number, { x: number; y: number }>();
+      let pinch = 0;
+      frame.addEventListener('pointerdown', (e) => { frame.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY }); });
+      frame.addEventListener('pointermove', (e) => {
+        const prev = ptrs.get(e.pointerId); if (!prev) return;
+        ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        // one finger scrolls the page; the map moves with two fingers or a mouse
+        if (e.pointerType === 'touch' && ptrs.size < 2) return;
+        if (ptrs.size === 2) {
+          const [a, b] = [...ptrs.values()];
+          const d = Math.hypot(a.x - b.x, a.y - b.y);
+          if (pinch) zoom(d / pinch, (a.x + b.x) / 2, (a.y + b.y) / 2);
+          pinch = d; return;
+        }
+        const r = frame.getBoundingClientRect();
+        const scale = vb.w / r.width;
+        vb.x -= (e.clientX - prev.x) * scale; vb.y -= (e.clientY - prev.y) * scale;
+        apply();
+      });
+      const up = (e: PointerEvent) => { ptrs.delete(e.pointerId); pinch = 0; };
+      frame.addEventListener('pointerup', up); frame.addEventListener('pointercancel', up);
+      fig.querySelectorAll<HTMLButtonElement>('[data-z]').forEach((b) => b.addEventListener('click', () => {
+        if (b.dataset.z === 'reset') { vb = { ...FULL }; apply(); } else zoom(b.dataset.z === 'in' ? 1.5 : 1 / 1.5);
+      }));
+      frame.querySelectorAll('button').forEach((b) => b.addEventListener('pointerdown', (e) => e.stopPropagation()));
+    });
+  }
+  initMap2040();
+  document.addEventListener('astro:page-load', initMap2040);
+</script>
