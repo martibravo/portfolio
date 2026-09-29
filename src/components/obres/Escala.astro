@@ -16,7 +16,7 @@ const B = morph.lines.find((l) => l.id === 'L9S')!;
       <path d={morph.bg.sea} fill="#c6dedb" />
       {morph.bg.rivers.map((r) => <path d={r.d} fill="none" stroke="#a9cecb" stroke-width={r.w * 3} stroke-linejoin="round" />)}
     </g>
-    <g class="bg-map" data-bg-map opacity="0"><use href="#a3-geo" /></g>
+    <g class="bg-map" data-bg-map opacity="0"><use href="#a3-geo-notram" /></g>
     <g class="ln">{morph.lines.map((l) => <path d={toD(l.city)} style={`stroke:${l.color}`} data-id={l.id} />)}</g>
   </svg>
   <div class="control">
@@ -32,7 +32,7 @@ const B = morph.lines.find((l) => l.id === 'L9S')!;
   .escala { margin:2rem 0 0; background:#fff; border-radius:12px; padding:1rem; }
   svg { border-radius:8px; }
   svg { display:block; width:100%; height:auto; }
-  .ln path { fill:none; stroke-width:7; stroke-linejoin:round; stroke-linecap:round; }
+  .ln path { fill:none; stroke-width:7; stroke-linejoin:miter; stroke-miterlimit:3; stroke-linecap:round; }
   .control { display:grid; grid-template-columns:auto 1fr auto; gap:1rem; align-items:center; margin-top:.75rem; font-size:.8125rem; }
   .control b { display:block; font-size:.9375rem; }
   input { accent-color:#111; }

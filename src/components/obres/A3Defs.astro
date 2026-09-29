@@ -4,6 +4,7 @@
    they can recolour and animate them. */
 import a3 from '../../data/metro/a3.json';
 const title = (t: string) => t === 'metro de barcelona';
+const TRAM = '#bde0db';
 const bold = a3.labels.filter((l) => (l.b || l.w || (l as { k?: number }).k) && !title(l.t));
 const small = a3.labels.filter((l) => !l.b && !l.w && !title(l.t));
 ---
@@ -12,6 +13,10 @@ const small = a3.labels.filter((l) => !l.b && !l.w && !title(l.t));
   <defs>
     <g id="a3-geo">
       {a3.geo.map((g) => <path d={g.d} fill={g.fill} fill-rule={g.eo ? 'evenodd' : 'nonzero'} />)}
+    </g>
+    <!-- the same geography without the tram network (the pale teal lines), for maps that only compare metro -->
+    <g id="a3-geo-notram">
+      {a3.geo.filter((g) => g.fill !== TRAM).map((g) => <path d={g.d} fill={g.fill} fill-rule={g.eo ? 'evenodd' : 'nonzero'} />)}
     </g>
     <g id="a3-ticks">
       {a3.ticks.map((t) => <path d={t.d} fill={t.c} />)}
