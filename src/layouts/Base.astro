@@ -40,9 +40,6 @@ const imageUrl = image ? new URL(image, Astro.site) : undefined;
   <meta name="twitter:description" content={description} />
   {imageUrl && <meta name="twitter:image" content={imageUrl} />}
   {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
   <div class="site">

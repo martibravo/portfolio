@@ -18,9 +18,9 @@ const riverLabels = [
 <g class="rivers" fill="none" stroke="#a9cecb" stroke-linejoin="round" stroke-linecap="round">
   {geo.rivers.map((r) => <path d={r.d} stroke-width={r.w * 2} />)}
 </g>
-<g class="river-names" fill="#6fa3a0" font-size="22" font-style="italic" font-family="Helvetica Neue, Arial, sans-serif">
+<g class="river-names" fill="#6fa3a0" font-size="22" font-style="italic" style="font-family:var(--campaign)">
   {riverLabels.map((l) => <text transform={`translate(${l.x} ${l.y}) rotate(${l.r})`}>{l.t}</text>)}
 </g>
-<g class="towns" font-family="Helvetica Neue, Arial, sans-serif" font-size="24" fill="#8a877e">
+<g class="towns" style="font-family:var(--campaign)" font-size="24" fill="#8a877e">
   {shown.map((t) => <text x={t.p[0]} y={t.p[1]} text-anchor="middle">{t.name}</text>)}
 </g>

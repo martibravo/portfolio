@@ -6,6 +6,28 @@
 }
 
 /* ─── Variables ──────────────────────────────────────────── */
+/* Nimbus Sans: see public/fonts/nimbus-sans/README.md for source and license */
+@font-face {
+  font-family: 'Nimbus Sans Web';
+  font-weight: 400; font-style: normal; font-display: swap;
+  src: local('Nimbus Sans'), local('NimbusSans-Regular'), url('/fonts/nimbus-sans/NimbusSans-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Nimbus Sans Web';
+  font-weight: 700; font-style: normal; font-display: swap;
+  src: local('Nimbus Sans Bold'), local('NimbusSans-Bold'), url('/fonts/nimbus-sans/NimbusSans-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Nimbus Sans Web';
+  font-weight: 400; font-style: italic; font-display: swap;
+  src: local('Nimbus Sans Italic'), local('NimbusSans-Italic'), url('/fonts/nimbus-sans/NimbusSans-Italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Nimbus Sans Web';
+  font-weight: 700; font-style: italic; font-display: swap;
+  src: local('Nimbus Sans Bold Italic'), local('NimbusSans-BoldItalic'), url('/fonts/nimbus-sans/NimbusSans-BoldItalic.woff2') format('woff2');
+}
+
 :root {
   --col:        640px;
   --bg:         #ffffff;
@@ -17,7 +39,9 @@
 
   --serif:  Georgia, 'Times New Roman', serif;
   --sans:   var(--campaign);
-  --campaign: 'Helvetica Neue', 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Arimo', Arial, sans-serif;
+  /* Helvetica wherever it's installed; everywhere else Nimbus Sans, the URW Helvetica clone we serve
+     ourselves. The web font only downloads when neither Helvetica is on the device. */
+  --campaign: 'Helvetica Neue', Helvetica, 'Nimbus Sans Web', sans-serif;
   --mono:   'Courier New', Courier, monospace;
 }
 
