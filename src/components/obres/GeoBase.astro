@@ -1,0 +1,26 @@
+---
+/* The real ground under the opening and the Caldes return: sea, rivers and
+   towns from OpenStreetMap, projected once (see docs/metro-maps-data.md). */
+import geo from '../../data/metro/geo.json';
+interface Props { towns?: string[] }
+const { towns = [] } = Astro.props;
+const [x0, y0, x1, y1] = geo.bbox;
+const shown = geo.towns.filter((t) => towns.includes(t.name));
+const riverLabels = [
+  { t: 'el Llobregat', x: -560, y: 330, r: 62 },
+  { t: 'el Besòs', x: 300, y: 330, r: -58 },
+  { t: 'Riera de Caldes', x: 104, y: -420, r: 72 },
+];
+---
+
+<rect x={x0 - 2000} y={y0 - 2000} width={x1 - x0 + 4000} height={y1 - y0 + 4000} fill="#faf9f6" />
+<path d={geo.sea} fill="#c6dedb" />
+<g class="rivers" fill="none" stroke="#a9cecb" stroke-linejoin="round" stroke-linecap="round">
+  {geo.rivers.map((r) => <path d={r.d} stroke-width={r.w * 2} />)}
+</g>
+<g class="river-names" fill="#6fa3a0" font-size="22" font-style="italic" font-family="Helvetica Neue, Arial, sans-serif">
+  {riverLabels.map((l) => <text transform={`translate(${l.x} ${l.y}) rotate(${l.r})`}>{l.t}</text>)}
+</g>
+<g class="towns" font-family="Helvetica Neue, Arial, sans-serif" font-size="24" fill="#8a877e">
+  {shown.map((t) => <text x={t.p[0]} y={t.p[1]} text-anchor="middle">{t.name}</text>)}
+</g>

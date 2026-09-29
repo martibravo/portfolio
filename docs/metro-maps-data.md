@@ -10,4 +10,7 @@ The case study at `/graphic-design/metro-map-2040/` redraws Martí's maps as SVG
 | `obres.ts` | The eight L9/L10 editions | From the "Data from your maps" tables: promised years, civil/architecture %, names, each edition's Novetats or map notes (Catalan as printed, English added). |
 | `a3-switches.json` | `a3.json` | The three proposals on the A3 geometry: L2/L5 split at Sagrada Família, L9/L10 through L5 (Collblanc → La Sagrera, offset ±3.2), and the L4 loop / L11 extension from page 3 of the A3 PDF. |
 
+| `geo.json` | OpenStreetMap export (Overpass, September 2026) | Coastline turned into a sea polygon, rivers (Llobregat, Besòs, Ripoll, Riera de Caldes…), current metro routes, towns; projected equirectangular at 41.5° N, 60 units a km. The S2, R3 and the C1/C2/R9 proposal are polylines through real station and town positions, not track geometry. Map data © OpenStreetMap contributors (ODbL). |
+| `morph.json` | `geo.json` + `network.json` | Each current metro line on its real alignment (fitted to the diagram frame) and its 2020 diagram twin, both resampled to 120 points, plus real lengths in km. |
+
 Opening years follow the map legend: “Any de finalització estimat segons PDI 2021-2030”.

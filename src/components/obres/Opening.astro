@@ -3,10 +3,11 @@
    page's only camera move, ~30 km south until Barcelona's network fills the
    screen, trains running on real service hours. */
 import Board from './Board.astro';
-import a3 from '../../data/metro/a3.json';
-import { TOWNS, S2, R3, COLORS, VB_CALDES, VB_BCN } from './valles';
+import GeoBase from './GeoBase.astro';
+import geo from '../../data/metro/geo.json';
+import { STOPS, COLORS, VB_CALDES } from './valles';
 
-const lines = a3.lines;
+const lines = geo.metro;
 const life = [
   { y: '1880', t: 'El Calderí opens' },
   { y: '1932', t: 'Service stops: lorries carry the granite now, and Sagalés runs buses to Barcelona' },
@@ -17,7 +18,11 @@ const life = [
   { y: '1980', t: 'The station building is knocked down, still structurally sound' },
   { y: '1981', t: 'Parc de l’Estació opens, after the town campaigned for it', end: true },
 ];
-const towns = [TOWNS.sabadellPN, TOWNS.mollet, TOWNS.granollers];
+const stations = [
+  { p: STOPS.sabadellPN, name: 'Sabadell Parc del Nord', side: 'l' },
+  { p: STOPS.mollet, name: 'Mollet - Sta. Rosa', side: 'r' },
+  { p: STOPS.granollers, name: 'Granollers - Canovelles', side: 'r' },
+];
 ---
 
 <section id="sense-servei" class="opening">
@@ -44,23 +49,23 @@ const towns = [TOWNS.sabadellPN, TOWNS.mollet, TOWNS.granollers];
 
     <div class="cam-stage">
       <svg viewBox={VB_CALDES.join(' ')} data-cam-svg role="img" aria-label="Map starting on Caldes de Montbui, with the S2 ending at Sabadell and the R3 passing through Mollet and Granollers, and an empty station ring at Caldes. Scrolling moves south until Barcelona’s metro network fills the view.">
-        <rect x="-2000" y="-3000" width="6000" height="6000" fill="#faf9f6" />
-        <use href="#a3-geo" />
-        <g class="lines">{lines.map((l) => <path d={l.d} style={`stroke:${l.color}`} data-line={l.id} />)}</g>
-        <use href="#a3-ticks" /><use href="#a3-stations" /><use href="#a3-names-bold" />
+        <GeoBase towns={['Terrassa', 'Sant Cugat', 'Montcada i Reixac', 'Badalona', 'la Garriga', 'Castellar del Vallès', 'Palau-solità i Plegamans']} />
+        <g class="lines">{lines.map((l) => <path d={l.d} style={`stroke:${l.color}`} data-line={l.line} />)}</g>
         <g class="valles">
-          <path d={S2} style={`stroke:${COLORS.S2}`} />
-          <path d={R3} style={`stroke:${COLORS.R3}`} />
-          <path class="bar" d="M740 -800 H780" style={`stroke:${COLORS.S2}`} />
-          {towns.map((t) => (
-            <g class="town"><circle cx={t.x} cy={t.y} r="9" /><text x={t.side === 'l' ? t.x - 22 : t.x + 22} y={t.y + 9} text-anchor={t.side === 'l' ? 'end' : 'start'}>{t.name}</text></g>
+          <path d={geo.S2} style={`stroke:${COLORS.S2}`} />
+          <path d={geo.R3} style={`stroke:${COLORS.R3}`} />
+          <path class="bar" d={`M${STOPS.sabadellPN[0] - 16} ${STOPS.sabadellPN[1]} h32`} style={`stroke:${COLORS.S2}`} />
+          {stations.map((t) => (
+            <g class="town"><circle cx={t.p[0]} cy={t.p[1]} r="8" /><text x={t.side === 'l' ? t.p[0] - 18 : t.p[0] + 18} y={t.p[1] + 8} text-anchor={t.side === 'l' ? 'end' : 'start'}>{t.name}</text></g>
           ))}
-          <circle class="lonely" cx={TOWNS.caldes.x} cy={TOWNS.caldes.y} r="26" />
-          <text class="caldes" x={TOWNS.caldes.x + 44} y={TOWNS.caldes.y + 14}>Caldes de Montbui</text>
-          <text class="dir" x="1712" y="-1440">R3 → Vic</text>
+          <circle class="lonely" cx={STOPS.caldes[0]} cy={STOPS.caldes[1]} r="20" />
+          <text class="caldes" x={STOPS.caldes[0] + 32} y={STOPS.caldes[1] + 11}>Caldes de Montbui</text>
+          <text class="dir" x={STOPS.granollers[0] + 60} y="-1030">R3 → Vic</text>
+          <text class="dir s2" x="-420" y="-40">S2 → Barcelona</text>
         </g>
         <g class="trains" data-trains></g>
       </svg>
+      <p class="osm">Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors</p>
       <p class="closed" data-closed hidden><span lang="ca">El metro obre a les 05:00.</span></p>
     </div>
   </div>
@@ -78,15 +83,18 @@ const towns = [TOWNS.sabadellPN, TOWNS.mollet, TOWNS.granollers];
   .spacer { height:60vh; }
   .cam-stage { position:sticky; top:4.5rem; height:calc(100vh - 6rem); align-self:start; }
   .cam-stage svg { width:100%; height:100%; display:block; border-radius:16px; }
-  .lines path { fill:none; stroke-width:5; stroke-linejoin:round; }
-  .valles path { fill:none; stroke-width:9; stroke-linejoin:round; }
+  .lines path { fill:none; stroke-width:6; stroke-linejoin:round; stroke-linecap:round; }
+  .valles path { fill:none; stroke-width:7; stroke-linejoin:round; }
   .valles .bar { stroke-width:10; }
   .town circle { fill:#fff; stroke:#111; stroke-width:5; }
-  .town text, .caldes, .dir { font-family:var(--campaign); font-size:30px; font-weight:700; fill:#111; }
-  .dir { font-size:24px; fill:#c8202f; }
-  .caldes { font-size:40px; }
-  .lonely { fill:none; stroke:#111; stroke-width:7; }
+  .town text, .caldes, .dir { font-family:var(--campaign); font-size:24px; font-weight:700; fill:#111; }
+  .dir { font-size:20px; fill:#c8202f; }
+  .dir.s2 { fill:#4f8f1f; }
+  .caldes { font-size:32px; }
+  .lonely { fill:#faf9f6; stroke:#111; stroke-width:6; }
   .trains :global(circle) { stroke:#fff; stroke-width:2.5; }
+  .osm { position:absolute; right:.75rem; bottom:.5rem; margin:0; font-size:.6875rem; color:#777; }
+  .osm a { color:inherit; }
   .closed { position:absolute; left:1rem; bottom:1rem; margin:0; background:#141414; color:#ffb300; font-weight:700; font-size:.8125rem; padding:.3rem .7rem; border-radius:4px; }
   .life { list-style:none; padding:0 0 0 1.6rem; margin:2rem 0 0; position:relative; }
   .life::before { content:''; position:absolute; left:6px; top:.5rem; bottom:.2rem; width:6px; background:#111; border-radius:3px; }
@@ -142,17 +150,17 @@ const towns = [TOWNS.sabadellPN, TOWNS.mollet, TOWNS.granollers];
     const NS = 'http://www.w3.org/2000/svg';
     const trains = [...svg.querySelectorAll<SVGPathElement>('.lines path')].flatMap((path) => {
       const len = path.getTotalLength();
-      const n = Math.max(2, Math.round(len / 420));
+      const n = Math.max(2, Math.round(len / 260));
       return Array.from({ length: n }, (_, i) => {
         const c = document.createElementNS(NS, 'circle');
-        c.setAttribute('r', '7');
+        c.setAttribute('r', '6');
         c.setAttribute('fill', getComputedStyle(path).stroke);
         layer.append(c);
         return { c, path, len, off: (i / n) * len * 2, dir: i % 2 };
       });
     });
     const place = (tm: number) => {
-      const SPEED = 48;   // map units a second: ~1 real minute per second
+      const SPEED = 30;   // 60 units = 1 km: a train at ~30 km/h, one real minute a second
       trains.forEach((t) => {
         let d = open ? (t.off + tm * SPEED) % (t.len * 2) : t.off % (t.len * 2);
         if (d > t.len) d = 2 * t.len - d;      // run back from the terminus

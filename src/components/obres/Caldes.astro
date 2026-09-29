@@ -3,36 +3,50 @@
    brings the train: C1, C2 and the R9 run in and meet at l'Estació. The only
    line on the page that draws itself. */
 import Board from './Board.astro';
-import { TOWNS, S2, R3, C1, C2, R9, COLORS } from './valles';
+import GeoBase from './GeoBase.astro';
+import geo from '../../data/metro/geo.json';
+import { STOPS, COLORS } from './valles';
 
-const shown = [TOWNS.sabadellPN, TOWNS.sabadellPM, TOWNS.castellar, TOWNS.sentmenat, TOWNS.palau, TOWNS.canPerera, TOWNS.mollet, TOWNS.granollers];
+const S = STOPS;
+const shown = [
+  { p: S.sabadellPN, name: 'Sabadell Parc del Nord', side: 'l' },
+  { p: S.sabadellPM, name: 'Sabadell Plaça Major', side: 'l' },
+  { p: S.castellar, name: 'Castellar del Vallès', side: 'l' },
+  { p: S.sentmenat, name: 'Sentmenat', side: 'u' },
+  { p: S.palau, name: 'Palau-solità i Plegamans', side: 'r' },
+  { p: S.canPerera, name: 'Can Perera Industrial', side: 'r' },
+  { p: S.mollet, name: 'Mollet - Sta. Rosa', side: 'r' },
+  { p: S.granollers, name: 'Granollers - Canovelles', side: 'r' },
+];
+const C = { x: S.caldes[0], y: S.caldes[1] };
 ---
 
 <div class="caldes" data-caldes>
   <div class="board-wrap" data-tip="The town archive keeps a 1912 timetable for the train between Caldes and Barcelona. This is the first one in a while.">
     <Board id="board-caldes" rows={[{ a: 'Caldes de Montbui', c: 'Sense servei' }]} small="ficció" />
   </div>
-  <svg viewBox="300 -1480 1720 1200" role="img" aria-label="The Vallès around Caldes de Montbui. After bringing the train, C1 runs from Sabadell through Castellar and Sentmenat, C2 runs down to Mollet, and the R9 comes from Plaça de Catalunya; all three end at Caldes de Montbui, l’Estació." data-scene>
-    <rect x="0" y="-2000" width="2400" height="2400" fill="#faf9f6" />
-    <path class="ln" d={S2} style={`stroke:${COLORS.S2}`} />
-    <path class="ln" d={R3} style={`stroke:${COLORS.R3}`} />
-    <path class="ln new" d={R9} pathLength="1" style={`stroke:${COLORS.R9}`} data-tip="In 1888 La Maquinista built a locomotive for the Barcelona–Sarrià railway, the line the R9 runs on. It was later sold to the Mollet–Caldes line. Known today as the Caldas, it’s the oldest Spanish-built locomotive still in existence, kept at the Catalan railway museum in Vilanova i la Geltrú." />
-    <path class="ln new" d={C1} pathLength="1" style={`stroke:${COLORS.C1}`} />
-    <path class="ln new" d={C2} pathLength="1" style={`stroke:${COLORS.C2}`} />
+  <svg viewBox="-560 -1080 1440 950" role="img" aria-label="The Vallès around Caldes de Montbui. After bringing the train, C1 runs from Sabadell through Castellar and Sentmenat, C2 runs down to Mollet, and the R9 comes from Plaça de Catalunya; all three end at Caldes de Montbui, l’Estació." data-scene>
+    <GeoBase towns={['Terrassa', 'Sant Cugat', 'Montcada i Reixac', 'la Garriga']} />
+    <path class="ln new r9" d={geo.R9} pathLength="1" style={`stroke:${COLORS.R9}`} data-tip="In 1888 La Maquinista built a locomotive for the Barcelona–Sarrià railway, the line the R9 runs on. It was later sold to the Mollet–Caldes line. Known today as the Caldas, it’s the oldest Spanish-built locomotive still in existence, kept at the Catalan railway museum in Vilanova i la Geltrú." />
+    <path class="ln" d={geo.S2} style={`stroke:${COLORS.S2}`} />
+    <path class="ln" d={geo.R3} style={`stroke:${COLORS.R3}`} />
+    <path class="ln new" d={geo.C1} pathLength="1" style={`stroke:${COLORS.C1}`} />
+    <path class="ln new" d={geo.C2} pathLength="1" style={`stroke:${COLORS.C2}`} />
     {shown.map((t) => (
-      <g class="town"><circle cx={t.x} cy={t.y} r="9" /><text x={t.side === 'l' ? t.x - 22 : t.x + 22} y={t.side === 'u' ? t.y - 22 : t.y + 9} text-anchor={t.side === 'l' ? 'end' : t.side === 'u' ? 'middle' : 'start'}>{t.name}</text></g>
+      <g class="town"><circle cx={t.p[0]} cy={t.p[1]} r="8" /><text x={t.side === 'l' ? t.p[0] - 18 : t.side === 'u' ? t.p[0] : t.p[0] + 18} y={t.side === 'u' ? t.p[1] - 18 : t.p[1] + 8} text-anchor={t.side === 'l' ? 'end' : t.side === 'u' ? 'middle' : 'start'}>{t.name}</text></g>
     ))}
-    <circle class="estacio" cx={TOWNS.caldes.x} cy={TOWNS.caldes.y} r="26" data-tip="In the 1940s there were attempts to bring El Calderí back. At one point someone even tried filling the boilers with the town’s thermal water." />
-    <text class="caldes-name" x={TOWNS.caldes.x + 44} y={TOWNS.caldes.y + 4}>Caldes de Montbui</text>
-    <text class="caldes-sub" x={TOWNS.caldes.x + 44} y={TOWNS.caldes.y + 44}>| l’Estació</text>
+    <circle class="estacio" cx={C.x} cy={C.y} r="20" data-tip="In the 1940s there were attempts to bring El Calderí back. At one point someone even tried filling the boilers with the town’s thermal water." />
+    <text class="caldes-name" x={C.x + 32} y={C.y - 2}>Caldes de Montbui</text>
+    <text class="caldes-sub" x={C.x + 32} y={C.y + 28}>| l’Estació</text>
     <g class="pills">
-      <g transform={`translate(${TOWNS.caldes.x + 44} ${TOWNS.caldes.y - 70})`}>
+      <g transform={`translate(${C.x + 32} ${C.y - 70})`}>
         <rect width="64" height="34" rx="17" fill={COLORS.C1} /><text x="32" y="25">C1</text>
         <rect x="72" width="64" height="34" rx="17" fill={COLORS.C2} /><text x="104" y="25">C2</text>
         <rect x="144" width="44" height="34" fill={COLORS.R9} /><text x="166" y="25" class="dk">R9</text>
       </g>
     </g>
   </svg>
+  <p class="osm">Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors. C1, C2 and the R9 to Caldes are my proposal.</p>
   <p class="tip" data-tip-box hidden></p>
   <button type="button" class="bring" data-bring>Porta-hi el tren <span>Bring the train</span></button>
 </div>
@@ -41,13 +55,14 @@ const shown = [TOWNS.sabadellPN, TOWNS.sabadellPM, TOWNS.castellar, TOWNS.sentme
   .caldes { position:relative; margin-top:2rem; }
   .board-wrap { max-width:none; }
   svg { display:block; width:100%; height:auto; margin-top:1rem; border-radius:12px; box-shadow:0 0 0 1px #e3e0d6; }
-  .ln { fill:none; stroke-width:9; stroke-linejoin:round; }
-  .new { stroke-width:12; stroke-dasharray:1; stroke-dashoffset:1; }
+  .ln { fill:none; stroke-width:7; stroke-linejoin:round; }
+  .new { stroke-width:9; stroke-dasharray:1; stroke-dashoffset:1; }
+  .r9 { stroke-width:17; }
   .caldes[data-brought] .new { stroke-dashoffset:0; transition:stroke-dashoffset var(--dur,2.4s) linear; }
   .town circle { fill:#fff; stroke:#111; stroke-width:5; }
-  .town text, .caldes-name, .caldes-sub { font:700 30px var(--campaign); fill:#111; }
-  .caldes-name { font-size:40px; }
-  .caldes-sub { font-size:32px; font-weight:400; }
+  .town text, .caldes-name, .caldes-sub { font:700 22px var(--campaign); fill:#111; }
+  .caldes-name { font-size:30px; }
+  .caldes-sub { font-size:24px; font-weight:400; }
   .estacio { fill:none; stroke:#111; stroke-width:7; transition:fill .01s linear 2.4s; }
   .caldes[data-brought] .estacio { fill:#fff; stroke-width:9; }
   .pills { opacity:0; }
@@ -56,6 +71,8 @@ const shown = [TOWNS.sabadellPN, TOWNS.sabadellPM, TOWNS.castellar, TOWNS.sentme
   .pills text.dk { fill:#111; }
   [data-tip] { cursor:help; }
   .tip { position:absolute; max-width:22rem; margin:0; background:#fff; border:3px solid #111; padding:.55rem .7rem; font-size:.8125rem; line-height:1.4; z-index:5; pointer-events:none; }
+  .osm { margin:.4rem 0 0; font-size:.6875rem; color:#777; }
+  .osm a { color:inherit; }
   .bring { margin-top:1rem; display:inline-flex; flex-direction:column; align-items:flex-start; border:0; background:#111; color:#ffb300; font:700 1.1rem var(--campaign); padding:.7rem 1.2rem; border-radius:6px; cursor:pointer; text-transform:uppercase; letter-spacing:.04em; }
   .bring span { font-size:.6875rem; color:#d9c38a; letter-spacing:.08em; }
   .bring[disabled] { opacity:.5; cursor:default; }
@@ -69,7 +86,7 @@ const shown = [TOWNS.sabadellPN, TOWNS.sabadellPM, TOWNS.castellar, TOWNS.sentme
       const board = root.querySelector<HTMLElement>('[data-board]')!;
       const row = board.querySelector('.row')!;
       const bring = root.querySelector<HTMLButtonElement>('[data-bring]')!;
-      root.querySelectorAll<SVGPathElement>('.new').forEach((p) => p.style.setProperty('--dur', `${(p.getTotalLength() / 700).toFixed(2)}s`));
+      root.querySelectorAll<SVGPathElement>('.new').forEach((p) => p.style.setProperty('--dur', `${(p.getTotalLength() / 500).toFixed(2)}s`));
       const write = (a: string, b: string, c: string) => {
         row.innerHTML = '';
         [['a', a], ['b', b], ['c', c]].forEach(([cls, txt]) => {

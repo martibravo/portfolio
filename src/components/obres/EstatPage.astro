@@ -11,6 +11,7 @@ import Mandri from './Mandri.astro';
 import Switches from './Switches.astro';
 import Map2040 from './Map2040.astro';
 import Caldes from './Caldes.astro';
+import Escala from './Escala.astro';
 import Board from './Board.astro';
 import MetroValles from '../metro/MetroValles.astro';
 
@@ -38,10 +39,8 @@ const rules = [
       <p>Underground, Barcelona is a mess. Lines bend around old foundations, dive under each other, run a kilometre without a stop and then cram three stations into the centre.</p>
       <p>A good metro map throws away almost everything true about the city (distance, direction, the curve of the coast). It keeps the one thing you need on a platform with a train coming: what connects to what.</p>
     </div>
-    <aside class="novetats pending">
-      <h4>Pendent</h4>
-      <p>The slider from <i>La ciutat · The city</i> to <i>El mapa · The map</i> needs the real station positions and tunnel alignments from OpenStreetMap. It goes here once that data is in.</p>
-    </aside>
+    <Escala />
+    <p class="after">The map on the right leaves out most of the city on the left. That’s the job.</p>
   </section>
 
   <section id="obres" class="block">
@@ -161,6 +160,7 @@ const rules = [
   .novetats { border:3px solid #111; background:#fff; max-width:60ch; margin-top:1.5rem; }
   .novetats h4 { margin:0; background:#111; color:#fff; padding:.3rem .7rem; font-size:1rem; }
   .novetats p { margin:0; padding:.7rem; font-size:.875rem; }
+  .after { margin:1rem 0 0; font-weight:700; }
   .hint { font-weight:700; }
   .hint span { font-weight:400; color:#666; margin-left:.4rem; }
   .original-valles { margin-top:3rem; }
