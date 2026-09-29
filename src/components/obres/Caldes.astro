@@ -12,7 +12,7 @@ const shown = [
   { p: S.sabadellPN, name: 'Sabadell Parc del Nord', side: 'l' },
   { p: S.sabadellPM, name: 'Sabadell Plaça Major', side: 'l' },
   { p: S.castellar, name: 'Castellar del Vallès', side: 'l' },
-  { p: S.sentmenat, name: 'Sentmenat', side: 'u' },
+  { p: S.sentmenat, name: 'Sentmenat', side: 'd' },
   { p: S.palau, name: 'Palau-solità i Plegamans', side: 'r' },
   { p: S.canPerera, name: 'Can Perera Industrial', side: 'r' },
   { p: S.mollet, name: 'Mollet - Sta. Rosa', side: 'r' },
@@ -33,7 +33,7 @@ const C = { x: S.caldes[0], y: S.caldes[1] };
     <path class="ln new" d={geo.C1} pathLength="1" style={`stroke:${COLORS.C1}`} />
     <path class="ln new" d={geo.C2} pathLength="1" style={`stroke:${COLORS.C2}`} />
     {shown.map((t) => (
-      <g class="town"><circle cx={t.p[0]} cy={t.p[1]} r="8" /><text x={t.side === 'l' ? t.p[0] - 18 : t.side === 'u' ? t.p[0] : t.p[0] + 18} y={t.side === 'u' ? t.p[1] - 18 : t.p[1] + 8} text-anchor={t.side === 'l' ? 'end' : t.side === 'u' ? 'middle' : 'start'}>{t.name}</text></g>
+      <g class="town"><circle cx={t.p[0]} cy={t.p[1]} r="8" /><text x={t.side === 'l' ? t.p[0] - 18 : t.side === 'u' || t.side === 'd' ? t.p[0] : t.p[0] + 18} y={t.side === 'u' ? t.p[1] - 18 : t.side === 'd' ? t.p[1] + 38 : t.p[1] + 8} text-anchor={t.side === 'l' ? 'end' : t.side === 'u' || t.side === 'd' ? 'middle' : 'start'}>{t.name}</text></g>
     ))}
     <circle class="estacio" cx={C.x} cy={C.y} r="20" data-tip="In the 1940s there were attempts to bring El Calderí back. At one point someone even tried filling the boilers with the town’s thermal water." />
     <text class="caldes-name" x={C.x + 32} y={C.y - 2}>Caldes de Montbui</text>
@@ -46,7 +46,7 @@ const C = { x: S.caldes[0], y: S.caldes[1] };
       </g>
     </g>
   </svg>
-  <p class="osm">Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors. C1, C2 and the R9 to Caldes are my proposal.</p>
+  <p class="osm">Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors. C1, C2 and the R9 to Caldes are my proposal: C1 and the R9 use the S2 and FGC’s planned extension to Castellar, and C2 relays El Calderí’s old trackbed.</p>
   <p class="tip" data-tip-box hidden></p>
   <button type="button" class="bring" data-bring>Porta-hi el tren <span>Bring the train</span></button>
 </div>
