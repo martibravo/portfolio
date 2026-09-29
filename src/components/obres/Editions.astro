@@ -146,6 +146,7 @@ const nameAt = (n: string, i: number) => NAMES[n]?.[i] || n;
 
 <style>
   .eds { margin:2rem 0 0; margin-inline:calc(50% - min(720px, 50vw - 16px)); }
+  @media (min-width:1200px) { .eds { margin-inline:0; } }
   .eds-head { display:flex; flex-wrap:wrap; gap:1rem 1.5rem; align-items:center; }
   .bullets { display:flex; gap:5px; }
   .bullets span { display:grid; place-items:center; width:54px; height:54px; background:var(--c); color:var(--ink,#fff); font-weight:700; font-size:1.5rem; letter-spacing:-.05em; }

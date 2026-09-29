@@ -26,17 +26,15 @@ const stations = [
 ---
 
 <section id="sense-servei" class="opening">
-  <p class="page-title"><span lang="ca">Estat de les obres</span> <span class="tr">State of the works</span></p>
+  <p class="tag">Sense servei <span>Out of service</span></p>
   <Board id="board-open" rows={[{ a: 'Caldes de Montbui', c: 'Sense servei' }]} small="No service · Sin servicio" />
-  <p class="strip">Metro Map 2040 · Case study · 2020–2026 · Cartography, data, code · Used by the <a href="https://www.diaridebarcelona.cat/w/linia9-metro-mai-arriba">Diari de Barcelona</a>, 2024</p>
 
   <div class="cam" data-cam>
     <div class="cam-copy">
       <h2>Caldes de Montbui has been waiting for a train since 1939.</h2>
-      <p>It had one once. El Calderí ran about fifteen kilometres down to Mollet, on and off, from 1880 until Franco’s troops reached the town in January 1939. It never came back.</p>
-      <p>I grew up in a flat on the old station grounds. From my window I could see where the trains used to stop.</p>
-      <p>Growing up queer in a small town, I looked at that missing station a lot. Barcelona was where I could be myself, and there was no train to get there.</p>
-      <p>At 19 I started drawing Barcelona’s metro. It turned out I loved the system as much as the way out. I haven’t stopped.</p>
+      <p>It had one once. El Calderí ran about fifteen kilometres down to Mollet, on and off, from 1880 until January 1939, and never came back.</p>
+      <p>I grew up in a flat on the old station grounds. Barcelona was where I could be myself, and there was no train to get there.</p>
+      <p>So at 19 I started drawing its metro. I liked the system as much as the way out, and I haven’t stopped.</p>
 
       <ol class="life" aria-label="The station’s own line, 1880 to 1981">
         {life.map((s) => (
@@ -74,11 +72,7 @@ const stations = [
 </section>
 
 <style>
-  .opening { padding-top:2rem; }
-  .page-title { margin:0 0 1rem; font-weight:700; font-size:.875rem; }
-  .page-title .tr, .strip { color:#666; font-weight:400; }
-  .strip { font-size:.8125rem; margin:.75rem 0 0; }
-  .strip a { color:inherit; }
+  .opening { padding-top:clamp(4rem,9vw,7rem); scroll-margin-top:4rem; }
   .cam { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.5fr); gap:clamp(1.5rem,4vw,3.5rem); margin-top:clamp(2rem,6vw,4rem); }
   .cam-copy h2 { font-size:clamp(1.9rem,4vw,3rem); line-height:1.05; letter-spacing:-.04em; margin:0 0 1.5rem; font-weight:600; }
   .cam-copy p { margin:0 0 1rem; max-width:42ch; }

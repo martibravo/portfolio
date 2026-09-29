@@ -1,0 +1,100 @@
+---
+/* 00 · Inici. The case study's front door, in the same shape as the other
+   case studies: title, what it is, what's inside. The key visual is the A3
+   map, still, built from the shared defs. */
+import a3 from '../../data/metro/a3.json';
+
+const inside = [
+  { id: 'en-servei', k: 'Maps', d: 'A redrawn network map, eight status maps and a 2040–2050 poster.' },
+  { id: 'escala', k: 'Systems', d: 'Three angles, one stroke, one gap: the rules a metro map runs on.' },
+  { id: 'obres', k: 'Data', d: 'Every percentage and promised date on Line 9, kept since 2022.' },
+  { id: 'i-si', k: 'Proposals', d: 'Small changes to the network, and a train back to Caldes.' },
+  { id: 'normes', k: 'Ideas', d: 'What six years of drawing one system taught me about design.' },
+];
+---
+
+<header class="intro" id="inici">
+  <p class="kicker">Graphic design · Cartography · 2020–2026</p>
+  <h1 lang="ca">Estat de<br />les obres</h1>
+  <p class="translation">State of the works</p>
+  <p class="lead">Six years of drawing Barcelona’s metro: a copy of the official map, a status map for Line 9 that a newspaper picked up, proposals nobody asked for, and a network for 2040.</p>
+  <p class="summary">Every map on this page is rebuilt from its own data and meant to be handled: scrub through the editions, straighten the city, throw the switches.</p>
+  <dl class="metadata">
+    <div><dt>Role</dt><dd>Cartography, information design, data collection</dd></div>
+    <div><dt>Context</dt><dd>Personal project<br />2020–2026 · eight editions</dd></div>
+    <div><dt>Output</dt><dd>Network diagram, status map series<br />A3 poster, proposals</dd></div>
+  </dl>
+  <p class="note">Used by the <a href="https://www.diaridebarcelona.cat/w/linia9-metro-mai-arriba">Diari de Barcelona</a> in 2024. Not affiliated with TMB, FGC or the Generalitat.</p>
+</header>
+
+<figure class="key">
+  <svg viewBox="430 250 1120 630" role="img" aria-label="Detail of the metro de barcelona 2040–2050 map: the city centre, from Sants to La Sagrera.">
+    <rect x="0" y="0" width="1920" height="1357" fill="#c6dedb" />
+    <use href="#a3-geo" />
+    <g class="lines">{a3.lines.map((l) => <path d={l.d} style={`stroke:${l.color}`} />)}</g>
+    <use href="#a3-ticks" /><use href="#a3-stations" /><use href="#a3-names-bold" /><use href="#a3-names-small" />
+  </svg>
+  <figcaption><i>metro de barcelona</i>, 2040–2050. The whole poster is in section 05.</figcaption>
+</figure>
+
+<ol class="inside" aria-label="What’s inside">
+  {inside.map((it, i) => (
+    <li>
+      <a href={`#${it.id}`}>
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          {i === 0 && <><path d="M4 30H44" class="l1" /><path d="M4 20H24L34 30" class="l2" /><circle cx="24" cy="30" r="6" class="ring" /></>}
+          {i === 1 && <><path d="M8 8V40M8 40H40M8 40L36 12" class="grid" /><path d="M6 34H22L34 22" class="l1" /></>}
+          {i === 2 && <><rect x="6" y="10" width="36" height="26" class="bar0" /><rect x="6" y="10" width="24" height="26" class="bar1" /><path d="M6 40H42" class="base" /></>}
+          {i === 3 && <><path d="M6 36H22L34 24H44" class="l1" /><path d="M22 36H44" class="l3" /><circle cx="22" cy="36" r="4" class="pt" /></>}
+          {i === 4 && <><rect x="6" y="12" width="16" height="16" class="bul1" /><rect x="26" y="12" width="16" height="16" class="bul2" /><path d="M6 36H42" class="base" /></>}
+        </svg>
+        <b>{it.k}</b>
+        <span>{it.d}</span>
+      </a>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .intro { max-width:880px; padding:clamp(2.5rem,6vw,5rem) 0 2rem; scroll-margin-top:4rem; }
+  .kicker { margin:0 0 1rem; font-size:.8125rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#666; }
+  h1 { font-family:var(--campaign); font-weight:600; letter-spacing:-.045em; margin:0; font-size:clamp(3.5rem,9vw,7.5rem); line-height:.94; }
+  .translation { margin:.6rem 0 0; color:#666; font-size:1.125rem; }
+  .lead { font-size:clamp(1.25rem,2.5vw,1.65rem); line-height:1.4; max-width:42ch; margin:2rem 0 1rem; }
+  .summary { max-width:65ch; margin:0; }
+  .metadata { display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:1.5rem; border-top:1px solid #e3e0d6; padding-top:1.5rem; margin:2rem 0 1rem; font-size:.875rem; }
+  .metadata div { margin:0; }
+  .metadata dt { color:#666; margin-bottom:.35rem; }
+  .metadata dd { margin:0; }
+  .note { color:#666; font-size:.8125rem; line-height:1.5; margin:0; }
+  .note a { color:inherit; }
+  .key { margin:1rem 0 0; }
+  .key svg { display:block; width:100%; height:auto; border-radius:12px; }
+  .lines path { fill:none; stroke-width:5; stroke-linejoin:round; }
+  .inside { list-style:none; padding:0; margin:2.5rem 0 0; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:1rem; }
+  .inside a { display:grid; gap:.35rem; align-content:start; height:100%; border-top:3px solid #111; padding-top:.75rem; text-decoration:none; color:#111; font-size:.875rem; line-height:1.4; }
+  .inside a:hover b, .inside a:focus-visible b { text-decoration:underline; }
+  .inside b { font-size:1rem; }
+  .inside span { color:#555; }
+  .inside svg { width:48px; height:48px; }
+  .inside path, .inside circle, .inside rect { fill:none; }
+  .l1 { stroke:#e32739; stroke-width:5; }
+  .l2 { stroke:#317bc8; stroke-width:5; stroke-linejoin:round; }
+  .l3 { stroke:#c6c6c6; stroke-width:5; stroke-dasharray:4 3; }
+  .ring { fill:#fff !important; stroke:#111; stroke-width:3.5; }
+  .pt { fill:#111 !important; }
+  .grid { stroke:#317bc8; stroke-width:1.5; opacity:.5; }
+  .bar0 { fill:#ebe8df !important; }
+  .bar1 { fill:#ffe07d !important; }
+  .base { stroke:#111; stroke-width:3; }
+  .bul1 { fill:#ff6600 !important; }
+  .bul2 { fill:#1793f3 !important; }
+  @media (max-width:900px) { .inside { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+  @media (max-width:640px) {
+    .metadata { grid-template-columns:1fr; gap:1rem; }
+    .metadata > div { display:grid; grid-template-columns:5rem 1fr; gap:1rem; }
+    .inside { grid-template-columns:1fr; }
+    .inside a { grid-template-columns:48px 1fr; column-gap:1rem; }
+    .inside svg { grid-row:span 2; }
+  }
+</style>
