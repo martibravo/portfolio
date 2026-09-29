@@ -1,7 +1,7 @@
 ---
-/* 06 · Propera estació. The opening's board and lonely ring again. The reader
-   brings the train: C1, C2 and the R9 run in and meet at l'Estació. The only
-   line on the page that draws itself. */
+/* 06 · Propera estació. The opening's board and lonely ring again. When the
+   map comes into view, C1, C2 and the R9 run in at train speed and meet at
+   l'Estació; the replay button runs them again. */
 import Board from './Board.astro';
 import GeoBase from './GeoBase.astro';
 import geo from '../../data/metro/geo.json';
@@ -25,7 +25,8 @@ const C = { x: S.caldes[0], y: S.caldes[1] };
   <div class="board-wrap" data-tip="The town archive keeps a 1912 timetable for the train between Caldes and Barcelona. This is the first one in a while.">
     <Board id="board-caldes" rows={[{ a: 'Caldes de Montbui', c: 'Sense servei' }]} small="ficció" />
   </div>
-  <svg viewBox="-560 -1080 1440 950" role="img" aria-label="The Vallès around Caldes de Montbui. After bringing the train, C1 runs from Sabadell through Castellar and Sentmenat, C2 runs down to Mollet, and the R9 comes from Plaça de Catalunya; all three end at Caldes de Montbui, l’Estació." data-scene>
+  <div class="scene-wrap">
+  <svg viewBox="-560 -1080 1440 950" role="img" aria-label="The Vallès around Caldes de Montbui. C1 runs from Sabadell through Castellar and Sentmenat, C2 runs down to Mollet, and the R9 comes from Plaça de Catalunya; all three end at Caldes de Montbui, l’Estació." data-scene>
     <GeoBase towns={['Terrassa', 'Sant Cugat', 'Montcada i Reixac', 'la Garriga']} />
     <path class="ln new r9" d={geo.R9} pathLength="1" style={`stroke:${COLORS.R9}`} data-tip="In 1888 La Maquinista built a locomotive for the Barcelona–Sarrià railway, the line the R9 runs on. It was later sold to the Mollet–Caldes line. Known today as the Caldas, it’s the oldest Spanish-built locomotive still in existence, kept at the Catalan railway museum in Vilanova i la Geltrú." />
     <path class="ln" d={geo.S2} style={`stroke:${COLORS.S2}`} />
@@ -46,9 +47,10 @@ const C = { x: S.caldes[0], y: S.caldes[1] };
       </g>
     </g>
   </svg>
+  <button type="button" class="replay" data-replay aria-label="Run the trains again"><span aria-hidden="true">↺</span> <span lang="ca">Torna-hi</span></button>
+  </div>
   <p class="osm">Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors. C1, C2 and the R9 to Caldes are my proposal: C1 and the R9 use the S2 and FGC’s planned extension to Castellar, and C2 relays El Calderí’s old trackbed.</p>
   <p class="tip" data-tip-box hidden></p>
-  <button type="button" class="bring" data-bring>Porta-hi el tren <span>Bring the train</span></button>
 </div>
 
 <style>
@@ -73,9 +75,10 @@ const C = { x: S.caldes[0], y: S.caldes[1] };
   .tip { position:absolute; max-width:22rem; margin:0; background:#fff; border:3px solid #111; padding:.55rem .7rem; font-size:.8125rem; line-height:1.4; z-index:5; pointer-events:none; }
   .osm { margin:.4rem 0 0; font-size:.6875rem; color:#666; }
   .osm a { color:inherit; }
-  .bring { margin-top:1rem; display:inline-flex; flex-direction:column; align-items:flex-start; border:0; background:#111; color:#ffb300; font:700 1.1rem var(--campaign); padding:.7rem 1.2rem; border-radius:6px; cursor:pointer; text-transform:uppercase; letter-spacing:.04em; }
-  .bring span { font-size:.6875rem; color:#d9c38a; letter-spacing:.08em; }
-  .bring[disabled] { opacity:.5; cursor:default; }
+  .scene-wrap { position:relative; }
+  .replay { position:absolute; right:.75rem; top:.75rem; border:2px solid #111; background:#faf9f6; font:700 .8125rem var(--campaign); padding:.3rem .75rem; border-radius:999px; cursor:pointer; }
+  .replay:hover, .replay:focus-visible { background:#111; color:#faf9f6; }
+  .caldes.resetting :global(*) { transition:none !important; }
   @media (prefers-reduced-motion:reduce) { .caldes[data-brought] .new, .estacio, .caldes[data-brought] .pills { transition:none; } }
 </style>
 
@@ -85,7 +88,8 @@ const C = { x: S.caldes[0], y: S.caldes[1] };
       root.dataset.initialized = '';
       const board = root.querySelector<HTMLElement>('[data-board]')!;
       const row = board.querySelector('.row')!;
-      const bring = root.querySelector<HTMLButtonElement>('[data-bring]')!;
+      const replay = root.querySelector<HTMLButtonElement>('[data-replay]')!;
+      const scene = root.querySelector<SVGSVGElement>('[data-scene]')!;
       // every line runs at the same speed; Caldes lights up when the last one (the R9) gets in
       let arrive = 0;
       root.querySelectorAll<SVGPathElement>('.new').forEach((p) => { const d = p.getTotalLength() / 500; arrive = Math.max(arrive, d); p.style.setProperty('--dur', `${d.toFixed(2)}s`); });
@@ -97,7 +101,7 @@ const C = { x: S.caldes[0], y: S.caldes[1] };
         const next: Record<string, string> = { a, b, c };
         Object.entries(next).forEach(([cls, txt]) => {
           const s = document.createElement('span'); s.className = cls;
-          [...txt].forEach((ch, i) => { const f = document.createElement('span'); if (prev[cls]?.[i] !== ch) f.className = 'fl'; else f.style.display = 'inline-block'; f.textContent = ch; s.append(f); });
+          [...txt].forEach((ch, i) => { const f = document.createElement('span'); if (prev[cls]?.[i] !== ch) f.className = 'fl'; else f.style.cssText = 'display:inline-block;white-space:pre'; f.textContent = ch; s.append(f); });
           row.append(s);
         });
         prev = next;
@@ -110,11 +114,21 @@ const C = { x: S.caldes[0], y: S.caldes[1] };
         if (txt !== last) write('Caldes de Montbui', 'R9 Pl. Catalunya', txt);
         left = left > 0 ? left - 1 : 240;
       };
-      bring.addEventListener('click', () => {
+      // the trains leave when the map is on screen; the board starts counting when they arrive
+      let wait = 0, every = 0;
+      const run = () => {
         root.dataset.brought = '';
-        bring.disabled = true;
-        setTimeout(() => { tick(); setInterval(tick, 1000); }, arrive * 1000);
-      });
+        wait = window.setTimeout(() => { tick(); every = window.setInterval(tick, 1000); }, arrive * 1000);
+      };
+      const reset = () => {
+        clearTimeout(wait); clearInterval(every);
+        root.classList.add('resetting'); delete root.dataset.brought;
+        left = 240; prev = {}; write('Caldes de Montbui', '', 'Sense servei');
+        void root.offsetWidth; root.classList.remove('resetting');
+      };
+      let started = false;
+      new IntersectionObserver(([e]) => { if (e.isIntersecting && !started) { started = true; run(); } }, { threshold: 0.5 }).observe(scene);
+      replay.addEventListener('click', () => { started = true; reset(); requestAnimationFrame(() => requestAnimationFrame(run)); });
       // hidden details for the people who hover
       const box = root.querySelector<HTMLElement>('[data-tip-box]')!;
       // reachable by mouse, tap and keyboard alike

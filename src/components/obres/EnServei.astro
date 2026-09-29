@@ -6,38 +6,69 @@ import network from '../../data/metro/network.json';
 import { LINES } from '../metro/lines';
 
 const W = 2414, H = 1196;
+// the map without the original's legend panel (rebuilt in HTML beside it) and its footer strip
+const VW = 1921, VH = 1100;
 const pts = (d: string) => [...d.matchAll(/(-?\d+\.?\d*) (-?\d+\.?\d*)/g)].map((m) => [Number(m[1]), Number(m[2])]);
 const old = network.lines.map((l) => ({ id: l.id, color: l.color, pieces: l.pieces.filter((p) => !p.new).map((p) => p.d) }));
 
 // Find a few real bends to annotate: horizontal or vertical into 45°.
-const bends: { x: number; y: number; a0: number; a1: number }[] = [];
+const bends: { x: number; y: number; a0: number; a1: number; deg: number }[] = [];
 for (const l of old) {
   for (const d of l.pieces) {
     const p = pts(d);
-    for (let i = 1; i < p.length - 1 && bends.length < 5; i++) {
+    for (let i = 1; i < p.length - 1 && bends.length < 7; i++) {
       const a0 = Math.atan2(p[i][1] - p[i - 1][1], p[i][0] - p[i - 1][0]);
       const a1 = Math.atan2(p[i + 1][1] - p[i][1], p[i + 1][0] - p[i][0]);
       const seg = Math.hypot(p[i + 1][0] - p[i][0], p[i + 1][1] - p[i][1]);
       const turn = Math.abs(((a1 - a0 + 3 * Math.PI) % (2 * Math.PI)) - Math.PI);
-      if (seg > 60 && Math.abs(turn - Math.PI / 4) < 0.05 && !bends.some((b) => Math.hypot(b.x - p[i][0], b.y - p[i][1]) < 400)) {
-        bends.push({ x: p[i][0], y: p[i][1], a0, a1 });
+      const deg = Math.abs(turn - Math.PI / 4) < 0.05 ? 45 : Math.abs(turn - Math.PI / 2) < 0.05 ? 90 : 0;
+      const room = !bends.some((b) => Math.hypot(b.x - p[i][0], b.y - p[i][1]) < 380);
+      if (seg > 60 && deg && room && p[i][0] < VW - 60 && bends.filter((b) => b.deg === deg).length < 3) {
+        bends.push({ x: p[i][0], y: p[i][1], a0, a1, deg });
       }
     }
   }
 }
+// 90° turns: the traced corners are slightly rounded, so pair up the long straights either side
+for (const l of old) {
+  for (const d of l.pieces) {
+    const p = pts(d);
+    const long = p.slice(0, -1).map((q, i) => ({ i, a: Math.atan2(p[i + 1][1] - q[1], p[i + 1][0] - q[0]), len: Math.hypot(p[i + 1][0] - q[0], p[i + 1][1] - q[1]) })).filter((s) => s.len > 45);
+    for (let k = 0; k < long.length - 1; k++) {
+      const A = long[k], B = long[k + 1];
+      let gap = 0; for (let m = A.i + 1; m < B.i; m++) gap += Math.hypot(p[m + 1][0] - p[m][0], p[m + 1][1] - p[m][1]);
+      const turn = Math.abs(((B.a - A.a + 3 * Math.PI) % (2 * Math.PI)) - Math.PI);
+      if (gap > 70 || Math.abs(turn - Math.PI / 2) > 0.1) continue;
+      // where the two straights meet
+      const [x1, y1] = p[A.i], [x3, y3] = p[B.i];
+      const d1 = [Math.cos(A.a), Math.sin(A.a)], d2 = [Math.cos(B.a), Math.sin(B.a)];
+      const den = d1[0] * d2[1] - d1[1] * d2[0];
+      const t = ((x3 - x1) * d2[1] - (y3 - y1) * d2[0]) / den;
+      const x = x1 + d1[0] * t, y = y1 + d1[1] * t;
+      if (x < VW - 60 && bends.filter((b) => b.deg === 90).length < 3 && !bends.some((b) => Math.hypot(b.x - x, b.y - y) < 380)) bends.push({ x, y, a0: A.a, a1: B.a, deg: 90 });
+    }
+  }
+}
+// the wedge between straight-on and the new heading: the turn itself
 const arc = (b: (typeof bends)[number], r = 34) => {
   const s = [b.x + r * Math.cos(b.a0), b.y + r * Math.sin(b.a0)];
   const e = [b.x + r * Math.cos(b.a1), b.y + r * Math.sin(b.a1)];
-  return `M${b.x} ${b.y} L${s[0].toFixed(1)} ${s[1].toFixed(1)} A${r} ${r} 0 0 1 ${e[0].toFixed(1)} ${e[1].toFixed(1)} Z`;
+  const sweep = Math.sin(b.a1 - b.a0) > 0 ? 1 : 0;
+  return `M${b.x} ${b.y} L${s[0].toFixed(1)} ${s[1].toFixed(1)} A${r} ${r} 0 0 ${sweep} ${e[0].toFixed(1)} ${e[1].toFixed(1)} Z`;
 };
-const rules = [
-  'Lines run at 0°, 45° or 90°. Nothing else.',
-  'Every line is 8 px wide. Parallel lines sit 8.5 px apart, centre to centre: they touch, round the corners too.',
-  'A station tick points at its label.',
-  'A ring is one station. A capsule is a walk between two.',
-  'A terminus is a bar across the line, with the name in the line’s colour.',
-  'Labels never cross a line.',
+// the original's legend panel, as printed
+const PANEL = [
+  { group: 'TMB', lines: [
+    ['L1', 'Badalona Pompeu Fabra', 'El Prat de Llobregat'], ['L2', 'Badalona Pompeu Fabra', 'Parc Logístic / Aeroport T1'],
+    ['L3', 'Trinitat Vella', 'Sant Feliu de Llobregat'], ['L4', 'La Sagrera', 'Trinitat Nova'], ['L5', 'Vall d’Hebron', 'Cornellà Centre'],
+    ['L9', 'Can Zam', 'Aeroport T1'], ['L10', 'Gorg', 'Pratenc'], ['L11', 'Trinitat Nova', 'Can Cuiàs'],
+  ] },
+  { group: 'FGC', lines: [
+    ['L6', 'Plaça Catalunya', 'Sarrià'], ['L7', 'Plaça Catalunya', 'Avinguda Tibidabo'],
+    ['L8', 'Molí Nou - Ciutat Cooperativa', 'Parc del Besòs'], ['L12', 'Sarrià', 'Finestrelles - Sant Joan de Déu'],
+  ] },
 ];
+const INKOF = Object.fromEntries(LINES.map((l) => [l.id, l]));
 ---
 
 <section id="en-servei" class="block">
@@ -45,17 +76,18 @@ const rules = [
   <h2>First, I copied.</h2>
   <div class="copy">
     <p>Before I had opinions about the network, I wanted its handwriting. I redrew the official map until mine and theirs were hard to tell apart, down to the legend panel and the footer in three languages.</p>
-    <p>Three angles: 0°, 45°, 90°. A tick points at its station’s name. A capsule means you’ll be walking down a corridor. Twelve colours, and not one more.</p>
+    <p>Lines run horizontal, vertical or at 45°, and every turn is 45° or 90°. A tick points at its station’s name, a ring is an interchange, a capsule means a walk down a corridor. Twelve colours, and not one more.</p>
     <p>It’s the least original work on this page. Everything else stands on it.</p>
   </div>
 
   <figure class="xray" data-xray>
     <div class="xray-bar">
-      <button type="button" data-all aria-pressed="false">Show the rules</button>
+      <button type="button" data-all aria-pressed="false">Show the grid</button>
       <span class="hint">Move the loupe over the map.</span>
       <a class="orig" href="/images/graphic-design/metro/network-2020.webp" target="_blank" rel="noopener">See the original ↗</a>
     </div>
-    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Barcelona metro network as it ran in 2020, redrawn in the style of the official TMB map. The loupe reveals the construction: grid, centrelines, stroke widths and bend angles." data-xray-svg>
+    <div class="xray-body">
+    <svg viewBox={`0 0 ${VW} ${VH}`} role="img" aria-label="Barcelona metro network as it ran in 2020, redrawn in the style of the official TMB map. The loupe reveals the construction: grid, centrelines, stroke widths and bend angles." data-xray-svg>
       <defs>
         <pattern id="xr-grid" width="40" height="40" patternUnits="userSpaceOnUse">
           <path d="M0 0H40M0 0V40M0 40L40 0M0 0L40 40" stroke="#317bc8" stroke-width=".7" opacity=".35" fill="none" />
@@ -65,7 +97,7 @@ const rules = [
           <circle data-loupe cx="-500" cy="-500" r="190" fill="#fff" />
         </mask>
       </defs>
-      <image href="/images/graphic-design/metro/network-2020.webp" width={W} height={H} />
+      <image href="/images/graphic-design/metro/network-2020.webp" width={W} height={H} preserveAspectRatio="none" />
       <g class="focus-layer">
         <rect width={W} height={H} fill="#faf9f6" opacity=".82" />
         {old.map((l) => <g data-fline={l.id}>{l.pieces.map((d) => <path d={d} style={`stroke:${l.color}`} />)}</g>)}
@@ -74,20 +106,27 @@ const rules = [
         <rect width={W} height={H} fill="#fbfaf5" />
         <rect width={W} height={H} fill="url(#xr-grid)" />
         {old.map((l) => l.pieces.map((d) => <><path class="hull" d={d} /><path class="cl" d={d} /></>))}
-        {bends.map((b) => <><path class="arc" d={arc(b)} /><g class="dim"><rect x={b.x + 30} y={b.y - 44} width="58" height="30" /><text x={b.x + 59} y={b.y - 22}>45°</text></g></>)}
-        <g class="dim"><path class="dl" d="M598 500 L626 528" /><rect x="636" y="500" width="150" height="30" /><text x="711" y="522">8.5 px · touch</text></g>
+        {bends.map((b) => <><path class="arc" d={arc(b)} /><g class="dim"><rect x={b.x + 30} y={b.y - 44} width="58" height="30" /><text x={b.x + 59} y={b.y - 22}>{b.deg}°</text></g></>)}
       </g>
       <circle class="lens" data-lens cx="-500" cy="-500" r="190" />
     </svg>
-    <ul class="legend" aria-label="Lines: hover one to isolate it">
-      {LINES.map((l) => <li><button type="button" data-line={l.id} style={`--c:${l.color};--ink:${l.ink}`}>{l.id}</button></li>)}
-    </ul>
+    <aside class="panel" aria-label="Línies del Metro: hover or focus a line to pick it out on the map" lang="ca">
+      <h3>Línies del Metro</h3>
+      {PANEL.map((g) => (
+        <>
+          <p class="grp">{g.group}</p>
+          <ul>
+            {g.lines.map(([id, a, b]) => (
+              <li><button type="button" data-line={id} style={`--c:${INKOF[id].color};--ink:${INKOF[id].ink}`}><span class="bul">{id}</span><span class="ends">{a}<br />{b}</span></button></li>
+            ))}
+          </ul>
+        </>
+      ))}
+    </aside>
+    </div>
     <figcaption>The network as it ran in 2020, redrawn after the official map.</figcaption>
   </figure>
 
-  <ol class="rules" aria-label="Rules the loupe shows">
-    {rules.map((r, i) => <li><b>{i + 1}</b>{r}</li>)}
-  </ol>
 
 </section>
 
@@ -98,7 +137,7 @@ const rules = [
   .xray-bar button[aria-pressed="true"] { background:#111; color:#faf9f6; }
   .hint { font-size:.8125rem; color:#666; }
   .orig { margin-left:auto; font-size:.8125rem; font-weight:700; color:#111; }
-  svg { display:block; width:100%; height:auto; background:#fff; border-radius:12px; cursor:crosshair; touch-action:pan-y; }
+  svg { display:block; width:100%; height:auto; background:#fff; cursor:crosshair; touch-action:pan-y; }
   .focus-layer { display:none; }
   .xray[data-focus] .focus-layer { display:inline; }
   .focus-layer path { fill:none; stroke-width:8; stroke-linejoin:round; }
@@ -108,14 +147,18 @@ const rules = [
   .arc { fill:#e3273930; stroke:#e32739; stroke-width:2; }
   .dim rect { fill:#111; }
   .dim text { fill:#fff; font:700 18px var(--campaign); text-anchor:middle; }
-  .dl { stroke:#e32739; stroke-width:3; }
   .lens { fill:none; stroke:#111; stroke-width:5; pointer-events:none; }
   .xray[data-rules] .lens { display:none; }
-  .legend { list-style:none; display:flex; flex-wrap:wrap; gap:4px; padding:0; margin:.75rem 0 0; }
-  .legend button { min-width:2.7rem; height:2rem; border:0; background:var(--c); color:var(--ink); font:700 .9375rem var(--campaign); letter-spacing:-.03em; border-radius:2px; cursor:pointer; }
-  .rules { list-style:none; padding:0; margin:2rem 0 0; display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.6rem 1.5rem; font-size:.875rem; }
-  .rules li { display:flex; gap:.6rem; }
-  .rules b { flex:none; display:inline-grid; place-items:center; width:1.4rem; height:1.4rem; background:#111; color:#fff; font-size:.75rem; }
+  .xray-body { display:grid; grid-template-columns:minmax(0,1fr) 15.5rem; background:#fff; border-radius:12px; overflow:hidden; }
+  .xray-body svg { height:100%; align-self:center; }
+  .panel { background:#f0f0f0; padding:.9rem .85rem .8rem; font-family:var(--campaign); }
+  .panel h3 { margin:0 0 .5rem; font-size:1.15rem; letter-spacing:-.02em; font-weight:700; }
+  .grp { margin:.55rem 0 .3rem; padding-bottom:.2rem; border-bottom:3px solid #888; font-weight:700; font-size:.95rem; }
+  .panel ul { list-style:none; margin:0; padding:0; display:grid; gap:.1rem; }
+  .panel button { display:grid; grid-template-columns:1.8rem 1fr; gap:.5rem; align-items:center; width:100%; padding:.1rem; border:0; background:none; text-align:left; font:600 .6875rem/1.2 var(--campaign); color:#111; cursor:pointer; border-radius:3px; }
+  .panel button:hover, .panel button:focus-visible, .panel button[aria-pressed="true"] { background:#fff; }
+  .bul { display:grid; place-items:center; width:1.8rem; height:1.8rem; background:var(--c); color:var(--ink); font-weight:700; font-size:.9rem; letter-spacing:-.04em; }
+  @media (max-width:820px) { .xray-body { grid-template-columns:1fr; } .panel ul { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 </style>
 
 <script>
@@ -146,7 +189,7 @@ const rules = [
         };
         const off = () => { delete fig.dataset.focus; };
         b.addEventListener('mouseenter', on); b.addEventListener('focus', on); b.addEventListener('click', on);
-        b.addEventListener('mouseleave', off); b.addEventListener('blur', off);
+        b.addEventListener('mouseleave', () => { if (document.activeElement !== b) off(); }); b.addEventListener('blur', off);
       });
     });
   }
