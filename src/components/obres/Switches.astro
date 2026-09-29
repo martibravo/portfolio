@@ -17,7 +17,8 @@ const cards = [
 
 <div class="switches" data-switches>
   <div class="map">
-    <svg viewBox="360 230 1300 880" role="img" aria-label="A ghosted Barcelona network with three sets of points: Sagrada Família, the middle of Line 9, and L4 and L11.">
+    <svg viewBox="300 150 2150 1210" preserveAspectRatio="xMinYMid meet" role="img" aria-label="A ghosted Barcelona network with three sets of points: Sagrada Família, the middle of Line 9, and L4 and L11.">
+      <rect x="0" y="0" width="2600" height="1500" fill="#faf9f6" />
       <use href="#a3-geo" />
       <g class="ghost">{ghost.map((l) => <path d={l.d} style={`stroke:${l.color}`} />)}</g>
       <!-- switch 3: L4 / L11 -->
@@ -52,8 +53,9 @@ const cards = [
 </div>
 
 <style>
-  .switches { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:1.5rem; margin-top:2rem; align-items:start; }
-  .map { position:sticky; top:4.5rem; background:#faf9f6; border-radius:12px; overflow:hidden; box-shadow:0 0 0 1px #e3e0d6; }
+  /* the map takes the whole width; the proposals sit over its right-hand side */
+  .switches { position:relative; margin-top:2rem; }
+  .map { background:#faf9f6; border-radius:12px; overflow:hidden; box-shadow:0 0 0 1px #e3e0d6; }
   svg { display:block; width:100%; height:auto; }
   path { fill:none; stroke-width:5; stroke-linejoin:round; }
   .ghost path { opacity:.16; }
@@ -66,8 +68,8 @@ const cards = [
   [data-s3] .plan path { opacity:0; transition-delay:0s; }
   .points circle { fill:#111; }
   .points text { fill:#fff; font:700 24px var(--campaign); }
-  .cards { list-style:none; margin:0; padding:0; display:grid; gap:1rem; }
-  .card { background:#fff; border:2px solid #111; padding:.9rem 1rem; }
+  .cards { list-style:none; margin:0; padding:0; display:grid; gap:.75rem; align-content:start; position:absolute; top:1rem; right:1rem; bottom:1rem; width:min(24rem,30%); overflow:auto; }
+  .card { background:#fff; border:2px solid #111; padding:.8rem .9rem; box-shadow:0 2px 0 #111; }
   .card-head { display:flex; align-items:center; gap:.6rem; }
   .num { display:inline-grid; place-items:center; width:1.6rem; height:1.6rem; border-radius:50%; background:#111; color:#fff; font-weight:700; font-size:.8125rem; }
   h3 { margin:0; font-size:1.125rem; letter-spacing:-.02em; flex:1; }
@@ -76,11 +78,15 @@ const cards = [
   .rod { position:absolute; left:50%; bottom:14px; width:6px; height:30px; margin-left:-3px; background:#111; border-radius:3px; transform-origin:bottom center; transform:rotate(-32deg); transition:transform .25s steps(3,end); }
   .rod::before { content:''; position:absolute; top:-7px; left:-5px; width:16px; height:16px; border-radius:50%; background:#e32739; }
   .lever[aria-pressed="true"] .rod { transform:rotate(32deg); }
-  dl { margin:.7rem 0 0; display:grid; gap:.5rem; font-size:.875rem; line-height:1.4; }
+  dl { margin:.6rem 0 0; display:grid; gap:.4rem; font-size:.8125rem; line-height:1.4; }
   dt { font-weight:700; font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:#666; }
   dd { margin:0; }
   dd small { color:#666; }
-  @media (max-width:860px) { .switches { grid-template-columns:1fr; } .map { position:sticky; top:3rem; z-index:2; } }
+  @media (max-width:860px) {
+    .cards { position:static; width:auto; margin-top:1rem; overflow:visible; }
+    .map { position:sticky; top:2.4rem; z-index:2; }
+    .map svg { aspect-ratio:1300/880; }
+  }
   @media (prefers-reduced-motion:reduce) { .ring path, .via path, .paint path, .rod { transition:none; } }
 </style>
 
