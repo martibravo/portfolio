@@ -110,7 +110,7 @@ const rules = [
   .dim text { fill:#fff; font:700 18px var(--campaign); text-anchor:middle; }
   .dl { stroke:#e32739; stroke-width:3; }
   .lens { fill:none; stroke:#111; stroke-width:5; pointer-events:none; }
-  .xray[data-all] .lens { display:none; }
+  .xray[data-rules] .lens { display:none; }
   .legend { list-style:none; display:flex; flex-wrap:wrap; gap:4px; padding:0; margin:.75rem 0 0; }
   .legend button { min-width:2.7rem; height:2rem; border:0; background:var(--c); color:var(--ink); font:700 .9375rem var(--campaign); letter-spacing:-.03em; border-radius:2px; cursor:pointer; }
   .rules { list-style:none; padding:0; margin:2rem 0 0; display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.6rem 1.5rem; font-size:.875rem; }
@@ -126,7 +126,7 @@ const rules = [
       const loupe = svg.querySelector<SVGCircleElement>('[data-loupe]')!;
       const lens = svg.querySelector<SVGCircleElement>('[data-lens]')!;
       const move = (ev: PointerEvent) => {
-        if (fig.dataset.all !== undefined) return;
+        if (fig.dataset.rules !== undefined) return;
         const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
         const p = pt.matrixTransform(svg.getScreenCTM()!.inverse());
         [loupe, lens].forEach((c) => { c.setAttribute('cx', String(p.x)); c.setAttribute('cy', String(p.y)); });
@@ -135,8 +135,8 @@ const rules = [
       svg.addEventListener('pointerdown', move);
       const all = fig.querySelector<HTMLButtonElement>('[data-all]')!;
       all.addEventListener('click', () => {
-        const on = fig.dataset.all === undefined;
-        if (on) { fig.dataset.all = ''; loupe.setAttribute('r', '4000'); } else { delete fig.dataset.all; loupe.setAttribute('r', '190'); }
+        const on = fig.dataset.rules === undefined;
+        if (on) { fig.dataset.rules = ''; loupe.setAttribute('r', '4000'); } else { delete fig.dataset.rules; loupe.setAttribute('r', '190'); }
         all.setAttribute('aria-pressed', String(on));
       });
       fig.querySelectorAll<HTMLButtonElement>('[data-line]').forEach((b) => {

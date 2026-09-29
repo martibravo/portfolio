@@ -1,6 +1,6 @@
 ---
-/* Block 15: "Metro del Vallès, Zona de la Riera de Caldes", redrawn as SVG
-   from the proposal artwork. Lines draw in, then the line badges pop. */
+/* "Metro del Vallès, Zona de la Riera de Caldes", redrawn as SVG from the
+   proposal artwork. Shown still: the original map, as drawn. */
 const C = { R9: '#ffc20e', C1: '#3e70c1', S2: '#7cbf3a', C2: '#d62fb0', R3: '#c8202f' };
 const lines = [
   { id: 'R3', d: 'M1612 -20 V490 Q1612 505 1601 516 L1135 982 Q1122 995 1122 1013 V1200' },
@@ -38,7 +38,7 @@ const legend = [
 ];
 ---
 
-<figure class="valles" data-reveal>
+<figure class="valles">
   <div class="art">
     <svg viewBox="0 0 2000 1186" role="img" aria-label="Metro del Vallès proposal around the Riera de Caldes: C1 from Sabadell Plaça Major to Caldes de Montbui via Castellar del Vallès and Sentmenat, C2 from Caldes de Montbui to Mollet - Santa Rosa via Palau-solità i Plegamans and Can Perera Industrial, with R9 and S2 to Barcelona and the R3 Rodalies line.">
       <g class="hdr"><text x="60" y="80" class="fgc">FGC</text><text x="300" y="62" class="k">METRO DEL VALLÈS</text><text x="300" y="104" class="t">Zona de la Riera de Caldes</text></g>
@@ -77,12 +77,6 @@ const legend = [
   .pill text { font-size:30px; font-weight:700; fill:#fff; }
   .pill text.dark { fill:#111; }
   .pill { transform-box:fill-box; transform-origin:center; }
-  [data-armed] .ln { stroke-dashoffset:1; transition:stroke-dashoffset 1.6s cubic-bezier(.5,0,.2,1) calc(var(--i) * .2s); }
-  [data-armed] .pill { transform:scale(0); transition:transform .45s cubic-bezier(.3,1.7,.5,1) calc(1.4s + var(--i) * .1s); }
-  [data-armed] .lbl, [data-armed] .tick, [data-armed] .cap, [data-armed] .ring { opacity:0; transition:opacity .5s 1.2s; }
-  [data-inview] .ln { stroke-dashoffset:0; }
-  [data-inview] .pill { transform:none; }
-  [data-inview] .lbl, [data-inview] .tick, [data-inview] .cap, [data-inview] .ring { opacity:1; }
   .note { grid-column:1/-1; margin:0; }
   .legend { list-style:none; padding:0; margin:0; display:grid; gap:.5rem; font-size:.875rem; }
   .legend li { display:flex; gap:.6rem; align-items:center; }

@@ -34,7 +34,7 @@ const inside = [
     <g class="lines">{a3.lines.map((l) => <path d={l.d} style={`stroke:${l.color}`} />)}</g>
     <use href="#a3-ticks" /><use href="#a3-stations" /><use href="#a3-names-bold" /><use href="#a3-names-small" />
   </svg>
-  <figcaption><i>metro de barcelona</i>, 2040–2050. The whole poster is in section 05.</figcaption>
+  <figcaption><i>metro de barcelona</i>, 2040–2050. The whole poster is further down, at <a href="#projectada">2040</a>.</figcaption>
 </figure>
 
 <ol class="inside" aria-label="What’s inside">
@@ -69,6 +69,7 @@ const inside = [
   .note { color:#666; font-size:.8125rem; line-height:1.5; margin:0; }
   .note a { color:inherit; }
   .key { margin:1rem 0 0; }
+  .key figcaption a { color:inherit; }
   .key svg { display:block; width:100%; height:auto; border-radius:12px; }
   .lines path { fill:none; stroke-width:5; stroke-linejoin:round; }
   .inside { list-style:none; padding:0; margin:2.5rem 0 0; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:1rem; }

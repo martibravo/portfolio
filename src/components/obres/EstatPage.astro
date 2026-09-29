@@ -18,7 +18,7 @@ const DIARI = 'https://www.diaridebarcelona.cat/w/linia9-metro-mai-arriba';
 const rules = [
   { n: 1, t: 'Learn the handwriting first.', d: 'I copied the official map before I changed a single line. Every project starts the same way for me: finding out how the thing already works, and why.' },
   { n: 2, t: 'Leave things out on purpose.', d: 'A metro map is mostly what’s missing. Most of my design work is deciding what the person in front of it doesn’t need to see yet.' },
-  { n: 3, t: 'Keep the map true after launch.', d: 'Eight editions, including fourteen months in which nothing happened. I’m the one still maintaining the thing a year after it ships.' },
+  { n: 3, t: 'Keep the map true after launch.', d: 'Eight editions, including a year with the boring machine parked at Mandri. I’m the one still maintaining the thing a year after it ships.' },
   { n: 4, t: 'Make public things readable.', d: 'When the official progress reports on Line 9 stopped, my map kept going, and a newspaper ended up using it. Turning public information into something people can actually check is the work I want to do more of.' },
 ];
 ---
@@ -34,18 +34,18 @@ const rules = [
   <EnServei />
 
   <section id="escala" class="block">
-    <p class="tag">No és a escala <span>Not to scale</span></p>
+    <p class="tag" lang="ca">No és a escala <span lang="en">Not to scale</span></p>
     <h2>Then I learned to lie properly.</h2>
     <div class="copy">
       <p>Underground, Barcelona is a mess. Lines bend around old foundations, dive under each other, run a kilometre without a stop and then cram three stations into the centre.</p>
       <p>A good metro map throws away almost everything true about the city (distance, direction, the curve of the coast). It keeps the one thing you need on a platform with a train coming: what connects to what.</p>
     </div>
     <Escala />
-    <p class="after">The map on the right leaves out most of the city on the left. That’s the job.</p>
+    <p class="after">The map leaves out most of the city. That’s the job.</p>
   </section>
 
   <section id="obres" class="block">
-    <p class="tag">En construcció <span>Under construction</span></p>
+    <p class="tag" lang="ca">En construcció <span lang="en">Under construction</span></p>
     <h2>Then I started keeping score.</h2>
     <div class="split">
       <div class="copy">
@@ -66,7 +66,7 @@ const rules = [
   </section>
 
   <section id="i-si" class="block">
-    <p class="tag">I si…? <span>What if?</span></p>
+    <p class="tag" lang="ca">I si…? <span lang="en">What if?</span></p>
     <h2>Then I started arguing with it.</h2>
     <div class="copy">
       <p>Once you can draw a network, you start seeing its seams: the branch that went the wrong way, the transfer that’s really a walk down a corridor. These are proposals nobody asked me for.</p>
@@ -77,7 +77,7 @@ const rules = [
   </section>
 
   <section id="projectada" class="block">
-    <p class="tag">Projectada <span>Planned</span></p>
+    <p class="tag" lang="ca">Projectada <span lang="en">Planned</span></p>
     <h2>Then I drew the one that doesn’t exist yet.</h2>
     <div class="copy">
       <p>This is Barcelona’s metro as I think it will look around 2040–2050: everything in the official plans, plus a few moves of my own.</p>
@@ -87,7 +87,7 @@ const rules = [
   </section>
 
   <section id="propera" class="block">
-    <p class="tag">Propera estació <span>Next stop</span></p>
+    <p class="tag" lang="ca">Propera estació <span lang="en">Next stop</span></p>
     <h2>So I drew Caldes a train.</h2>
     <div class="copy">
       <p>Metro del Vallès, Zona de la Riera de Caldes. Two new lines: C1 from Sabadell through Castellar and Sentmenat, and C2 down to Mollet, more or less where El Calderí used to run. And the R9, all the way from Plaça de Catalunya.</p>
@@ -99,7 +99,7 @@ const rules = [
   </section>
 
   <section id="normes" class="block">
-    <p class="tag">Normes d’ús <span>Rules of use</span></p>
+    <p class="tag" lang="ca">Normes d’ús <span lang="en">Rules of use</span></p>
     <h2>What six years of this taught me</h2>
     <ol class="normes">
       {rules.map((r) => (
@@ -114,11 +114,10 @@ const rules = [
         </li>
       ))}
     </ol>
-    <p class="colours">Every colour on this page is a line colour.</p>
   </section>
 
   <section id="sortides" class="block">
-    <p class="tag">Properes sortides <span>Next departures</span></p>
+    <p class="tag" lang="ca">Properes sortides <span lang="en">Next departures</span></p>
     <nav class="departures" aria-label="Next departures">
       <div class="dep-head"><span>Destinació</span><span>Via</span><span>Sortida</span></div>
       <a href="/about/"><span>Contacte</span><span>about</span><span>ara</span></a>
@@ -145,15 +144,11 @@ const rules = [
   .obres :global(.copy p) { margin:0 0 1rem; }
   .obres :global(.block) { padding:clamp(4rem,9vw,7rem) 0 0; scroll-margin-top:4rem; }
   .obres :global(figcaption) { font-size:.8125rem; color:#666; margin-top:.5rem; }
-  .sub { font-size:clamp(1.5rem,3vw,2.2rem); letter-spacing:-.04em; margin:4.5rem 0 1rem; font-weight:600; }
   .split { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); gap:2rem; align-items:start; }
   .press { display:block; border:3px solid #111; background:#fff; padding:.8rem 1rem; text-decoration:none; color:#111; }
   .press span { display:block; font-size:.8125rem; color:#555; }
   .press .press-tag { color:#111; font-weight:700; text-transform:uppercase; font-size:.6875rem; letter-spacing:.06em; margin-bottom:.4rem; }
   .press b { display:block; font-size:1.25rem; line-height:1.15; letter-spacing:-.02em; margin-bottom:.4rem; }
-  .novetats { border:3px solid #111; background:#fff; max-width:60ch; margin-top:1.5rem; }
-  .novetats h4 { margin:0; background:#111; color:#fff; padding:.3rem .7rem; font-size:1rem; }
-  .novetats p { margin:0; padding:.7rem; font-size:.875rem; }
   .after { margin:1rem 0 0; font-weight:700; }
   .hint { font-weight:700; }
   .hint span { font-weight:400; color:#666; margin-left:.4rem; }
@@ -172,7 +167,6 @@ const rules = [
   .normes .st { stroke:#e32739; stroke-width:4; }
   .normes .bd { fill:#141414; }
   .normes .bl { stroke:#ffb300; stroke-width:5; }
-  .colours { margin:2rem 0 0; font-size:.75rem; color:#666; }
   .departures { background:#141414; color:#ffb300; border-radius:6px; padding:.8rem 1.1rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
   .departures > * { display:grid; grid-template-columns:1.4fr 1fr 6rem; gap:1rem; padding:.45rem 0; }
   .dep-head { color:#b98a1c; font-size:.6875rem; letter-spacing:.08em; }

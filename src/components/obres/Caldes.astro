@@ -63,15 +63,15 @@ const C = { x: S.caldes[0], y: S.caldes[1] };
   .town text, .caldes-name, .caldes-sub { font:700 22px var(--campaign); fill:#111; }
   .caldes-name { font-size:30px; }
   .caldes-sub { font-size:24px; font-weight:400; }
-  .estacio { fill:none; stroke:#111; stroke-width:7; transition:fill .01s linear 2.4s; }
+  .estacio { fill:none; stroke:#111; stroke-width:7; transition:fill .01s linear var(--arrive,2.4s); }
   .caldes[data-brought] .estacio { fill:#fff; stroke-width:9; }
   .pills { opacity:0; }
-  .caldes[data-brought] .pills { opacity:1; transition:opacity .01s linear 2.4s; }
+  .caldes[data-brought] .pills { opacity:1; transition:opacity .01s linear var(--arrive,2.4s); }
   .pills text { font:700 22px var(--campaign); fill:#fff; text-anchor:middle; }
   .pills text.dk { fill:#111; }
   [data-tip] { cursor:help; }
   .tip { position:absolute; max-width:22rem; margin:0; background:#fff; border:3px solid #111; padding:.55rem .7rem; font-size:.8125rem; line-height:1.4; z-index:5; pointer-events:none; }
-  .osm { margin:.4rem 0 0; font-size:.6875rem; color:#777; }
+  .osm { margin:.4rem 0 0; font-size:.6875rem; color:#666; }
   .osm a { color:inherit; }
   .bring { margin-top:1rem; display:inline-flex; flex-direction:column; align-items:flex-start; border:0; background:#111; color:#ffb300; font:700 1.1rem var(--campaign); padding:.7rem 1.2rem; border-radius:6px; cursor:pointer; text-transform:uppercase; letter-spacing:.04em; }
   .bring span { font-size:.6875rem; color:#d9c38a; letter-spacing:.08em; }
@@ -86,14 +86,21 @@ const C = { x: S.caldes[0], y: S.caldes[1] };
       const board = root.querySelector<HTMLElement>('[data-board]')!;
       const row = board.querySelector('.row')!;
       const bring = root.querySelector<HTMLButtonElement>('[data-bring]')!;
-      root.querySelectorAll<SVGPathElement>('.new').forEach((p) => p.style.setProperty('--dur', `${(p.getTotalLength() / 500).toFixed(2)}s`));
+      // every line runs at the same speed; Caldes lights up when the last one (the R9) gets in
+      let arrive = 0;
+      root.querySelectorAll<SVGPathElement>('.new').forEach((p) => { const d = p.getTotalLength() / 500; arrive = Math.max(arrive, d); p.style.setProperty('--dur', `${d.toFixed(2)}s`); });
+      root.style.setProperty('--arrive', `${arrive.toFixed(2)}s`);
+      // a split-flap board: only the characters that change flip
+      let prev: Record<string, string> = {};
       const write = (a: string, b: string, c: string) => {
         row.innerHTML = '';
-        [['a', a], ['b', b], ['c', c]].forEach(([cls, txt]) => {
+        const next: Record<string, string> = { a, b, c };
+        Object.entries(next).forEach(([cls, txt]) => {
           const s = document.createElement('span'); s.className = cls;
-          [...txt].forEach((ch) => { const f = document.createElement('span'); f.className = 'fl'; f.textContent = ch; s.append(f); });
+          [...txt].forEach((ch, i) => { const f = document.createElement('span'); if (prev[cls]?.[i] !== ch) f.className = 'fl'; else f.style.display = 'inline-block'; f.textContent = ch; s.append(f); });
           row.append(s);
         });
+        prev = next;
       };
       let left = 240;
       const tick = () => {
@@ -106,18 +113,24 @@ const C = { x: S.caldes[0], y: S.caldes[1] };
       bring.addEventListener('click', () => {
         root.dataset.brought = '';
         bring.disabled = true;
-        setTimeout(() => { tick(); setInterval(tick, 1000); }, 2400);
+        setTimeout(() => { tick(); setInterval(tick, 1000); }, arrive * 1000);
       });
       // hidden details for the people who hover
       const box = root.querySelector<HTMLElement>('[data-tip-box]')!;
-      root.querySelectorAll<Element>('[data-tip]').forEach((el) => {
-        el.addEventListener('pointerenter', (e) => {
-          box.textContent = el.getAttribute('data-tip'); box.hidden = false;
-          const r = root.getBoundingClientRect(); const pe = e as PointerEvent;
-          box.style.left = `${Math.min(pe.clientX - r.left + 12, r.width - 360)}px`;
-          box.style.top = `${pe.clientY - r.top + 12}px`;
-        });
+      // reachable by mouse, tap and keyboard alike
+      const showTip = (el: Element, x: number, y: number) => {
+        box.textContent = el.getAttribute('data-tip'); box.hidden = false;
+        const r = root.getBoundingClientRect();
+        box.style.left = `${Math.max(0, Math.min(x - r.left + 12, r.width - 360))}px`;
+        box.style.top = `${y - r.top + 12}px`;
+      };
+      root.querySelectorAll<HTMLElement | SVGElement>('[data-tip]').forEach((el) => {
+        el.setAttribute('tabindex', '0');
+        if (el instanceof SVGElement) { el.setAttribute('role', 'note'); el.setAttribute('aria-label', el.getAttribute('data-tip')!); }
+        el.addEventListener('pointerenter', (e) => showTip(el, (e as PointerEvent).clientX, (e as PointerEvent).clientY));
+        el.addEventListener('focus', () => { const b = el.getBoundingClientRect(); showTip(el, b.left + b.width / 2, b.top + b.height / 2); });
         el.addEventListener('pointerleave', () => { box.hidden = true; });
+        el.addEventListener('blur', () => { box.hidden = true; });
       });
     });
   }

@@ -24,8 +24,8 @@ const B = morph.lines.find((l) => l.id === 'L9S')!;
     <input type="range" min="0" max="1000" value="0" aria-label="From the real city to the map" data-t />
     <span lang="ca"><b>El mapa</b> The map</span>
   </div>
-  <p class="readout" aria-live="polite">On this map, a kilometre of <b style={`color:${A.color}`}>L7</b> looks <b data-ratio>1.0</b>× as long as a kilometre of <b style={`color:${B.color}`}>L9 Sud</b>.</p>
-  <figcaption>Left: the lines on their real alignment, turned to sit like the map (map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors). Right: the same lines on my <i>metro de barcelona</i> map. Every station slides to its own place. Drag to straighten the city.</figcaption>
+  <p class="readout">On this map, a kilometre of <b style={`color:${A.color}`}>L7</b> looks <b data-ratio>1.0</b>× as long as a kilometre of <b style={`color:${B.color}`}>L9 Sud</b>.</p>
+  <figcaption>At one end, the lines on their real alignment, turned to sit like the map (map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors). At the other, the same lines on my <i>metro de barcelona</i> map. Every station slides to its own place. Drag to straighten the city.</figcaption>
 </figure>
 
 <style>
@@ -63,6 +63,8 @@ const B = morph.lines.find((l) => l.id === 'L9S')!;
         out.textContent = r.toFixed(1);
       };
       input.addEventListener('input', update);
+      // announce the ratio once the reader lets go, not on every step
+      input.addEventListener('change', () => input.setAttribute('aria-valuetext', `${Math.round(Number(input.value) / 10)}% of the way to the map; a kilometre of L7 looks ${out.textContent} times as long as one of L9 Sud`));
       update();
     });
   }

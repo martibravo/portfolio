@@ -5,7 +5,7 @@ interface Props { rows: { a: string; b?: string; c?: string }[]; id?: string; sm
 const { rows, id, small } = Astro.props;
 ---
 
-<div class="board" data-board id={id}>
+<div class="board" data-board id={id} lang="ca">
   {rows.map((r) => (
     <p class="row"><span class="a">{r.a}</span>{r.b && <span class="b">{r.b}</span>}{r.c && <span class="c">{r.c}</span>}</p>
   ))}

@@ -115,14 +115,14 @@ const nameAt = (n: string, i: number) => NAMES[n]?.[i] || n;
     <img class="orig" data-orig-img alt="" width="1920" height="1080" loading="lazy" />
     <aside class="margin" data-note hidden></aside>
     <section class="novetats">
-      <h4 data-box-title>{e0.box.title}</h4>
+      <h4 data-box-title lang="ca">{e0.box.title}</h4>
       <ul data-box>{e0.box.items.map((it) => <li><span lang="ca">{it.ca}</span><small>{it.en}</small></li>)}</ul>
     </section>
   </div>
 
   <div class="track" data-track role="slider" tabindex="0" aria-label="Edition" aria-valuemin="1" aria-valuemax={EDITIONS.length} aria-valuenow="1" aria-valuetext={e0.label}>
     <div class="rail"></div>
-    {EDITIONS.map((e, i) => <button type="button" class="stop" tabindex="-1" style={`--p:${(i / (EDITIONS.length - 1)) * 100}%`} data-go={i}><span>{e.label}</span></button>)}
+    {EDITIONS.map((e, i) => <button type="button" class="stop" tabindex="-1" aria-hidden="true" style={`--p:${(i / (EDITIONS.length - 1)) * 100}%`} data-go={i}><span>{e.label}</span></button>)}
     <span class="train" data-train aria-hidden="true"><i></i></span>
   </div>
   <p class="drag"><b>Eight editions of the same tunnel.</b> Drag the train.</p>
@@ -209,13 +209,13 @@ const nameAt = (n: string, i: number) => NAMES[n]?.[i] || n;
 
   .body { display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr); gap:1.25rem; margin-top:1rem; align-items:start; }
   .left { min-width:0; }
-  .novetats { position:absolute; left:.75rem; bottom:.75rem; width:min(46%,26rem); border:3px solid #111; background:#fff; }
-  .eds[data-whole] .novetats { position:static; width:auto; border-width:3px 0 0; }
-  .eds[data-whole] .novetats ul { max-height:none; columns:2; column-gap:1.5rem; }
-  @media (max-width:640px) { .eds[data-whole] .novetats ul { columns:1; } }
+  /* under the map, so it never covers the stations it talks about */
+  .novetats { position:static; width:auto; border-top:3px solid #111; background:#fff; }
+  .novetats ul { max-height:none; columns:2; column-gap:1.5rem; }
+  @media (max-width:640px) { .novetats ul { columns:1; } }
   .eds[data-whole] .margin { right:auto; left:.75rem; }
   .novetats h4 { margin:0; background:#111; color:#fff; font:700 .875rem var(--campaign); padding:.25rem .6rem; }
-  .novetats ul { margin:0; padding:.45rem .6rem .5rem 1.4rem; font-size:.75rem; line-height:1.3; max-height:13.5rem; overflow:auto; }
+  .novetats ul { margin:0; padding:.45rem .6rem .5rem 1.4rem; font-size:.75rem; line-height:1.3; }
   .novetats :global(li) { margin-bottom:.3rem; }
   .novetats :global(small) { display:block; color:#666; font-size:.6875rem; }
   .stations { list-style:none; margin:0; padding:0; border-top:3px solid #111; }
@@ -228,11 +228,12 @@ const nameAt = (n: string, i: number) => NAMES[n]?.[i] || n;
   .pc .red { color:#e32739; }
   .yr :global(.y) { position:relative; display:inline-block; background:#111; color:#fff; font-weight:700; font-size:.6875rem; padding:0 .3rem; font-variant-numeric:tabular-nums; }
   .yr :global(.y.old) { background:#fff; color:#111; box-shadow:inset 0 0 0 1.5px #111; }
-  .yr :global(.y.old)::after { content:''; position:absolute; left:-2px; right:-2px; top:50%; height:2px; background:#e32739; transform-origin:left; animation:strike .35s linear both; }
+  .yr :global(.y.old)::after { content:''; position:absolute; left:-2px; right:-2px; top:50%; height:2px; background:#e32739; transform-origin:left; }
+  .yr :global(.y.old.fresh)::after { animation:strike .35s linear both; }
   @keyframes strike { from { transform:scaleX(0); } }
   .card.off { opacity:.35; }
   .card.off .nm { text-decoration:line-through; }
-  @media (max-width:980px) { .body { grid-template-columns:1fr; } .novetats { position:static; width:auto; margin-top:.75rem; } .novetats ul { max-height:none; } }
+  @media (max-width:980px) { .body { grid-template-columns:1fr; } }
   @media (prefers-reduced-motion:reduce) { .bored, .tbm, .bar i, .train { transition:none; } .yr :global(.y.old)::after { animation:none; } }
 </style>
 
@@ -311,7 +312,10 @@ const nameAt = (n: string, i: number) => NAMES[n]?.[i] || n;
           D.years[n].slice(0, i + 1).forEach((y) => { if (y && y !== seen[seen.length - 1]) seen.push(y); });
           const box = card.querySelector('[data-years]')!;
           box.innerHTML = '';
-          seen.forEach((y, k) => { const s = document.createElement('span'); s.className = k < seen.length - 1 ? 'y old' : 'y'; s.textContent = y; box.append(s); });
+          // only a year that slipped at this very edition gets its strike drawn; older ones are already struck
+          const before = new Set<string>(); let last = '';
+          D.years[n].slice(0, i).forEach((y) => { if (y && y !== last) { if (last) before.add(last); last = y; } });
+          seen.forEach((y, k) => { const s = document.createElement('span'); const old = k < seen.length - 1; s.className = old ? (before.has(y) ? 'y old' : 'y old fresh') : 'y'; s.textContent = y; box.append(s); });
         });
       };
 
@@ -324,7 +328,8 @@ const nameAt = (n: string, i: number) => NAMES[n]?.[i] || n;
       track.addEventListener('keydown', (ev) => {
         if (ev.key === 'ArrowRight' || ev.key === 'ArrowUp') { show(Math.min(N - 1, cur + 1)); ev.preventDefault(); }
         if (ev.key === 'ArrowLeft' || ev.key === 'ArrowDown') { show(Math.max(0, cur - 1)); ev.preventDefault(); }
-        if (ev.key === 'Home') show(0); if (ev.key === 'End') show(N - 1);
+        if (ev.key === 'Home') { show(0); ev.preventDefault(); }
+        if (ev.key === 'End') { show(N - 1); ev.preventDefault(); }
       });
       // original exports
       const btn = $<HTMLButtonElement>('[data-orig]'); const img = $<HTMLImageElement>('[data-orig-img]');
