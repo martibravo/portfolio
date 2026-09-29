@@ -21,7 +21,7 @@ const life = [
 const stations = [
   { p: STOPS.sabadellPN, name: 'Sabadell Parc del Nord', side: 'l' },
   { p: STOPS.mollet, name: 'Mollet - Sta. Rosa', side: 'r' },
-  { p: STOPS.granollers, name: 'Granollers - Canovelles', side: 'r' },
+  { p: STOPS.granollers, name: 'Granollers - Canovelles', side: 'l' },
 ];
 ---
 
@@ -50,7 +50,9 @@ const stations = [
     <div class="cam-stage">
       <svg viewBox={VB_CALDES.join(' ')} data-cam-svg role="img" aria-label="Map starting on Caldes de Montbui, with the S2 ending at Sabadell and the R3 passing through Mollet and Granollers, and an empty station ring at Caldes. Scrolling moves south until Barcelona’s metro network fills the view.">
         <GeoBase towns={['Terrassa', 'Sant Cugat', 'Montcada i Reixac', 'Badalona', 'la Garriga', 'Castellar del Vallès', 'Palau-solità i Plegamans']} />
+        <g class="future">{geo.future.map((f) => <path d={f.d} style={`stroke:${f.color}`} />)}</g>
         <g class="lines">{lines.map((l) => <path d={l.d} style={`stroke:${l.color}`} data-line={l.line} />)}</g>
+        <g class="future-st">{geo.futureStations.map((p) => <circle cx={p[0]} cy={p[1]} r="5" />)}</g>
         <g class="valles">
           <path d={geo.S2} style={`stroke:${COLORS.S2}`} />
           <path d={geo.R3} style={`stroke:${COLORS.R3}`} />
@@ -65,7 +67,7 @@ const stations = [
         </g>
         <g class="trains" data-trains></g>
       </svg>
-      <p class="osm">Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors</p>
+      <p class="osm"><span class="dash" aria-hidden="true"></span> Under construction or planned · Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors</p>
       <p class="closed" data-closed hidden><span lang="ca">El metro obre a les 05:00.</span></p>
     </div>
   </div>
@@ -84,6 +86,9 @@ const stations = [
   .cam-stage { position:sticky; top:4.5rem; height:calc(100vh - 6rem); align-self:start; }
   .cam-stage svg { width:100%; height:100%; display:block; border-radius:16px; }
   .lines path { fill:none; stroke-width:6; stroke-linejoin:round; stroke-linecap:round; }
+  .future path { fill:none; stroke-width:6; stroke-dasharray:12 9; stroke-linejoin:round; }
+  .future-st circle { fill:#fff; stroke:#111; stroke-width:2.5; }
+  .dash { display:inline-block; width:22px; height:0; border-top:3px dashed #777; vertical-align:middle; margin-right:.2rem; }
   .valles path { fill:none; stroke-width:7; stroke-linejoin:round; }
   .valles .bar { stroke-width:10; }
   .town circle { fill:#fff; stroke:#111; stroke-width:5; }
